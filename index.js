@@ -69,9 +69,7 @@ function updateSpecFromPackage(packageInfo) {
 }
 
 function init(predefinedSpec) {
-    predefinedSpec = predefinedSpec || {};
     spec = {info: {}, paths: {}, schemes: []};
-
     app._router.stack.forEach(router => {
         const stack = router.handle.stack;
         if (!stack) {
@@ -118,7 +116,7 @@ function init(predefinedSpec) {
     });
 
     updateSpecFromPackage(packageInfo);
-    spec = sortObject(_.merge(spec, predefinedSpec));
+    spec = sortObject(_.merge(spec, predefinedSpec || {}));
     app.use('/api-spec', (req, res) => {
         res.setHeader('Content-Type', 'application/json');
         res.send(JSON.stringify(spec, null, 2));
@@ -304,17 +302,28 @@ module.exports = {
                 if (methodAndPathKey) {
                     const method = methodAndPathKey.method;
                     processResponse(res, method);
-                    updateSchemes(req);
-                    processPath(req, method, methodAndPathKey.pathKey);
-                    processHeaders(req, method);
-                    processBody(req, method);
-                    processQuery(req, method);
                 }
             } catch (err) {}
             return next();
         });
 
-        // make sure we list routers after they are configured
-        setTimeout(() => init(predefinedSpec), 1000);
+        // make sure we list routes after they are configured
+        setTimeout(() => {
+            app.use((req, res, next) => {
+                try {
+                    const methodAndPathKey = getMethod(req);
+                    if (methodAndPathKey) {
+                        const method = methodAndPathKey.method;
+                        updateSchemes(req);
+                        processPath(req, method, methodAndPathKey.pathKey);
+                        processHeaders(req, method);
+                        processBody(req, method);
+                        processQuery(req, method);
+                    }
+                } catch (err) {}
+                return next();
+            });
+            init(predefinedSpec);
+        }, 1000);
     }
 };
