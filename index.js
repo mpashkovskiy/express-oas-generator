@@ -90,7 +90,7 @@ function init(predefinedSpec) {
     if (packageInfo.license) {
         spec.info.license = {name: packageInfo.license};
     }
-    spec.info.description += '[Specification JSON](/api-spec)';
+    spec.info.description = '[Specification JSON](/api-spec)';
     if (packageInfo.description) {
         spec.info.description = '\n\n' + packageInfo.description;
     }
