@@ -32,9 +32,45 @@ function getType(obj) {
     return 'integer';
 }
 
+function fillExamples(schema, vals) {
+    for (let prop in schema.properties) {
+        if (schema.properties[prop].type === 'object') {
+            fillExamples(schema.properties[prop], vals[prop]);
+        } else {
+            schema.properties[prop].example = (prop === 'password') ? '******' : vals[prop];
+        }
+    }
+}
+
+function getSchema(json) {
+    const schema = generateSchema.json(json);
+    delete schema['$schema'];
+    fillExamples(schema, json);
+    return schema;
+}
+
+
+
+
+function updateSpecFromPackage(packageInfo) {
+    if (packageInfo.name) {
+        spec.info.title = packageInfo.name;
+    }
+    if (packageInfo.version) {
+        spec.info.version = packageInfo.version;
+    }
+    if (packageInfo.license) {
+        spec.info.license = {name: packageInfo.license};
+    }
+    spec.info.description = '[Specification JSON](/api-spec)';
+    if (packageInfo.description) {
+        spec.info.description = '\n\n' + packageInfo.description;
+    }
+}
+
 function init(predefinedSpec) {
     predefinedSpec = predefinedSpec || {};
-    spec = {info: {}, paths: {}, schemes: [], securityDefinitions: {}};
+    spec = {info: {}, paths: {}, schemes: []};
 
     app._router.stack.forEach(router => {
         const stack = router.handle.stack;
@@ -55,15 +91,15 @@ function init(predefinedSpec) {
                     params.push(paramName);
                 });
             }
+
             spec.paths[path] = {};
             let methods = Object.keys(route.route.methods).filter(m => route.route.methods[m] === true && !m.startsWith('_'));
             methods.forEach(m => {
                 m = m.toLowerCase();
                 spec.paths[path][m] = {
-                    consumes: [],
+                    consumes: ['application/json'],
                     produces: [],
                     responses: {},
-                    security: [],
                     parameters: params.map(p => {
                         return {
                             'name': p,
@@ -81,19 +117,7 @@ function init(predefinedSpec) {
         })
     });
 
-    if (packageInfo.name) {
-        spec.info.title = packageInfo.name;
-    }
-    if (packageInfo.version) {
-        spec.info.version = packageInfo.version;
-    }
-    if (packageInfo.license) {
-        spec.info.license = {name: packageInfo.license};
-    }
-    spec.info.description = '[Specification JSON](/api-spec)';
-    if (packageInfo.description) {
-        spec.info.description = '\n\n' + packageInfo.description;
-    }
+    updateSpecFromPackage(packageInfo);
     spec = sortObject(_.merge(spec, predefinedSpec));
     app.use('/api-spec', (req, res) => {
         res.setHeader('Content-Type', 'application/json');
@@ -151,10 +175,6 @@ function processPath(req, method, pathKey) {
 }
 
 function processHeaders(req, method) {
-    const contentType = req.headers['content-type'].split(';')[0];
-    if (method.consumes.indexOf(contentType) === -1) {
-        method.consumes.push(contentType);
-    }
     Object
         .keys(req.headers)
         .filter(h => h === 'authorization' || h.startsWith('x-'))
@@ -163,35 +183,20 @@ function processHeaders(req, method) {
                 method.responses[401] = {description: 'Unauthorized'};
             }
 
+            method.security = method.security || [];
             if (method.security.map(s => Object.keys(s)[0]).indexOf(h) === -1) {
                 let obj = {};
                 obj[h] = []
                 method.security.push(obj);
             }
 
+            spec.securityDefinitions = spec.securityDefinitions || {};
             spec.securityDefinitions[h] = {
                 'name': h,
                 'in': 'header',
                 'type': 'apiKey'
             }
         });
-}
-
-function fillExamples(schema, vals) {
-    for (let prop in schema.properties) {
-        if (schema.properties[prop].type === 'object') {
-            fillExamples(schema.properties[prop], vals[prop]);
-        } else {
-            schema.properties[prop].example = (prop === 'password') ? '******' : vals[prop];
-        }
-    }
-}
-
-function getSchema(body) {
-    const schema = generateSchema.json(body);
-    delete schema['$schema'];
-    fillExamples(schema, body);
-    return schema;
 }
 
 function processBody(req, method) {
@@ -237,9 +242,9 @@ function processQuery(req, method) {
 }
 
 function processResponse(res, method) {
-    var oldWrite = res.write;
-    var oldEnd = res.end;
-    var chunks = [];
+    const oldWrite = res.write;
+    const oldEnd = res.end;
+    let chunks = [];
 
     res.write = function (chunk) {
         if (!method.responses[this.statusCode]) {
@@ -292,34 +297,24 @@ module.exports = {
     init: (aApp, predefinedSpec) => {
         app = aApp;
 
-        // middleware to handle responses
+        // middleware to handle responses/requests
         app.use((req, res, next) => {
             try {
                 const methodAndPathKey = getMethod(req);
                 if (methodAndPathKey) {
-                    processResponse(res, methodAndPathKey.method);
+                    const method = methodAndPathKey.method;
+                    processResponse(res, method);
+                    updateSchemes(req);
+                    processPath(req, method, methodAndPathKey.pathKey);
+                    processHeaders(req, method);
+                    processBody(req, method);
+                    processQuery(req, method);
                 }
             } catch (err) {}
             return next();
         });
 
-        setTimeout(() => {
-            // middleware to handle requests
-            app.use((req, res, next) => {
-                try {
-                    const methodAndPathKey = getMethod(req);
-                    if (methodAndPathKey) {
-                        const method = methodAndPathKey.method;
-                        updateSchemes(req);
-                        processPath(req, method, methodAndPathKey.pathKey);
-                        processHeaders(req, method);
-                        processBody(req, method);
-                        processQuery(req, method);
-                    }
-                } catch (err) {}
-                return next();
-            });
-            init(predefinedSpec);
-        }, 2000);
+        // make sure we list routers after they are configured
+        setTimeout(() => init(predefinedSpec), 1000);
     }
 };
