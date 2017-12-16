@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "test"
+    "test": "test",
+    "patch-publish": "npm version publish && npm publish && git push --tag"
   },
   "repository": {
     "type": "git",
