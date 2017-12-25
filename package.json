@@ -3,9 +3,15 @@
   "version": "0.1.6",
   "description": "",
   "main": "index.js",
-  "scripts": {
+  "directories": {
     "test": "test",
-    "patch-publish": "npm version patch && npm publish && git push --tag"
+    "lib": "lib"
+  },
+  "scripts": {
+    "lint": "eslint --ignore-pattern \"*.json\" lib/** test/** index.js",
+    "jasmine": "nyc --reporter cobertura --reporter html --reporter text --report-dir ./build/test-reports/coverage node ./node_modules/jasmine/bin/jasmine.js JASMINE_CONFIG_PATH=test/_jasmine/jasmine.json",
+    "test": "npm run lint -- --fix && npm run jasmine",
+    "pp": "npm version patch && npm publish && git push --tag"
   },
   "repository": {
     "type": "git",
@@ -26,5 +32,14 @@
     "generate-schema": "^2.6.0",
     "lodash": "^4.17.4",
     "swagger-ui-express": "^2.0.11"
+  },
+  "devDependencies": {
+    "eslint": "^4.13.1",
+    "express": "^4.16.2",
+    "jasmine": "^2.8.0",
+    "jasmine-reporters": "^2.2.1",
+    "jasmine-spec-reporter": "^4.2.1",
+    "nyc": "^11.3.0",
+    "request": "^2.83.0"
   }
 }
