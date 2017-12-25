@@ -40,7 +40,7 @@ function init(predefinedSpec) {
     stack.forEach(route => {
       const params = [];
       let path = prefix + route.route.path;
-      const matches = path.match(/:([^\/]+)/g);
+      const matches = path.match(/:([^/]+)/g);
       if (matches) {
         matches.forEach(found => {
           const paramName = found.substr(1);
@@ -86,7 +86,7 @@ function getPathKey(req) {
   const pathKeys = Object.keys(spec.paths);
   for (let i = 0; i < pathKeys.length; i += 1) {
     const pathKey = pathKeys[i];
-    if (url.match(`${pathKey.replace(/{([^\/]+)}/g, '(?:([^\\\\/]+?))')}\/?$`)) {
+    if (url.match(`${pathKey.replace(/{([^/]+)}/g, '(?:([^\\\\/]+?))')}/?$`)) {
       return pathKey; 
     }
   }
@@ -109,6 +109,16 @@ function getMethod(req) {
   }
 
   return { method: spec.paths[pathKey][m], pathKey };
+}
+
+function updateSchemesAndHost(req) {
+  spec.schemes = spec.schemes || [];
+  if (spec.schemes.indexOf(req.protocol) === -1) {
+    spec.schemes.push(req.protocol);
+  }
+  if (!spec.host) {
+    spec.host = req.get('host');
+  }
 }
 
 module.exports.init = (aApp, predefinedSpec) => {
@@ -134,14 +144,7 @@ module.exports.init = (aApp, predefinedSpec) => {
         const methodAndPathKey = getMethod(req);
         if (methodAndPathKey) {
           const method = methodAndPathKey.method;
-          spec.schemes = spec.schemes || [];
-          if (spec.schemes.indexOf(req.protocol) === -1) {
-            spec.schemes.push(req.protocol);
-          }
-          if (!spec.host) {
-            spec.host = res.req.get('host');
-          }
-
+          updateSchemesAndHost(req);
           processors.processPath(req, method, methodAndPathKey.pathKey);
           processors.processHeaders(req, method, spec);
           processors.processBody(req, method);
