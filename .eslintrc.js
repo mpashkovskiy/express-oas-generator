@@ -50,7 +50,8 @@ module.exports = {
     'no-else-return': 'error',
     'no-useless-concat': 'error',
     'no-multi-spaces': 'error',
-    'complexity': ['error', 4],
+    'complexity': ['warn', 4],
     'no-floating-decimal': 'error',
+    'no-unsafe-finally': 'warn'
   }
 };

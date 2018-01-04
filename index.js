@@ -1,9 +1,11 @@
 const _ = require('lodash');
+const fs = require('fs');
 const swaggerUi = require('swagger-ui-express');
 const utils = require('./lib/utils');
 const processors = require('./lib/processors');
 
-const packageInfo = require(`${process.cwd()}/package.json`);
+const packageJsonPath = `${process.cwd()}/package.json`;
+const packageInfo = fs.existsSync(packageJsonPath) ? require(packageJsonPath) : {};
 
 let app;
 let spec = {};
@@ -28,11 +30,11 @@ function updateSpecFromPackage() {
 }
 
 function init(predefinedSpec) {
-  spec = { swagger: '2.0', paths: {}};
+  spec = { swagger: '2.0', paths: {} };
   app._router.stack.forEach(router => {
     const stack = router.handle.stack;
     if (!stack) {
-      return; 
+      return;
     }
 
     let prefix = `${router.regexp}`;
@@ -52,8 +54,7 @@ function init(predefinedSpec) {
       spec.paths[path] = {};
       const methods = Object.keys(route.route.methods).filter(m => route.route.methods[m] === true && !m.startsWith('_'));
       methods.forEach(m => {
-        m = m.toLowerCase();
-        spec.paths[path][m] = {
+        spec.paths[path][m.toLowerCase()] = {
           consumes: ['application/json'],
           parameters: params.map(p => ({
             name: p,
@@ -79,7 +80,7 @@ function init(predefinedSpec) {
 
 function getPathKey(req) {
   if (spec.paths[req.url]) {
-    return req.url; 
+    return req.url;
   }
 
   const url = req.url.split('?')[0];
@@ -87,7 +88,7 @@ function getPathKey(req) {
   for (let i = 0; i < pathKeys.length; i += 1) {
     const pathKey = pathKeys[i];
     if (url.match(`${pathKey.replace(/{([^/]+)}/g, '(?:([^\\\\/]+?))')}/?$`)) {
-      return pathKey; 
+      return pathKey;
     }
   }
   return undefined;
