@@ -1,6 +1,6 @@
 # express-oas-generator
 
-[![Build Status](https://travis-ci.org/mpashkovskiy/express-oas-generator.svg?branch=master)](https://travis-ci.org/mpashkovskiy/express-oas-generator)
+[![Build Status](https://travis-ci.org/mpashkovskiy/express-oas-generator.svg?branch=master)](https://travis-ci.org/mpashkovskiy/express-oas-generator) [![Coverage Status](https://coveralls.io/repos/github/mpashkovskiy/express-oas-generator/badge.svg)](https://coveralls.io/github/mpashkovskiy/express-oas-generator)
 
 Module to:
 * automatically generate OpenAPI (Swagger) specification for existing ExpressJS 4.x REST API applications;
