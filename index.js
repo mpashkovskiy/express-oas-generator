@@ -79,6 +79,10 @@ function init(predefinedSpec) {
 }
 
 function getPathKey(req) {
+  if (!req.url) {
+    return undefined;
+  }
+
   if (spec.paths[req.url]) {
     return req.url;
   }
