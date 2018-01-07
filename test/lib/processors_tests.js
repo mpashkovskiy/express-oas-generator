@@ -70,6 +70,14 @@ describe('processors.js', () => {
       processors.processBody(req, method);
       expect(method.parameters).toBe(undefined);
     });
+
+    it('WHEN called twice THE should not add element twice', () => {
+      const req = { body: { a: 1 } };
+      let method = {};
+      processors.processBody(req, method);
+      processors.processBody(req, method);
+      expect(method.parameters.length).toBe(1);
+    });
   });
 
   describe('processQuery()', () => {
