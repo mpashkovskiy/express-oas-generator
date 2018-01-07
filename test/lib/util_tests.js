@@ -12,6 +12,8 @@ describe('utils.js', () => {
 
   it('WHEN getType method called THEN it returns proper type', () => {
     expect(utils.getType('a')).toBe('string');
+    expect(utils.getType('true')).toBe('boolean');
+    expect(utils.getType(true)).toBe('boolean');
     expect(utils.getType('1a')).toBe('string');
     expect(utils.getType('1')).toBe('integer');
     expect(utils.getType(1)).toBe('integer');
