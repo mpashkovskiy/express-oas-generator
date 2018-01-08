@@ -133,7 +133,7 @@ module.exports.init = (aApp, predefinedSpec) => {
   app.use((req, res, next) => {
     try {
       const methodAndPathKey = getMethod(req);
-      if (methodAndPathKey) {
+      if (methodAndPathKey && methodAndPathKey.method) {
         processors.processResponse(res, methodAndPathKey.method); 
       }
     } finally {
@@ -147,7 +147,7 @@ module.exports.init = (aApp, predefinedSpec) => {
     app.use((req, res, next) => {
       try {
         const methodAndPathKey = getMethod(req);
-        if (methodAndPathKey) {
+        if (methodAndPathKey && methodAndPathKey.method && methodAndPathKey.pathKey) {
           const method = methodAndPathKey.method;
           updateSchemesAndHost(req);
           processors.processPath(req, method, methodAndPathKey.pathKey);
