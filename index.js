@@ -40,6 +40,10 @@ function init(predefinedSpec) {
     let prefix = `${router.regexp}`;
     prefix = prefix.substr(2, prefix.indexOf('?(?') - 3).replace(/\\/g, '');
     stack.forEach(route => {
+      if (!route.route) {
+        return; 
+      }
+ 
       const params = [];
       let path = prefix + route.route.path;
       const matches = path.match(/:([^/]+)/g);
