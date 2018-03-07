@@ -55,7 +55,9 @@ function init(predefinedSpec) {
         });
       }
 
-      spec.paths[path] = {};
+      if (!spec.paths[path]) {
+        spec.paths[path] = {};
+      }
       const methods = Object.keys(route.route.methods).filter(m => route.route.methods[m] === true && !m.startsWith('_'));
       methods.forEach(m => {
         spec.paths[path][m.toLowerCase()] = {
