@@ -28,6 +28,10 @@ describe('index.js', () => {
   beforeAll(done => {
     const app = express();
     generator.init(app, {});
+    app.post( '/hello', (req, res) => {
+      res.setHeader('Content-Type', 'text/plain');
+      return res.end('whatever');
+    });
     app.use('/should_not_be_handled', middleware);
     let router = express.Router();
     router.get('/success/:param/router', middleware);
@@ -42,7 +46,7 @@ describe('index.js', () => {
 
   beforeEach(done => {
     let spec = generator.getSpec();
-    expect(Object.keys(spec.paths).length).toBe(3);
+    expect(Object.keys(spec.paths).length).toBe(4);
     request.get(`http://localhost:${port}/api-spec`, (error, res) => {
       expect(JSON.parse(res.body)).toEqual(spec);
       done();

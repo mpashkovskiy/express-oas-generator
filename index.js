@@ -3,6 +3,7 @@ const fs = require('fs');
 const swaggerUi = require('swagger-ui-express');
 const utils = require('./lib/utils');
 const processors = require('./lib/processors');
+const listEndpoints = require('express-list-endpoints');
 
 const packageJsonPath = `${process.cwd()}/package.json`;
 const packageInfo = fs.existsSync(packageJsonPath) ? require(packageJsonPath) : {};
@@ -31,44 +32,32 @@ function updateSpecFromPackage() {
 
 function init(predefinedSpec) {
   spec = { swagger: '2.0', paths: {} };
-  app._router.stack.forEach(router => {
-    const stack = router.handle.stack;
-    if (!stack) {
-      return;
+
+  const endpoints = listEndpoints(app);
+  endpoints.forEach(endpoint => {
+    const params = [];
+    let path = endpoint.path;
+    const matches = path.match(/:([^/]+)/g);
+    if (matches) {
+      matches.forEach(found => {
+        const paramName = found.substr(1);
+        path = path.replace(found, `{${paramName}}`);
+        params.push(paramName);
+      });
     }
 
-    let prefix = `${router.regexp}`;
-    prefix = prefix.substr(2, prefix.indexOf('?(?') - 3).replace(/\\/g, '');
-    stack.forEach(route => {
-      if (!route.route) {
-        return; 
-      }
- 
-      const params = [];
-      let path = prefix + route.route.path;
-      const matches = path.match(/:([^/]+)/g);
-      if (matches) {
-        matches.forEach(found => {
-          const paramName = found.substr(1);
-          path = path.replace(found, `{${paramName}}`);
-          params.push(paramName);
-        });
-      }
-
-      if (!spec.paths[path]) {
-        spec.paths[path] = {};
-      }
-      const methods = Object.keys(route.route.methods).filter(m => route.route.methods[m] === true && !m.startsWith('_'));
-      methods.forEach(m => {
-        spec.paths[path][m.toLowerCase()] = {
-          consumes: ['application/json'],
-          parameters: params.map(p => ({
-            name: p,
-            in: 'path',
-            required: true,
-          })) || [],
-        };
-      });
+    if (!spec.paths[path]) {
+      spec.paths[path] = {};
+    }
+    endpoint.methods.forEach(m => {
+      spec.paths[path][m.toLowerCase()] = {
+        consumes: ['application/json'],
+        parameters: params.map(p => ({
+          name: p,
+          in: 'path',
+          required: true,
+        })) || [],
+      };
     });
   });
 
