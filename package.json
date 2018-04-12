@@ -31,6 +31,7 @@
   },
   "homepage": "https://github.com/mpashkovskiy/express-oas-generator#readme",
   "dependencies": {
+    "express-list-endpoints": "^3.0.1",
     "generate-schema": "^2.6.0",
     "lodash": "^4.17.4",
     "swagger-ui-express": "^2.0.11"
