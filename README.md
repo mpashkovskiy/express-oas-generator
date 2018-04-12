@@ -20,10 +20,10 @@ let app = express();
 expressOasGenerator.init(app, {}); // to overwrite generated specification's values use second argument.
 
 ```
-* **Important!** In order to get description of all parameters and JSON payloads you have to run REST API tests against the application so module can analyze requests/responses
+* **Important!** In order to get description of all parameters and JSON payloads you have to start using your REST API or run REST API tests against it so module can analyze requests/responses
 * Assuming you running your app on port 8000
     * open [http://localhost:8000/api-docs](http://localhost:8000/api-docs) to see Swagger UI for your REST API
-    * specification file is available  [http://localhost:8000/api-spec](http://localhost:8000/api-spec) - link prepended to description field
+    * specification file is available  [http://localhost:8000/api-spec](http://localhost:8000/api-spec) - link is prepended to description field
 
 ## Rationale
 
