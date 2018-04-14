@@ -2,6 +2,7 @@
 
 const express = require('express');
 const request = require('request');
+const bodyParser = require('body-parser');
 const generator = require('../index.js');
 
 const MS_TO_STARTUP = 2000;
@@ -9,6 +10,7 @@ const port = 8080;
 const ERROR_RESPONSE_CODE = 500;
 const BASE_PATH = '/api/v1';
 const ERROR_PATH = '/error';
+const PLAIN_TEXT_RESPONSE = 'whatever';
 
 describe('index.js', () => {
 
@@ -28,9 +30,16 @@ describe('index.js', () => {
   beforeAll(done => {
     const app = express();
     generator.init(app, {});
-    app.post( '/hello', (req, res) => {
+
+    app.use(bodyParser.json({}));
+    app.get('/hello', (req, res) => {
       res.setHeader('Content-Type', 'text/plain');
-      return res.end('whatever');
+      return res.end(PLAIN_TEXT_RESPONSE);
+    });
+    app.post('/hello2', (req, res, next) => {
+      res.setHeader('Content-Type', 'application/json');
+      res.send({key: 'secret'});
+      next();
     });
     app.use('/should_not_be_handled', middleware);
     let router = express.Router();
@@ -46,14 +55,48 @@ describe('index.js', () => {
 
   beforeEach(done => {
     let spec = generator.getSpec();
-    expect(Object.keys(spec.paths).length).toBe(4);
+    expect(Object.keys(spec.paths).length).toBe(5);
     request.get(`http://localhost:${port}/api-spec`, (error, res) => {
       expect(JSON.parse(res.body)).toEqual(spec);
       done();
     });
   });
 
-  afterAll(() => server.close());
+  afterAll(() => {
+    // console.info(JSON.stringify(generator.getSpec(), null, 2));
+    server.close()
+  });
+
+  it('WHEN making GET request to endpoint returning plain text THEN schema filled properly', done => {
+    const path = `/hello`;
+    request.get(`http://localhost:${port}${path}`, () => {
+      const method = generator.getSpec().paths[path].get;
+      expect(method.produces).toEqual(['text/plain']);
+      expect(method.responses[200].schema.type).toEqual('string');
+      expect(method.responses[200].schema.example).toEqual(PLAIN_TEXT_RESPONSE);
+      done();
+    });
+  });
+
+  it('WHEN making POST request to routerless endpoint THEN body is documented', done => {
+    const path = `/hello2`;
+    const postData = {"foo": "bar"};
+    request({
+      url: `http://localhost:${port}${path}`,
+      method: 'POST',
+      headers: {'content-type' : 'application/json'},
+      body: JSON.stringify(postData)
+    }, () => {
+      const method = generator.getSpec().paths[path].post;
+      ['consumes', 'produces'].forEach(el =>
+        expect(method[el]).toEqual(['application/json'])
+      );
+      const bodyParam = method.parameters[0];
+      expect(bodyParam.in).toEqual('body');
+      expect(bodyParam.schema.properties.foo.type).toEqual('string');
+      done();
+    });
+  });
 
   it('WHEN making success requests THEN path should be filled with request and response schema', done => {
     const param = 1;
@@ -63,7 +106,7 @@ describe('index.js', () => {
       expect(spec.host).toEqual(`localhost:${port}`);
       expect(spec.schemes).toEqual(['http']);
 
-      const expressPath = path.replace('/1', '/{param}');
+      const expressPath = path.replace('/' + param, '/{param}');
       const specPath = spec.paths[expressPath];
       expect(specPath).toBeDefined();
       expect(Object.keys(specPath)).toEqual(['get']);
