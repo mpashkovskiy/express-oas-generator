@@ -6,7 +6,7 @@ const bodyParser = require('body-parser');
 const generator = require('../index.js');
 
 const MS_TO_STARTUP = 2000;
-const port = 8080;
+const port = 8888;
 const ERROR_RESPONSE_CODE = 500;
 const BASE_PATH = '/api/v1';
 const ERROR_PATH = '/error';
@@ -64,14 +64,15 @@ describe('index.js', () => {
 
   afterAll(() => {
     // console.info(JSON.stringify(generator.getSpec(), null, 2));
-    server.close()
+    server.close();
   });
 
   it('WHEN making GET request to endpoint returning plain text THEN schema filled properly', done => {
-    const path = `/hello`;
+    const path = '/hello';
     request.get(`http://localhost:${port}${path}`, () => {
       const method = generator.getSpec().paths[path].get;
       expect(method.produces).toEqual(['text/plain']);
+      expect(method.summary).toEqual(path);
       expect(method.responses[200].schema.type).toEqual('string');
       expect(method.responses[200].schema.example).toEqual(PLAIN_TEXT_RESPONSE);
       done();
@@ -79,8 +80,8 @@ describe('index.js', () => {
   });
 
   it('WHEN making POST request to routerless endpoint THEN body is documented', done => {
-    const path = `/hello2`;
-    const postData = {"foo": "bar"};
+    const path = '/hello2';
+    const postData = {'foo': 'bar'};
     request({
       url: `http://localhost:${port}${path}`,
       method: 'POST',
@@ -91,6 +92,7 @@ describe('index.js', () => {
       ['consumes', 'produces'].forEach(el =>
         expect(method[el]).toEqual(['application/json'])
       );
+      expect(method.summary).toEqual(path);
       const bodyParam = method.parameters[0];
       expect(bodyParam.in).toEqual('body');
       expect(bodyParam.schema.properties.foo.type).toEqual('string');
