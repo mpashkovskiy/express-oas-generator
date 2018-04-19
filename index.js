@@ -51,6 +51,7 @@ function init(predefinedSpec) {
     }
     endpoint.methods.forEach(m => {
       spec.paths[path][m.toLowerCase()] = {
+        summary: path,
         consumes: ['application/json'],
         parameters: params.map(p => ({
           name: p,
