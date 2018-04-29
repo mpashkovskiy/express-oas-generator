@@ -12,6 +12,26 @@ const BASE_PATH = '/api/v1';
 const ERROR_PATH = '/error';
 const PLAIN_TEXT_RESPONSE = 'whatever';
 
+it('WHEN patch function is provided THEN it is applied to spec', done => {
+  const app = express();
+  const newTitle = 'New title';
+  generator.init(app, function(spec) {
+    spec.info.title = newTitle;
+    return spec;
+  });
+  app.get('/hello', (req, res) => {
+    res.setHeader('Content-Type', 'text/plain');
+    return res.end(PLAIN_TEXT_RESPONSE);
+  });
+  app.set('port', port);
+  const server = app.listen(app.get('port'));
+  setTimeout(() => {
+    expect(generator.getSpec().info.title).toBe(newTitle);
+    done();
+  }, MS_TO_STARTUP);
+  server.close();
+});
+
 describe('index.js', () => {
 
   let server;

@@ -63,7 +63,9 @@ function init(predefinedSpec) {
   });
 
   updateSpecFromPackage();
-  spec = utils.sortObject(_.merge(spec, predefinedSpec || {}));
+  spec = typeof predefinedSpec === 'object'
+    ? utils.sortObject(_.merge(spec, predefinedSpec || {}))
+    : predefinedSpec(spec);
   app.use('/api-spec', (req, res, next) => {
     res.setHeader('Content-Type', 'application/json');
     res.send(JSON.stringify(spec, null, 2));
