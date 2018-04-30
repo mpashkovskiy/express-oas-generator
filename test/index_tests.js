@@ -19,8 +19,8 @@ it('WHEN patch function is provided THEN it is applied to spec', done => {
   const app = express();
   generator.init(app, function(spec) {
     spec.info.title = newTitle;
-    if (spec.paths[path]) {
-      spec.paths[path].get.parameters.example = newValue;
+    if (spec.paths[path] && spec.paths[path].get.parameters[0]) {
+      spec.paths[path].get.parameters[0].example = newValue;
     }
     return spec;
   });
@@ -35,7 +35,7 @@ it('WHEN patch function is provided THEN it is applied to spec', done => {
       request.get(`http://localhost:${port}${path}?a=1`, () => {
         const spec = generator.getSpec();
         expect(spec.info.title).toBe(newTitle);
-        expect(spec.paths[path].get.parameters.example).toBe(newValue);
+        expect(spec.paths[path].get.parameters[0].example).toBe(newValue);
         server.close();
         done();
       });

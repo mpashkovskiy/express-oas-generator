@@ -24,6 +24,16 @@ expressOasGenerator.init(app, {}); // to overwrite generated specification's val
 * Assuming you running your app on port 8000
     * open [http://localhost:8000/api-docs](http://localhost:8000/api-docs) to see Swagger UI for your REST API
     * specification file is available  [http://localhost:8000/api-spec](http://localhost:8000/api-spec) - link is prepended to description field
+    
+Second argument of `expressOasGenerator.init(app, {})` could be either an object or a function. In case of the object generated spec will be merged with the object. In case of function it will be used to apply changes for generated spec. Example of function usage:
+```javascript
+generator.init(app, function(spec) {
+    spec.info.title = 'New Title';
+    spec.paths['/path'].get.parameters[0].example = 2;
+    return spec;
+});
+
+```
 
 ## Rationale
 
