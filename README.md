@@ -28,8 +28,8 @@ expressOasGenerator.init(app, {}); // to overwrite generated specification's val
 Second argument of `expressOasGenerator.init(app, {})` could be either an object or a function. In case of the object generated spec will be merged with the object. In case of function it will be used to apply changes for generated spec. Example of function usage:
 ```javascript
 generator.init(app, function(spec) {
-    spec.info.title = 'New Title';
-    spec.paths['/path'].get.parameters[0].example = 2;
+    _.set(spec, 'info.title', 'New Title');
+    _.set(spec, 'paths[\'/path\'].get.parameters[0].example', 2);
     return spec;
 });
 
