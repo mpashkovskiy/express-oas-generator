@@ -1,5 +1,7 @@
 # express-oas-generator
 
+[![npm package](https://nodei.co/npm/express-oas-generator.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/express-oas-generator/)
+
 [![Build Status](https://travis-ci.org/mpashkovskiy/express-oas-generator.svg?branch=master)](https://travis-ci.org/mpashkovskiy/express-oas-generator) [![Coverage Status](https://coveralls.io/repos/github/mpashkovskiy/express-oas-generator/badge.svg)](https://coveralls.io/github/mpashkovskiy/express-oas-generator) [![Known Vulnerabilities](https://snyk.io/test/github/mpashkovskiy/express-oas-generator/badge.svg?targetFile=package.json)](https://snyk.io/test/github/mpashkovskiy/express-oas-generator?targetFile=package.json)
 
 Module to:
