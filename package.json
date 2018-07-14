@@ -1,6 +1,6 @@
 {
   "name": "express-oas-generator",
-  "version": "0.1.21",
+  "version": "0.1.25",
   "description": "",
   "main": "index.js",
   "directories": {
@@ -13,7 +13,7 @@
     "cve-check": "node_modules/.bin/nsp check --output checkstyle",
     "test": "npm run lint -- --fix && npm run cve-check && npm run jasmine",
     "send-coverage": "nyc report --reporter=text-lcov | ./node_modules/coveralls/bin/coveralls.js",
-    "pp": "npm version patch && npm publish && git push --tag"
+    "pp": "npm version patch && npm publish && git push && git push --tag"
   },
   "repository": {
     "type": "git",
@@ -33,8 +33,8 @@
   "dependencies": {
     "express-list-endpoints": "^3.0.1",
     "generate-schema": "^2.6.0",
-    "lodash": "^4.17.4",
-    "swagger-ui-express": "^2.0.11"
+    "lodash": "^4.17.5",
+    "swagger-ui-express": "^3.0.8"
   },
   "devDependencies": {
     "body-parser": "^1.18.2",
@@ -48,6 +48,6 @@
     "nsp": "^3.1.0",
     "nsp-formatter-checkstyle": "^1.0.2",
     "nyc": "^11.3.0",
-    "request": "^2.83.0"
+    "request": "^2.85.0"
   }
 }

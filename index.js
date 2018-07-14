@@ -9,6 +9,7 @@ const packageJsonPath = `${process.cwd()}/package.json`;
 const packageInfo = fs.existsSync(packageJsonPath) ? require(packageJsonPath) : {};
 
 let app;
+let predefinedSpec;
 let spec = {};
 
 function updateSpecFromPackage() {
@@ -30,7 +31,7 @@ function updateSpecFromPackage() {
   }
 }
 
-function init(predefinedSpec) {
+function init() {
   spec = { swagger: '2.0', paths: {} };
 
   const endpoints = listEndpoints(app);
@@ -63,15 +64,21 @@ function init(predefinedSpec) {
   });
 
   updateSpecFromPackage();
-  spec = utils.sortObject(_.merge(spec, predefinedSpec || {}));
+  spec = patchSpec(predefinedSpec);
   app.use('/api-spec', (req, res, next) => {
     res.setHeader('Content-Type', 'application/json');
-    res.send(JSON.stringify(spec, null, 2));
+    res.send(JSON.stringify(patchSpec(predefinedSpec), null, 2));
     return next();
   });
   app.use('/api-docs', swaggerUi.serve, (req, res) => {
-    swaggerUi.setup(spec)(req, res);
+    swaggerUi.setup(patchSpec(predefinedSpec))(req, res);
   });
+}
+
+function patchSpec(predefinedSpec) {
+  return typeof predefinedSpec === 'object'
+    ? utils.sortObject(_.merge(spec, predefinedSpec || {}))
+    : predefinedSpec(spec);
 }
 
 function getPathKey(req) {
@@ -122,8 +129,9 @@ function updateSchemesAndHost(req) {
   }
 }
 
-module.exports.init = (aApp, predefinedSpec) => {
+module.exports.init = (aApp, aPredefinedSpec) => {
   app = aApp;
+  predefinedSpec = aPredefinedSpec;
 
   // middleware to handle responses
   app.use((req, res, next) => {
@@ -155,8 +163,10 @@ module.exports.init = (aApp, predefinedSpec) => {
         return next();
       }
     });
-    init(predefinedSpec);
+    init();
   }, 1000);
 };
 
-module.exports.getSpec = () => spec;
+module.exports.getSpec = () => {
+  return patchSpec(predefinedSpec);
+};

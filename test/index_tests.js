@@ -12,6 +12,37 @@ const BASE_PATH = '/api/v1';
 const ERROR_PATH = '/error';
 const PLAIN_TEXT_RESPONSE = 'whatever';
 
+it('WHEN patch function is provided THEN it is applied to spec', done => {
+  const path = '/hello';
+  const newTitle = 'New title';
+  const newValue = 2;
+  const app = express();
+  generator.init(app, function(spec) {
+    spec.info.title = newTitle;
+    if (spec.paths[path] && spec.paths[path].get.parameters[0]) {
+      spec.paths[path].get.parameters[0].example = newValue;
+    }
+    return spec;
+  });
+  app.get(path, (req, res, next) => {
+    res.setHeader('Content-Type', 'text/plain');
+    res.send(PLAIN_TEXT_RESPONSE);
+    return next();
+  });
+  app.set('port', port);
+  const server = app.listen(app.get('port'), function() {
+    setTimeout(() => {
+      request.get(`http://localhost:${port}${path}?a=1`, () => {
+        const spec = generator.getSpec();
+        expect(spec.info.title).toBe(newTitle);
+        expect(spec.paths[path].get.parameters[0].example).toBe(newValue);
+        server.close();
+        done();
+      });
+    }, MS_TO_STARTUP);
+  });
+});
+
 describe('index.js', () => {
 
   let server;
