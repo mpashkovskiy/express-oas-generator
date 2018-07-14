@@ -1,9 +1,13 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const generator = require('./index.js');
+const _ = require('lodash');
 
 const app = express();
-generator.init(app, {});
+generator.init(app, function (spec) {
+  _.set(spec, 'paths["/foo/{name}"].get.parameters[0].description', 'description of a pramaeter');
+  return spec;
+});
 
 app.use(bodyParser.json({}));
 let router = express.Router();
