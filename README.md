@@ -37,6 +37,19 @@ generator.init(app, function(spec) {
 
 ```
 
+To write specification into a file use third and forth (optional) arguments:
+```javascript
+expressOasGenerator.init(
+  app,
+  function(spec) { return spec; },
+  'path/to/a/file/filename.json',
+  60 * 1000
+)
+```
+where:
+* 'path/to/a/file/filename.json' - path to a file and file name
+* 60 * 1000 - write interval in milliseconds (optional parameter, by default interval is equal to 10 seconds)
+
 ## Rationale
 
 Goal of the module is to provide developers with Swagger UI in development environments. Module process every request and response therefore it may slow down your app - is not supposed to be used in production environment.

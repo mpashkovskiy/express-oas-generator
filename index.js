@@ -1,5 +1,6 @@
 const _ = require('lodash');
 const fs = require('fs');
+const path = require('path');
 const swaggerUi = require('swagger-ui-express');
 const utils = require('./lib/utils');
 const processors = require('./lib/processors');
@@ -11,18 +12,19 @@ const packageInfo = fs.existsSync(packageJsonPath) ? require(packageJsonPath) : 
 let app;
 let predefinedSpec;
 let spec = {};
+let lastRecordTime = new Date().getTime();
 
 function updateSpecFromPackage() {
   spec.info = spec.info || {};
 
   if (packageInfo.name) {
-    spec.info.title = packageInfo.name; 
+    spec.info.title = packageInfo.name;
   }
   if (packageInfo.version) {
-    spec.info.version = packageInfo.version; 
+    spec.info.version = packageInfo.version;
   }
   if (packageInfo.license) {
-    spec.info.license = { name: packageInfo.license }; 
+    spec.info.license = { name: packageInfo.license };
   }
 
   spec.info.description = '[Specification JSON](/api-spec)';
@@ -103,17 +105,17 @@ function getPathKey(req) {
 
 function getMethod(req) {
   if (req.url.startsWith('/api-')) {
-    return undefined; 
+    return undefined;
   }
 
   const m = req.method.toLowerCase();
   if (m === 'options') {
-    return undefined; 
+    return undefined;
   }
 
   const pathKey = getPathKey(req);
   if (!pathKey) {
-    return undefined; 
+    return undefined;
   }
 
   return { method: spec.paths[pathKey][m], pathKey };
@@ -129,16 +131,27 @@ function updateSchemesAndHost(req) {
   }
 }
 
-module.exports.init = (aApp, aPredefinedSpec) => {
+module.exports.init = (aApp, aPredefinedSpec, aPath, aWriteInterval) => {
   app = aApp;
   predefinedSpec = aPredefinedSpec;
+  const writeInterval = aWriteInterval | 10 * 1000;
 
   // middleware to handle responses
   app.use((req, res, next) => {
     try {
       const methodAndPathKey = getMethod(req);
       if (methodAndPathKey && methodAndPathKey.method) {
-        processors.processResponse(res, methodAndPathKey.method); 
+        processors.processResponse(res, methodAndPathKey.method);
+      }
+      const ts = new Date().getTime();
+      if (aPath && ts - lastRecordTime > writeInterval) {
+        lastRecordTime = ts;
+        fs.writeFile(aPath, JSON.stringify(spec, null, 2), 'utf8', err => {
+          const fullPath = path.resolve(aPath);
+          if (err) {
+            throw new Error(`Cannot store the specification into ${fullPath} because of ${err.message}`);
+          }
+        });
       }
     } finally {
       return next();

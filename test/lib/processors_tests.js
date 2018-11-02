@@ -113,6 +113,9 @@ describe('processors.js', () => {
         statusCode: 200,
         write: write,
         end: end,
+        getHeaders: () => {
+          return {}; 
+        }
       };
       let method = {};
       const json = { a: 1 };
