@@ -4,6 +4,8 @@ const express = require('express');
 const request = require('request');
 const bodyParser = require('body-parser');
 const generator = require('../index.js');
+const sinon = require('sinon');
+const fs = require('fs');
 
 const MS_TO_STARTUP = 2000;
 const port = 8888;
@@ -203,5 +205,40 @@ describe('index.js', () => {
       done();
     });
   });
+
+});
+
+describe('index.js with baseUrlPath', () => {
+
+  let fsStub;
+
+  beforeAll( function() {
+    const packageJsonPath = `${process.cwd()}/package.json`;
+    fsStub = sinon.stub(fs, 'existsSync');
+    const packageJson = {
+      name: 'express-oas-generator',
+      version: '1.0.4',
+      description: 'base url',
+      main: 'index.js',
+      baseUrlPath: '/swagger'
+    };
+
+    fsStub.withArgs(packageJsonPath).returns(packageJson);
+  });
+
+  afterAll(function() {
+    fsStub.restore();
+  });
+
+
+  it('WHEN making error request THEN error response should be added to path', () => {
+
+    const app = express();
+    generator.init(app, {});
+    const spec = generator.getSpec();
+    expect(spec.info.description).toBeDefined();
+  });
+
+
 
 });
