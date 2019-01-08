@@ -8,22 +8,26 @@ Module to:
 * automatically generate OpenAPI (Swagger) specification for existing ExpressJS 4.x REST API applications;
 * provide Swagger UI basing on generated specification.
 
-## Additions to your package.json
+## (OPTIONAL) Additions to your package.json
 
-add your service base url path to package.json
-```angular2
+If your service is running not at the root of the server add full base path URL to package.json
+
+```json 
+{
 "baseUrlPath" : "/tokens"
+}
 ```
 
 Here is a sample
-```angular2
+```json 
+{
  "name": "cwt-sts-svc",
   "version": "1.1.48",
   "description": "JWT generation service",
   "keywords": [],
   "author": "",
   "main": "lib",
-  "baseUrlPath1" : "/tokens",
+  "baseUrlPath" : "/tokens",
   "bin": {
     "cwt-sts-svc": "bin/server"
   }
