@@ -1,6 +1,6 @@
 {
   "name": "express-oas-generator",
-  "version": "2.0.3",
+  "version": "1.0.4",
   "description": "",
   "main": "index.js",
   "directories": {
@@ -17,19 +17,19 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/DigitalChiefArchitect/express-oas-generator.git"
+    "url": "git+https://github.com/mpashkovskiy/express-oas-generator.git"
   },
   "keywords": [
     "ExpressJS",
     "OpenAPI",
     "Swagger"
   ],
-  "author": "Matvey Pashkovskiy <mathew.pashkovsky@gmail.com> (https://www.linkedin.com/in/matvey-pashkovskiy-0a1a9940/) , Eyal Zamir <eyal.zamir@gmail.com>",
+  "author": "Matvey Pashkovskiy <mathew.pashkovsky@gmail.com> (https://www.linkedin.com/in/matvey-pashkovskiy-0a1a9940/)",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/DigitalChiefArchitect/express-oas-generator/issues"
+    "url": "https://github.com/mpashkovskiy/express-oas-generator/issues"
   },
-  "homepage": "https://github.com/DigitalChiefArchitect/express-oas-generator#readme",
+  "homepage": "https://github.com/mpashkovskiy/express-oas-generator#readme",
   "dependencies": {
     "express-list-endpoints": "^3.0.1",
     "generate-schema": "^2.6.0",
