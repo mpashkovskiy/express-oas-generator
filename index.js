@@ -27,11 +27,7 @@ function updateSpecFromPackage() {
     spec.info.license = { name: packageInfo.license };
   }
 
-  if (packageInfo.baseUrlPath) {
-    spec.info.baseUrlPath = { serviceBaseUrl : packageInfo.baseUrlPath };
-  } else {
-    packageInfo.baseUrlPath = '';
-  }
+  packageInfo.baseUrlPath = packageInfo.baseUrlPath || '';
 
   spec.info.description = '[Specification JSON]('+packageInfo.baseUrlPath +'/api-spec)';
   if (packageInfo.description) {
