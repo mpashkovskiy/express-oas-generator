@@ -27,9 +27,13 @@ function updateSpecFromPackage() {
     spec.info.license = { name: packageInfo.license };
   }
 
-  packageInfo.baseUrlPath = packageInfo.baseUrlPath || '';
+  if (packageInfo.baseUrlPath) {
+    spec.info.description = '[Specification JSON]('+packageInfo.baseUrlPath +'/api-spec) , base url : ' + packageInfo.baseUrlPath;
+  } else {
+    packageInfo.baseUrlPath = '';
+    spec.info.description = '[Specification JSON]('+packageInfo.baseUrlPath +'/api-spec)';
+  }
 
-  spec.info.description = '[Specification JSON]('+packageInfo.baseUrlPath +'/api-spec)';
   if (packageInfo.description) {
     spec.info.description += `\n\n${packageInfo.description}`;
   }
