@@ -10,7 +10,7 @@
   "scripts": {
     "lint": "eslint --ignore-pattern \"*.json\" lib/** test/** index.js",
     "jasmine": "nyc --reporter cobertura --reporter html --reporter text --report-dir ./build/test-reports/coverage node ./node_modules/jasmine/bin/jasmine.js JASMINE_CONFIG_PATH=test/_jasmine/jasmine.json",
-    "cve-check": "node_modules/.bin/nsp check --output checkstyle",
+    "cve-check": "npm audit --audit-level high",
     "test": "npm run lint -- --fix && npm run cve-check && npm run jasmine",
     "send-coverage": "nyc report --reporter=text-lcov | ./node_modules/coveralls/bin/coveralls.js",
     "pp": "npm version patch && npm publish && git push && git push --tag"
