@@ -27,7 +27,14 @@ function updateSpecFromPackage() {
     spec.info.license = { name: packageInfo.license };
   }
 
-  spec.info.description = '[Specification JSON](/api-spec)';
+  //ADDED BY EYALZM - for supporting base Url Path via package.json
+  if (packageInfo.baseUrlPath) {
+    spec.info.baseUrlPath = { serviceBaseUrl : packageInfo.baseUrlPath };
+  } else {
+    packageInfo.baseUrlPath = '';
+  }
+
+  spec.info.description = '[Specification JSON]('+packageInfo.baseUrlPath +'/api-spec)';
   if (packageInfo.description) {
     spec.info.description += `\n\n${packageInfo.description}`;
   }
@@ -67,12 +74,12 @@ function init() {
 
   updateSpecFromPackage();
   spec = patchSpec(predefinedSpec);
-  app.use('/api-spec', (req, res, next) => {
+  app.use(packageInfo.baseUrlPath +'/api-spec', (req, res, next) => {
     res.setHeader('Content-Type', 'application/json');
     res.send(JSON.stringify(patchSpec(predefinedSpec), null, 2));
     return next();
   });
-  app.use('/api-docs', swaggerUi.serve, (req, res) => {
+  app.use(packageInfo.baseUrlPath +'/api-docs', swaggerUi.serve, (req, res) => {
     swaggerUi.setup(patchSpec(predefinedSpec))(req, res);
   });
 }
