@@ -2,10 +2,11 @@
 
 const express = require('express');
 const request = require('request');
-const bodyParser = require('body-parser');
-const generator = require('../index.js');
 const sinon = require('sinon');
 const fs = require('fs');
+const bodyParser = require('body-parser');
+const generator = require('../index.js');
+
 
 const MS_TO_STARTUP = 2000;
 const port = 8888;
@@ -231,7 +232,7 @@ describe('index.js with baseUrlPath', () => {
   });
 
 
-  it('WHEN making error request THEN error response should be added to path', () => {
+  it('WHEN package json includes baseUrlPath THEN spec description is updated', () => {
 
     const app = express();
     generator.init(app, {});
