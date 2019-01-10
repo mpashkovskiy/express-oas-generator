@@ -6,8 +6,8 @@ const utils = require('./lib/utils');
 const processors = require('./lib/processors');
 const listEndpoints = require('express-list-endpoints');
 
-const packageJsonPath = `${process.cwd()}/package.json`;
-const packageInfo = fs.existsSync(packageJsonPath) ? require(packageJsonPath) : {};
+let packageJsonPath = `${process.cwd()}/package.json`;
+let packageInfo;
 
 let app;
 let predefinedSpec;
@@ -15,6 +15,10 @@ let spec = {};
 let lastRecordTime = new Date().getTime();
 
 function updateSpecFromPackage() {
+
+  /* eslint global-require : off */
+  packageInfo = fs.existsSync(packageJsonPath) ? require(packageJsonPath) : {};
+
   spec.info = spec.info || {};
 
   if (packageInfo.name) {
@@ -37,6 +41,7 @@ function updateSpecFromPackage() {
   if (packageInfo.description) {
     spec.info.description += `\n\n${packageInfo.description}`;
   }
+
 }
 
 function init() {
@@ -188,4 +193,8 @@ module.exports.init = (aApp, aPredefinedSpec, aPath, aWriteInterval) => {
 
 module.exports.getSpec = () => {
   return patchSpec(predefinedSpec);
+};
+
+module.exports.setPackageInfoPath = pkgInfoPath => {
+  packageJsonPath = `${process.cwd()}/${pkgInfoPath}/package.json`;
 };

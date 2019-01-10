@@ -2,8 +2,7 @@
 
 const express = require('express');
 const request = require('request');
-const sinon = require('sinon');
-const fs = require('fs');
+const assert = require('assert');
 const bodyParser = require('body-parser');
 const generator = require('../index.js');
 
@@ -209,37 +208,59 @@ describe('index.js', () => {
 
 });
 
-describe('index.js with baseUrlPath', () => {
-
-  let fsStub;
-
-  beforeAll( function() {
-    const packageJsonPath = `${process.cwd()}/package.json`;
-    fsStub = sinon.stub(fs, 'existsSync');
-    const packageJson = {
-      name: 'express-oas-generator',
-      version: '1.0.4',
-      description: 'base url',
-      main: 'index.js',
-      baseUrlPath: '/swagger'
-    };
-
-    fsStub.withArgs(packageJsonPath).returns(packageJson);
+it('WHEN package json includes baseUrlPath THEN spec description is updated', done => {
+  const path = '/hello';
+  const newTitle = 'New title';
+  const app = express();
+  const pkgJsonWithBaseUrlPath = 'test/specs/withBaseUrlPath';
+  generator.setPackageInfoPath(pkgJsonWithBaseUrlPath);
+  generator.init(app, function(spec) {
+    spec.info.title = newTitle;
+    return spec;
   });
-
-  afterAll(function() {
-    fsStub.restore();
+  app.get(path, (req, res, next) => {
+    res.setHeader('Content-Type', 'text/plain');
+    res.send(PLAIN_TEXT_RESPONSE);
+    return next();
   });
-
-
-  it('WHEN package json includes baseUrlPath THEN spec description is updated', () => {
-
-    const app = express();
-    generator.init(app, {});
-    const spec = generator.getSpec();
-    expect(spec.info.description).toBeDefined();
+  app.set('port', port);
+  const server = app.listen(app.get('port'), function() {
+    setTimeout(() => {
+      request.get(`http://localhost:${port}${path}?a=1`, () => {
+        const spec = generator.getSpec();
+        assert.equal(spec.info.description.indexOf(', base url :') > 0, true);
+        server.close();
+        done();
+      });
+    }, MS_TO_STARTUP);
   });
+});
 
+it('WHEN package json does not include baseUrlPath THEN spec description is normal', done => {
+  const path = '/hello';
+  const newTitle = 'New title';
 
-
+  const app = express();
+  const pkgJsonWithBaseUrlPath = 'test/specs/withoutBaseUrlPath';
+  generator.setPackageInfoPath(pkgJsonWithBaseUrlPath);
+  generator.init(app, function(spec) {
+    spec.info.title = newTitle;
+    return spec;
+  });
+  app.get(path, (req, res, next) => {
+    res.setHeader('Content-Type', 'text/plain');
+    res.send(PLAIN_TEXT_RESPONSE);
+    return next();
+  });
+  app.set('port', port);
+  const server = app.listen(app.get('port'), function() {
+    setTimeout(() => {
+      request.get(`http://localhost:${port}${path}?a=1`, () => {
+        const spec = generator.getSpec();
+        assert.equal(spec.info.description.indexOf(', base url :') > 0, false);
+        server.close();
+        done();
+      });
+    }, MS_TO_STARTUP);
+  });
 });
