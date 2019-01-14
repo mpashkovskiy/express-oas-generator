@@ -212,18 +212,20 @@ it('WHEN package json includes baseUrlPath THEN spec description is updated', do
   const path = '/hello';
   const newTitle = 'New title';
   const app = express();
-  const pkgJsonWithBaseUrlPath = 'test/specs/withBaseUrlPath';
-  generator.setPackageInfoPath(pkgJsonWithBaseUrlPath);
+  const pkgJsonPath = 'test/specs/withBaseUrlPath';
+  generator.setPackageInfoPath(pkgJsonPath);
   generator.init(app, function(spec) {
     spec.info.title = newTitle;
     return spec;
   });
+
   app.get(path, (req, res, next) => {
     res.setHeader('Content-Type', 'text/plain');
     res.send(PLAIN_TEXT_RESPONSE);
     return next();
   });
   app.set('port', port);
+
   const server = app.listen(app.get('port'), function() {
     setTimeout(() => {
       request.get(`http://localhost:${port}${path}?a=1`, () => {
@@ -234,25 +236,29 @@ it('WHEN package json includes baseUrlPath THEN spec description is updated', do
       });
     }, MS_TO_STARTUP);
   });
+
+
 });
 
-it('WHEN package json does not include baseUrlPath THEN spec description is normal', done => {
+it('WHEN package json does notinclude' +
+  ' baseUrlPath THEN spec description is not updated', done => {
   const path = '/hello';
   const newTitle = 'New title';
-
   const app = express();
-  const pkgJsonWithBaseUrlPath = 'test/specs/withoutBaseUrlPath';
-  generator.setPackageInfoPath(pkgJsonWithBaseUrlPath);
+  const pkgJsonPath = 'test/specs/withoutBaseUrlPath';
+  generator.setPackageInfoPath(pkgJsonPath);
   generator.init(app, function(spec) {
     spec.info.title = newTitle;
     return spec;
   });
+
   app.get(path, (req, res, next) => {
     res.setHeader('Content-Type', 'text/plain');
     res.send(PLAIN_TEXT_RESPONSE);
     return next();
   });
   app.set('port', port);
+
   const server = app.listen(app.get('port'), function() {
     setTimeout(() => {
       request.get(`http://localhost:${port}${path}?a=1`, () => {
@@ -263,4 +269,6 @@ it('WHEN package json does not include baseUrlPath THEN spec description is norm
       });
     }, MS_TO_STARTUP);
   });
+
+
 });

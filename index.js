@@ -7,7 +7,7 @@ const processors = require('./lib/processors');
 const listEndpoints = require('express-list-endpoints');
 
 let packageJsonPath = `${process.cwd()}/package.json`;
-let packageInfo;
+let packageInfo = fs.existsSync(packageJsonPath) ? require(packageJsonPath) : {};
 
 let app;
 let predefinedSpec;
@@ -32,10 +32,10 @@ function updateSpecFromPackage() {
   }
 
   if (packageInfo.baseUrlPath) {
-    spec.info.description = '[Specification JSON]('+packageInfo.baseUrlPath +'/api-spec) , base url : ' + packageInfo.baseUrlPath;
+    spec.info.description = '[Specification JSON](' + packageInfo.baseUrlPath + '/api-spec) , base url : ' + packageInfo.baseUrlPath;
   } else {
     packageInfo.baseUrlPath = '';
-    spec.info.description = '[Specification JSON]('+packageInfo.baseUrlPath +'/api-spec)';
+    spec.info.description = '[Specification JSON](' + packageInfo.baseUrlPath + '/api-spec)';
   }
 
   if (packageInfo.description) {
