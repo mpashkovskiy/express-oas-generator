@@ -208,8 +208,8 @@ describe('index.js', () => {
 
 });
 
-it('WHEN package json includes baseUrlPath THEN spec description is updated', () => {
-  //const path = '/hello';
+it('WHEN package json includes baseUrlPath THEN spec description is updated', done => {
+  const path = '/hello';
   const newTitle = 'New title';
   const app = express();
   const pkgJsonPath = 'test/specs/withBaseUrlPath';
@@ -224,10 +224,20 @@ it('WHEN package json includes baseUrlPath THEN spec description is updated', ()
     assert.equal(spec.info.description.indexOf(', base url :') > 0, true);
   }, 1001);
 
+  app.set('port', port);
+  const server = app.listen(app.get('port'), function() {
+    setTimeout(() => {
+      request.get(`http://localhost:${port}${path}?a=1`, () => {
+        server.close();
+        done();
+      });
+    }, MS_TO_STARTUP);
+  });
 });
 
 
-it('WHEN package json does not include baseUrlPath THEN spec description is not updated', () => {
+it('WHEN package json does not include baseUrlPath THEN spec description is not updated', done => {
+  const path = '/hello';
   const newTitle = 'New title';
   const app = express();
   const pkgJsonPath = 'test/specs/withoutBaseUrlPath';
@@ -242,5 +252,13 @@ it('WHEN package json does not include baseUrlPath THEN spec description is not 
     assert.equal(spec.info.description.indexOf(', base url :') > 0, false);
   }, 1001);
 
-
+  app.set('port', port);
+  const server = app.listen(app.get('port'), function() {
+    setTimeout(() => {
+      request.get(`http://localhost:${port}${path}?a=1`, () => {
+        server.close();
+        done();
+      });
+    }, MS_TO_STARTUP);
+  });
 });
