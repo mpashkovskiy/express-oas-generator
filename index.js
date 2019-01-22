@@ -7,8 +7,7 @@ const processors = require('./lib/processors');
 const listEndpoints = require('express-list-endpoints');
 
 let packageJsonPath = `${process.cwd()}/package.json`;
-let packageInfo = fs.existsSync(packageJsonPath) ? require(packageJsonPath) : {};
-
+let packageInfo;
 let app;
 let predefinedSpec;
 let spec = {};
