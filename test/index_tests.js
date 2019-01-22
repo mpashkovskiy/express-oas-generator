@@ -2,8 +2,10 @@
 
 const express = require('express');
 const request = require('request');
+const assert = require('assert');
 const bodyParser = require('body-parser');
 const generator = require('../index.js');
+
 
 const MS_TO_STARTUP = 2000;
 const port = 8888;
@@ -204,4 +206,27 @@ describe('index.js', () => {
     });
   });
 
+});
+
+it('WHEN package json includes baseUrlPath THEN spec description is updated', done => {
+  generator.setPackageInfoPath('test/specs/withBaseUrlPath');
+  generator.init(express(), {});
+
+  setTimeout(() => {
+    const spec = generator.getSpec();
+    assert.equal(spec.info.description.indexOf(', base url :') > 0, true);
+    done();
+  }, 1001);
+});
+
+
+it('WHEN package json does not include baseUrlPath THEN spec description is not updated', done => {
+  generator.setPackageInfoPath('test/specs/withoutBaseUrlPath');
+  generator.init(express(), {});
+
+  setTimeout(() => {
+    const spec = generator.getSpec();
+    assert.equal(spec.info.description.indexOf(', base url :') > 0, false);
+    done();
+  }, 1001);
 });

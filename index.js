@@ -6,15 +6,18 @@ const utils = require('./lib/utils');
 const processors = require('./lib/processors');
 const listEndpoints = require('express-list-endpoints');
 
-const packageJsonPath = `${process.cwd()}/package.json`;
-const packageInfo = fs.existsSync(packageJsonPath) ? require(packageJsonPath) : {};
-
+let packageJsonPath = `${process.cwd()}/package.json`;
+let packageInfo;
 let app;
 let predefinedSpec;
 let spec = {};
 let lastRecordTime = new Date().getTime();
 
 function updateSpecFromPackage() {
+
+  /* eslint global-require : off */
+  packageInfo = fs.existsSync(packageJsonPath) ? require(packageJsonPath) : {};
+
   spec.info = spec.info || {};
 
   if (packageInfo.name) {
@@ -27,10 +30,17 @@ function updateSpecFromPackage() {
     spec.info.license = { name: packageInfo.license };
   }
 
-  spec.info.description = '[Specification JSON](/api-spec)';
+  if (packageInfo.baseUrlPath) {
+    spec.info.description = '[Specification JSON](' + packageInfo.baseUrlPath + '/api-spec) , base url : ' + packageInfo.baseUrlPath;
+  } else {
+    packageInfo.baseUrlPath = '';
+    spec.info.description = '[Specification JSON](' + packageInfo.baseUrlPath + '/api-spec)';
+  }
+
   if (packageInfo.description) {
     spec.info.description += `\n\n${packageInfo.description}`;
   }
+
 }
 
 function init() {
@@ -67,12 +77,12 @@ function init() {
 
   updateSpecFromPackage();
   spec = patchSpec(predefinedSpec);
-  app.use('/api-spec', (req, res, next) => {
+  app.use(packageInfo.baseUrlPath + '/api-spec', (req, res, next) => {
     res.setHeader('Content-Type', 'application/json');
     res.send(JSON.stringify(patchSpec(predefinedSpec), null, 2));
     return next();
   });
-  app.use('/api-docs', swaggerUi.serve, (req, res) => {
+  app.use(packageInfo.baseUrlPath + '/api-docs', swaggerUi.serve, (req, res) => {
     swaggerUi.setup(patchSpec(predefinedSpec))(req, res);
   });
 }
@@ -182,4 +192,8 @@ module.exports.init = (aApp, aPredefinedSpec, aPath, aWriteInterval) => {
 
 module.exports.getSpec = () => {
   return patchSpec(predefinedSpec);
+};
+
+module.exports.setPackageInfoPath = pkgInfoPath => {
+  packageJsonPath = `${process.cwd()}/${pkgInfoPath}/package.json`;
 };
