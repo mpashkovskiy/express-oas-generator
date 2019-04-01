@@ -1,3 +1,6 @@
+// Example of using the module
+
+
 const express = require('express');
 const bodyParser = require('body-parser');
 const generator = require('./index.js');
