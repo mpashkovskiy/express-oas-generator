@@ -12,7 +12,7 @@ Module to:
 ## How to use
 
 * Install module `npm i express-oas-generator --save`;
-* Import in script where you initialize ExpressJS application;
+* Import it in a script where you initialize ExpressJS application (see [server.js](server.js) for usage example);
 ```javascript
 const express = require('express');
 const expressOasGenerator = require('express-oas-generator');
