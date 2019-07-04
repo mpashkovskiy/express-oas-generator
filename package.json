@@ -13,7 +13,9 @@
     "cve-check": "npm audit --audit-level high",
     "test": "npm run lint -- --fix && npm run cve-check && npm run jasmine",
     "send-coverage": "nyc report --reporter=text-lcov | ./node_modules/coveralls/bin/coveralls.js",
-    "pp": "npm version patch && npm publish && git push && git push --tag"
+    "pp": "npm version patch && npm publish && git push && git push --tag",
+    "snyk-protect": "snyk protect",
+    "prepare": "npm run snyk-protect"
   },
   "repository": {
     "type": "git",
@@ -34,7 +36,8 @@
     "express-list-endpoints": "^3.0.1",
     "generate-schema": "^2.6.0",
     "lodash": "^4.17.11",
-    "swagger-ui-express": "^3.0.8"
+    "swagger-ui-express": "^3.0.8",
+    "snyk": "^1.189.0"
   },
   "devDependencies": {
     "assert": "^1.4.1",
@@ -51,5 +54,6 @@
     "nyc": "^13.3.0",
     "request": "^2.88.0",
     "zlib": "^1.0.5"
-  }
+  },
+  "snyk": true
 }
