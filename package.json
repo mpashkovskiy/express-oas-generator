@@ -33,7 +33,7 @@
   "dependencies": {
     "express-list-endpoints": "^3.0.1",
     "generate-schema": "^2.6.0",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.12",
     "swagger-ui-express": "^3.0.8"
   },
   "devDependencies": {
@@ -46,9 +46,7 @@
     "jasmine-reporters": "^2.2.1",
     "jasmine-spec-reporter": "^4.2.1",
     "mocha-lcov-reporter": "^1.3.0",
-    "nsp": "^3.2.1",
-    "nsp-formatter-checkstyle": "^1.0.2",
-    "nyc": "^13.3.0",
+    "nyc": "^14.1.1",
     "request": "^2.88.0",
     "zlib": "^1.0.5"
   }
