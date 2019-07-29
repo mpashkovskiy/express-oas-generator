@@ -4,5 +4,4 @@ node_modules
 build
 .idea
 *.iml
-server.js
 test_spec.json
