@@ -71,6 +71,7 @@ function init() {
           in: 'path',
           required: true,
         })) || [],
+        responses: {}
       };
     });
   });

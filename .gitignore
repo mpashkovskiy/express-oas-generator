@@ -5,3 +5,4 @@ build
 .idea
 *.iml
 server.js
+test_spec.json
