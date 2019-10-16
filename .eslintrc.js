@@ -30,6 +30,7 @@ module.exports = {
     'default-case': 'error',
     'no-alert': 'error',
     'no-eq-null': 'error',
+    'no-empty': 'warn',
     'no-implicit-coercion': 'error',
     'no-labels': 'error',
     'no-lone-blocks': 'error',

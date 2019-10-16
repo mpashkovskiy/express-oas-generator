@@ -81,7 +81,7 @@ function init() {
   app.use(packageInfo.baseUrlPath + '/api-spec', (req, res, next) => {
     res.setHeader('Content-Type', 'application/json');
     res.send(JSON.stringify(patchSpec(predefinedSpec), null, 2));
-    return next();
+    next();
   });
   app.use(packageInfo.baseUrlPath + '/api-docs', swaggerUi.serve, (req, res) => {
     swaggerUi.setup(patchSpec(predefinedSpec))(req, res);
@@ -164,9 +164,8 @@ module.exports.init = (aApp, aPredefinedSpec, aPath, aWriteInterval) => {
           }
         });
       }
-    } finally {
-      return next();
-    }
+    } catch (e) {}
+    next();
   });
 
   // make sure we list routes after they are configured
@@ -183,9 +182,8 @@ module.exports.init = (aApp, aPredefinedSpec, aPath, aWriteInterval) => {
           processors.processBody(req, method);
           processors.processQuery(req, method);
         }
-      } finally {
-        return next();
-      }
+      } catch (e) {}
+      next();
     });
     init();
   }, 1000);
