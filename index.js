@@ -186,7 +186,7 @@ module.exports.init = (aApp, aPredefinedSpec, aPath, aWriteInterval) => {
       next();
     });
     init();
-  }, 1000);
+  }, 0);
 };
 
 module.exports.getSpec = () => {
