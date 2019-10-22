@@ -145,7 +145,7 @@ function updateSchemesAndHost(req) {
 module.exports.init = (aApp, aPredefinedSpec, aPath, aWriteInterval, aApiDocsPath = 'api-docs') => {
   app = aApp;
   predefinedSpec = aPredefinedSpec;
-  const writeInterval = aWriteInterval | 10 * 1000;
+  const writeInterval = aWriteInterval || 10 * 1000;
 
   // middleware to handle responses
   app.use((req, res, next) => {
