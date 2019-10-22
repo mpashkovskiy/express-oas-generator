@@ -230,3 +230,60 @@ it('WHEN package json does not include baseUrlPath THEN spec description is not 
     done();
   }, 1001);
 });
+
+it('WHEN custom path for docs set THEN the the path should provide it', done => {
+  const app = express();
+  const path = '/';
+  generator.init(
+    app,
+    function(spec) {
+      return spec;
+    },
+    'api-spec.json',
+    1000,
+    'custom-docs'
+  );
+  app.get(path, (req, res, next) => {
+    res.setHeader('Content-Type', 'text/plain');
+    res.send(PLAIN_TEXT_RESPONSE);
+    return next();
+  });
+  app.set('port', port);
+  const server = app.listen(app.get('port'), function() {
+    setTimeout(() => {
+      request.get(`http://localhost:${port}/custom-docs`, (error, response) => {
+        expect(error).toBeNull();
+        expect(response.statusCode).toBe(200);
+        server.close();
+        done();
+      });
+    }, MS_TO_STARTUP);
+  });
+});
+
+it('WHEN no custom path for docs set THEN the default path should be provided', done => {
+  const app = express();
+  const path = '/';
+  generator.init(
+    app,
+    function(spec) {
+      return spec;
+    }
+  );
+  app.get(path, (req, res, next) => {
+    res.setHeader('Content-Type', 'text/plain');
+    res.send(PLAIN_TEXT_RESPONSE);
+    return next();
+  });
+  app.set('port', port);
+  const server = app.listen(app.get('port'), function() {
+    setTimeout(() => {
+      request.get(`http://localhost:${port}/api-docs`, (error, response) => {
+        expect(error).toBeNull();
+        expect(response.statusCode).toBe(200);
+        server.close();
+        done();
+      });
+    }, MS_TO_STARTUP);
+  });
+});
