@@ -43,7 +43,7 @@ function updateSpecFromPackage() {
 
 }
 
-function init() {
+function init(aApiDocsPath) {
   spec = { swagger: '2.0', paths: {} };
 
   const endpoints = listEndpoints(app);
@@ -83,7 +83,7 @@ function init() {
     res.send(JSON.stringify(patchSpec(predefinedSpec), null, 2));
     next();
   });
-  app.use(packageInfo.baseUrlPath + '/api-docs', swaggerUi.serve, (req, res) => {
+  app.use(packageInfo.baseUrlPath + '/' + aApiDocsPath, swaggerUi.serve, (req, res) => {
     swaggerUi.setup(patchSpec(predefinedSpec))(req, res);
   });
 }
@@ -142,10 +142,10 @@ function updateSchemesAndHost(req) {
   }
 }
 
-module.exports.init = (aApp, aPredefinedSpec, aPath, aWriteInterval) => {
+module.exports.init = (aApp, aPredefinedSpec, aPath, aWriteInterval, aApiDocsPath = 'api-docs') => {
   app = aApp;
   predefinedSpec = aPredefinedSpec;
-  const writeInterval = aWriteInterval | 10 * 1000;
+  const writeInterval = aWriteInterval || 10 * 1000;
 
   // middleware to handle responses
   app.use((req, res, next) => {
@@ -154,8 +154,10 @@ module.exports.init = (aApp, aPredefinedSpec, aPath, aWriteInterval) => {
       if (methodAndPathKey && methodAndPathKey.method) {
         processors.processResponse(res, methodAndPathKey.method);
       }
+      let firstTime = true;
       const ts = new Date().getTime();
-      if (aPath && ts - lastRecordTime > writeInterval) {
+      if (firstTime || aPath && ts - lastRecordTime > writeInterval) {
+        firstTime = false;
         lastRecordTime = ts;
         fs.writeFile(aPath, JSON.stringify(spec, null, 2), 'utf8', err => {
           const fullPath = path.resolve(aPath);
