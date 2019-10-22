@@ -154,8 +154,10 @@ module.exports.init = (aApp, aPredefinedSpec, aPath, aWriteInterval, aApiDocsPat
       if (methodAndPathKey && methodAndPathKey.method) {
         processors.processResponse(res, methodAndPathKey.method);
       }
+      let firstTime = true;
       const ts = new Date().getTime();
-      if (aPath && ts - lastRecordTime > writeInterval) {
+      if (firstTime || aPath && ts - lastRecordTime > writeInterval) {
+        firstTime = false;
         lastRecordTime = ts;
         fs.writeFile(aPath, JSON.stringify(spec, null, 2), 'utf8', err => {
           const fullPath = path.resolve(aPath);
