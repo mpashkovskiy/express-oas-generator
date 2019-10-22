@@ -168,25 +168,22 @@ module.exports.init = (aApp, aPredefinedSpec, aPath, aWriteInterval) => {
     next();
   });
 
-  // make sure we list routes after they are configured
-  setTimeout(() => {
-    // middleware to handle requests
-    app.use((req, res, next) => {
-      try {
-        const methodAndPathKey = getMethod(req);
-        if (methodAndPathKey && methodAndPathKey.method && methodAndPathKey.pathKey) {
-          const method = methodAndPathKey.method;
-          updateSchemesAndHost(req);
-          processors.processPath(req, method, methodAndPathKey.pathKey);
-          processors.processHeaders(req, method, spec);
-          processors.processBody(req, method);
-          processors.processQuery(req, method);
-        }
-      } catch (e) {}
-      next();
-    });
-    init();
-  }, 0);
+  // middleware to handle requests
+  app.use((req, res, next) => {
+    try {
+      const methodAndPathKey = getMethod(req);
+      if (methodAndPathKey && methodAndPathKey.method && methodAndPathKey.pathKey) {
+        const method = methodAndPathKey.method;
+        updateSchemesAndHost(req);
+        processors.processPath(req, method, methodAndPathKey.pathKey);
+        processors.processHeaders(req, method, spec);
+        processors.processBody(req, method);
+        processors.processQuery(req, method);
+      }
+    } catch (e) {}
+    next();
+  });
+  init(aApiDocsPath);
 };
 
 module.exports.getSpec = () => {
