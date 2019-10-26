@@ -142,7 +142,7 @@ function updateSchemesAndHost(req) {
   }
 }
 
-module.exports.init = (aApp, aPredefinedSpec, aPath, aWriteInterval, aApiDocsPath = 'api-docs') => {
+module.exports.init = (aApp, aPredefinedSpec, aPath, aWriteInterval, aApiDocsPath = 'api-docs', onWriteCallback = () => {}) => {
   app = aApp;
   predefinedSpec = aPredefinedSpec;
   const writeInterval = aWriteInterval || 10 * 1000;
@@ -163,6 +163,12 @@ module.exports.init = (aApp, aPredefinedSpec, aPath, aWriteInterval, aApiDocsPat
           const fullPath = path.resolve(aPath);
           if (err) {
             throw new Error(`Cannot store the specification into ${fullPath} because of ${err.message}`);
+          }
+          try {
+            onWriteCallback();
+          } catch (e) {
+            console.error('Failed in the `onWriteCallback()` - check your stuff!');
+            throw new Error(err);
           }
         });
       }
