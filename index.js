@@ -43,7 +43,19 @@ function updateSpecFromPackage() {
 
 }
 
-function init(aApiDocsPath) {
+/**
+ * @description serve the openAPI docs with swagger at a specified path / url
+ *
+ * @param {object} options
+ * @param {string} [options.path=api-docs] where to serve the openAPI docs. Defaults to `api-docs`
+ * @param {*} [options.predefinedSpec=undefined]
+ *
+ * @returns void
+ */
+function serveApiDocs(options = { path: 'api-docs', predefinedSpec: undefined }) {
+  const { path, predefinedSpec } = options;
+
+  const aApiDocsPath = path;
   spec = { swagger: '2.0', paths: {} };
 
   const endpoints = listEndpoints(app);
@@ -87,6 +99,8 @@ function init(aApiDocsPath) {
     swaggerUi.setup(patchSpec(predefinedSpec))(req, res);
   });
 }
+
+module.exports.serveApiDocs = serveApiDocs;
 
 function patchSpec(predefinedSpec) {
   return typeof predefinedSpec === 'object'
@@ -187,7 +201,7 @@ module.exports.init = (aApp, aPredefinedSpec, aPath, aWriteInterval, aApiDocsPat
       } catch (e) {}
       next();
     });
-    init(aApiDocsPath);
+    serveApiDocs({ path: aApiDocsPath, predefinedSpec });
   }, 1000);
 };
 
