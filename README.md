@@ -51,6 +51,21 @@ where:
 * 'path/to/a/file/filename.json' - path to a file and file name
 * 60 * 1000 - write interval in milliseconds (optional parameter, by default interval is equal to 10 seconds)
 
+To change the Swagger UI path for your REST API use fifth (optional) argument:
+```javascript
+expressOasGenerator.init(
+  app,
+  function(spec) { return spec; },
+  'path/to/a/file/filename.json',
+  60 * 1000,
+  'custom-docs-path'
+)
+```
+where:
+* 'path/to/a/file/filename.json' - path to a file and file name
+* 60 * 1000 - write interval in milliseconds (optional parameter, by default interval is equal to 10 seconds)
+* 'custom-docs-path' - Swagger UI path for your REST API (default: api-docs)
+
 ## (Optional) Additions to your package.json
 
 If your service is running not at the root of the server add full base path URL to package.json
