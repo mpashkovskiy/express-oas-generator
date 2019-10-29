@@ -100,8 +100,6 @@ function serveApiDocs(options = { path: 'api-docs', predefinedSpec: undefined })
   });
 }
 
-module.exports.serveApiDocs = serveApiDocs;
-
 function patchSpec(predefinedSpec) {
   return typeof predefinedSpec === 'object'
     ? utils.sortObject(_.merge(spec, predefinedSpec || {}))
@@ -217,8 +215,6 @@ function injectResponseMiddleware(expressApp, options = { pathToOutputFile: unde
   });
 }
 
-module.exports.injectResponseMiddleware = injectResponseMiddleware;
-
 /** TODO - type defs for Express don't work (I tried @external) */
 /**
  * Apply this **last**!
@@ -251,8 +247,6 @@ function injectRequestMiddleware() {
     }
   });
 }
-
-module.exports.injectRequestMiddleware = injectRequestMiddleware;
 
 /**
  * TODO
@@ -318,12 +312,19 @@ function init(aApp, aPredefinedSpec = undefined, aPath = undefined, aWriteInterv
   }, 1000);
 }
 
-module.exports.init = init;
-
-module.exports.getSpec = () => {
+const getSpec = () => {
   return patchSpec(predefinedSpec);
 };
 
-module.exports.setPackageInfoPath = pkgInfoPath => {
+const setPackageInfoPath = pkgInfoPath => {
   packageJsonPath = `${process.cwd()}/${pkgInfoPath}/package.json`;
+};
+
+module.exports = {
+  injectResponseMiddleware,
+  injectRequestMiddleware,
+  serveApiDocs,
+  init,
+  getSpec,
+  setPackageInfoPath
 };
