@@ -368,7 +368,6 @@ const setPackageInfoPath = pkgInfoPath => {
 module.exports = {
   injectResponseMiddleware,
   injectRequestMiddleware,
-  serveApiDocs,
   init,
   getSpec,
   setPackageInfoPath
