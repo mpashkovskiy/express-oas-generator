@@ -219,6 +219,10 @@ function injectResponseMiddleware(expressApp, options = { pathToOutputFile: unde
           const fullPath = path.resolve(pathToOutputFile);
 
           if (err) {
+            /**
+			 * TODO - this is broken - the error will be caught and ignored in the catch below.
+			 * See https://github.com/mpashkovskiy/express-oas-generator/pull/39#discussion_r340026645
+			 */
             throw new Error(`Cannot store the specification into ${fullPath} because of ${err.message}`);
           }
         });
