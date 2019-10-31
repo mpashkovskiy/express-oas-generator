@@ -287,3 +287,29 @@ it('WHEN no custom path for docs set THEN the default path should be provided', 
     }, MS_TO_STARTUP);
   });
 });
+
+it('WHEN **request** middleware is injected before **response** middleware THEN an error should be thrown', done => {
+  const app = express();
+
+  /**
+   * @note make sure that the global variables are reset
+   * after every test
+   */
+
+  expect(() => {
+    generator.injectRequestMiddleware(app);
+  }).toThrowError();
+
+  done();
+});
+
+it('WHEN middleware order is correct THEN no errors should be thrown', done => {
+  const app = express();
+
+  expect(() => {
+    generator.injectResponseMiddleware(app, {});
+    generator.injectRequestMiddleware(app);
+  }).not.toThrowError();
+
+  done();
+});
