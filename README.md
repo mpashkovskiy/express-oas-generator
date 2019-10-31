@@ -11,6 +11,8 @@ Module to:
 
 ## How to use
 
+> Note - make sure to also read the [Advanced usage (recommended)](#advanced-usage-recommended) section after this!
+
 * Install module `npm i express-oas-generator --save`;
 * Import it in a script where you initialize ExpressJS application (see [server.js](server.js) for usage example);
 ```javascript
@@ -65,6 +67,51 @@ where:
 * 'path/to/a/file/filename.json' - path to a file and file name
 * 60 * 1000 - write interval in milliseconds (optional parameter, by default interval is equal to 10 seconds)
 * 'custom-docs-path' - Swagger UI path for your REST API (default: api-docs)
+
+## Advanced usage (recommended)
+
+Instead of using a single `init` handler, we'll use 2 separate ones - one for **responses**, and one for **requests**.
+
+```diff
+let app = express();
+
+-expressOasGenerator.init(app, {});
++expressOasGenerator.injectResponseMiddleware(app, {});
+
+/** do other stuff with `app` */
+
+app.listen(PORT, () => {
++	expressOasGenerator.injectRequestMiddleware(app);
+})
+```
+
+mind the order of the middleware handlers - first we apply the one for **responses**, then we apply the one for **requests**,
+which might seem counter-intuitive since requests come before responses, but this is how we need to do it.
+
+Don't worry - we'll throw a loud error if you messed this up so that you can correct yourself quickly! 💥
+
+### Why do we need to do this?
+
+In order to generate documentation, we need to analyze both **responses** and **requests**.
+
+The tricky thing is - one handler must be placed as the very first middleware of the express app,
+and the other must be the very last.
+
+In the `expressOasGenerator.init()` method, we assume you that place it straight after initializing the express app.
+We create a `setTimeout` of `1000` miliseconds, and then we place the other handler,
+to make sure it's the last middleware.
+
+The basic approach is error-prone
+
+* if you have heavy initialization logic
+
+if it takes longer than a second, then the request handler will be placed, and it would not be the last middleware of the app.
+
+* if you want to start using the API as soon as possible
+
+in this case, requests would not be handled until the `1000` milisecond `setTimeout` passes and applies the request middleware.
+
+This could occur, for example, if you start your express server and then run the API tests immidiately - that wouldn't work. You'd have to start your server and then make your tests wait a second before the request middleware is applied.
 
 ## (Optional) Additions to your package.json
 
