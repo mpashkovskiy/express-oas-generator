@@ -68,11 +68,11 @@ function updateSpecFromPackage() {
  *
  * @param {object} options
  * @param {string} [options.path=api-docs] where to serve the openAPI docs. Defaults to `api-docs`
- * @param {*} [options.predefinedSpec=undefined]
+ * @param {*} [options.predefinedSpec={}]
  *
  * @returns void
  */
-function serveApiDocs(options = { path: 'api-docs', predefinedSpec: undefined }) {
+function serveApiDocs(options = { path: 'api-docs', predefinedSpec: {} }) {
   const { path, predefinedSpec } = options;
 
   const aApiDocsPath = path;
@@ -256,12 +256,12 @@ function injectResponseMiddleware(expressApp, options = { pathToOutputFile: unde
  *
  * @param {object} options
  * @param {string} [options.path=api-docs] where to serve the openAPI docs. Defaults to `api-docs`
- * @param {*} [options.predefinedSpec=undefined]
+ * @param {*} [options.predefinedSpec={}]
  *
  *
  * @returns void
  */
-function injectRequestMiddleware(options = { path: 'api-docs', predefinedSpec: undefined }) {
+function injectRequestMiddleware(options = { path: 'api-docs', predefinedSpec: {} }) {
   /** make sure the middleware placement order (by the user) is correct */
   if (responseMiddlewareHasBeenApplied !== true) {
     const wrongMiddlewareOrderError = `
@@ -341,13 +341,13 @@ For more information, see https://github.com/mpashkovskiy/express-oas-generator#
  * and also will call `serveApiDocs`.
  *
  * @param {Express} aApp - the express app
- * @param {*} [aPredefinedSpec=undefined]
+ * @param {*} [aPredefinedSpec={}]
  * @param {string|undefined} [aPath=undefined] where to write the openAPI specification to.
  * Specify this to create the openAPI specification file.
  * @param {number} [aWriteInterval=10000] how often to write the openAPI specification to file
  * @param {string} [aApiDocsPath=api-docs] where to serve the openAPI docs. Defaults to `api-docs`
  */
-function init(aApp, aPredefinedSpec = undefined, aPath = undefined, aWriteInterval = 1000 * 10, aApiDocsPath = 'api-docs') {
+function init(aApp, aPredefinedSpec = {}, aPath = undefined, aWriteInterval = 1000 * 10, aApiDocsPath = 'api-docs') {
   /**
    * TODO - shouldn't `predefinedSpec` be assigned @ `serveApiDocs`?
    *
