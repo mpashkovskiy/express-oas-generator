@@ -307,8 +307,18 @@ it('WHEN middleware order is correct THEN no errors should be thrown', done => {
   const app = express();
 
   expect(() => {
-    generator.injectResponseMiddleware(app, {});
-    generator.injectRequestMiddleware(app);
+    try {
+      generator.injectResponseMiddleware(app, {});
+      generator.injectRequestMiddleware(app);
+    } catch (err) {
+      /**
+	   * this shoud NOT happen, but if it does - log the error & let it bubble
+	   */
+
+      // eslint-disable-next-line no-console
+      console.error(err);
+      throw err;
+    }
   }).not.toThrowError();
 
   done();
