@@ -80,9 +80,10 @@ let app = express();
 
 /** do other stuff with `app` */
 
-app.listen(PORT, () => {
-+	expressOasGenerator.injectRequestMiddleware(app);
-})
+/** place this as the last middleware */
++expressOasGenerator.injectRequestMiddleware(app);
+
+app.listen(PORT);
 ```
 
 mind the order of the middleware handlers - first we apply the one for **responses**, then we apply the one for **requests**,
