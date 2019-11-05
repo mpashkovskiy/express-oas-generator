@@ -9,6 +9,11 @@ const listEndpoints = require('express-list-endpoints');
 let packageJsonPath = `${process.cwd()}/package.json`;
 let packageInfo;
 let app;
+
+/**
+ * @param {function|object} predefinedSpec either the Swagger specification
+ * or a function with one argument producing it.
+ */
 let predefinedSpec;
 let spec = {};
 let lastRecordTime = new Date().getTime();
