@@ -121,9 +121,11 @@ function serveApiDocs(options = { path: 'api-docs', predefinedSpec: {} }) {
 }
 
 function patchSpec(predefinedSpec) {
-  return typeof predefinedSpec === 'object'
-    ? utils.sortObject(_.merge(spec, predefinedSpec || {}))
-    : predefinedSpec(spec);
+  return !predefinedSpec
+    ? {}
+    : typeof predefinedSpec === 'object'
+      ? utils.sortObject(_.merge(spec, predefinedSpec || {}))
+      : predefinedSpec(spec);
 }
 
 function getPathKey(req) {
