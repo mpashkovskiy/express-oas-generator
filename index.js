@@ -250,9 +250,18 @@ function injectResponseMiddleware(expressApp, options = { pathToOutputFile: unde
  * @description `request` middleware.
  * Applies to the `app` you provided in `injectResponseMiddleware`
  *
+ * Also, since this is the last function you'll need to invoke,
+ * it also initializes the specification and serves the api documentation.
+ * The options are for these tasks.
+ *
+ * @param {object} options
+ * @param {string} [options.path=api-docs] where to serve the openAPI docs. Defaults to `api-docs`
+ * @param {*} [options.predefinedSpec=undefined]
+ *
+ *
  * @returns void
  */
-function injectRequestMiddleware() {
+function injectRequestMiddleware(options = { path: 'api-docs', predefinedSpec: undefined }) {
   /** make sure the middleware placement order (by the user) is correct */
   if (responseMiddlewareHasBeenApplied !== true) {
     const wrongMiddlewareOrderError = `
@@ -296,6 +305,9 @@ For more information, see https://github.com/mpashkovskiy/express-oas-generator#
       next();
     }
   });
+
+  /** forward options to `serveApiDocs`: */
+  serveApiDocs({path: options.path, predefinedSpec: options.predefinedSpec });
 }
 
 /**
