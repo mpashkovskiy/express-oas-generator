@@ -371,8 +371,7 @@ function init(aApp, aPredefinedSpec = {}, aPath = undefined, aWriteInterval = 10
    * wouldn't be the last one.
    */
   setTimeout(() => {
-    injectRequestMiddleware();
-    serveApiDocs({ path: aApiDocsPath, predefinedSpec });
+    injectRequestMiddleware({ path: aApiDocsPath, predefinedSpec });
   }, 1000);
 }
 
