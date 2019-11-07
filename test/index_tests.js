@@ -310,7 +310,7 @@ it('WHEN middleware order is correct THEN no errors should be thrown', done => {
       generator.handleRequests();
     } catch (err) {
       /**
-	   * this shoud NOT happen, but if it does - log the error & let it bubble
+	   * this should NOT happen, but if it does - log the error & let it bubble
 	   */
 
       // eslint-disable-next-line no-console

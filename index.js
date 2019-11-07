@@ -198,7 +198,7 @@ function handleResponses(expressApp, options = { pathToOutputFile: undefined, wr
 
   /**
    * save the `expressApp` to our local `app` variable.
-   * Used here, but not in `injestRequestMiddleware`,
+   * Used here, but not in `handleRequests`,
    * because this comes before it.
    */
   app = expressApp;
@@ -366,7 +366,7 @@ function init(aApp, aPredefinedSpec = {}, aPath = undefined, aWriteInterval = 10
    * TODO - this (setTimeout) is error-prone.
    * See https://github.com/mpashkovskiy/express-oas-generator/pull/32#issuecomment-546807216
    *
-   * There could be some heavylifing initialization that takes
+   * There could be some heavy-lifting initialization that takes
    * more than a second and in those cases the requests processing middleware
    * wouldn't be the last one.
    */
