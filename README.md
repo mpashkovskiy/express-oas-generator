@@ -81,7 +81,7 @@ let app = express();
 /** do other stuff with `app` */
 
 /** place this as the last middleware */
-+expressOasGenerator.injectRequestMiddleware(app);
++expressOasGenerator.handleRequests(app);
 
 app.listen(PORT);
 ```

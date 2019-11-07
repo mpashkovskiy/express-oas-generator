@@ -249,7 +249,7 @@ function handleResponses(expressApp, options = { pathToOutputFile: undefined, wr
  *
  * (as the very last middleware of your express app)
  *
- * @description `request` middleware.
+ * @description apply the `request` middleware
  * Applies to the `app` you provided in `handleResponses`
  *
  * Also, since this is the last function you'll need to invoke,
@@ -263,7 +263,7 @@ function handleResponses(expressApp, options = { pathToOutputFile: undefined, wr
  *
  * @returns void
  */
-function injectRequestMiddleware(options = { path: 'api-docs', predefinedSpec: {} }) {
+function handleRequests(options = { path: 'api-docs', predefinedSpec: {} }) {
   /** make sure the middleware placement order (by the user) is correct */
   if (responseMiddlewareHasBeenApplied !== true) {
     const wrongMiddlewareOrderError = `
@@ -328,9 +328,9 @@ For more information, see https://github.com/mpashkovskiy/express-oas-generator#
  */
 /**
  * @warn it's preferred that you use `handleResponses`,
- * `injectRequestMiddleware` and `serveApiDocs` **individually**
+ * `handleRequests` and `serveApiDocs` **individually**
  * and not directly from this `init` function,
- * because we need `injectRequestMiddleware` to be placed as the
+ * because we need `handleRequests` to be placed as the
  * very last middleware and we cannot guarantee this here,
  * since we're only using an arbitrary setTimeout of `1000` ms.
  *
@@ -339,7 +339,7 @@ For more information, see https://github.com/mpashkovskiy/express-oas-generator#
  *
  * @description initialize the `express-oas-generator`.
  *
- * This will apply both `handleResponses` and `injectRequestMiddleware`
+ * This will apply both `handleResponses` and `handleRequests`
  * and also will call `serveApiDocs`.
  *
  * @param {Express} aApp - the express app
@@ -354,7 +354,7 @@ function init(aApp, aPredefinedSpec = {}, aPath = undefined, aWriteInterval = 10
    * TODO - shouldn't `predefinedSpec` be assigned @ `serveApiDocs`?
    *
    * I don't know if the `predefinedSpec` is used anywhere for `handleResponses`
-   * and before `injectRequestMiddleware` is called
+   * and before `handleRequests` is called
    */
   predefinedSpec = aPredefinedSpec;
 
@@ -371,7 +371,7 @@ function init(aApp, aPredefinedSpec = {}, aPath = undefined, aWriteInterval = 10
    * wouldn't be the last one.
    */
   setTimeout(() => {
-    injectRequestMiddleware({ path: aApiDocsPath, predefinedSpec });
+    handleRequests({ path: aApiDocsPath, predefinedSpec });
   }, 1000);
 }
 
@@ -385,7 +385,7 @@ const setPackageInfoPath = pkgInfoPath => {
 
 module.exports = {
   handleResponses,
-  injectRequestMiddleware,
+  handleRequests,
   init,
   getSpec,
   setPackageInfoPath

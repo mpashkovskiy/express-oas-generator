@@ -297,7 +297,7 @@ it('WHEN **request** middleware is injected before **response** middleware THEN 
    */
 
   expect(() => {
-    generator.injectRequestMiddleware(app);
+    generator.handleRequests(app);
   }).toThrowError();
 
   done();
@@ -309,7 +309,7 @@ it('WHEN middleware order is correct THEN no errors should be thrown', done => {
   expect(() => {
     try {
       generator.handleResponses(app, {});
-      generator.injectRequestMiddleware(app);
+      generator.handleRequests(app);
     } catch (err) {
       /**
 	   * this shoud NOT happen, but if it does - log the error & let it bubble
