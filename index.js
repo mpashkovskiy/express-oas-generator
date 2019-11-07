@@ -182,7 +182,7 @@ function updateSchemesAndHost(req) {
  *
  * (straight after creating the express app (as the very first middleware))
  *
- * @description `response` middleware.
+ * @description apply the `response` middleware.
  *
  * @param {Express} expressApp - the express app
  *
@@ -193,7 +193,7 @@ function updateSchemesAndHost(req) {
  *
  * @returns void
  */
-function injectResponseMiddleware(expressApp, options = { pathToOutputFile: undefined, writeIntervalMs: 1000 * 10 }) {
+function handleResponses(expressApp, options = { pathToOutputFile: undefined, writeIntervalMs: 1000 * 10 }) {
   responseMiddlewareHasBeenApplied = true;
 
   /**
@@ -250,7 +250,7 @@ function injectResponseMiddleware(expressApp, options = { pathToOutputFile: unde
  * (as the very last middleware of your express app)
  *
  * @description `request` middleware.
- * Applies to the `app` you provided in `injectResponseMiddleware`
+ * Applies to the `app` you provided in `handleResponses`
  *
  * Also, since this is the last function you'll need to invoke,
  * it also initializes the specification and serves the api documentation.
@@ -327,7 +327,7 @@ For more information, see https://github.com/mpashkovskiy/express-oas-generator#
  *
  */
 /**
- * @warn it's preferred that you use `injectResponseMiddleware`,
+ * @warn it's preferred that you use `handleResponses`,
  * `injectRequestMiddleware` and `serveApiDocs` **individually**
  * and not directly from this `init` function,
  * because we need `injectRequestMiddleware` to be placed as the
@@ -339,7 +339,7 @@ For more information, see https://github.com/mpashkovskiy/express-oas-generator#
  *
  * @description initialize the `express-oas-generator`.
  *
- * This will apply both `injectResponseMiddleware` and `injectRequestMiddleware`
+ * This will apply both `handleResponses` and `injectRequestMiddleware`
  * and also will call `serveApiDocs`.
  *
  * @param {Express} aApp - the express app
@@ -353,12 +353,12 @@ function init(aApp, aPredefinedSpec = {}, aPath = undefined, aWriteInterval = 10
   /**
    * TODO - shouldn't `predefinedSpec` be assigned @ `serveApiDocs`?
    *
-   * I don't know if the `predefinedSpec` is used anywhere for `injectResponseMiddleware`
+   * I don't know if the `predefinedSpec` is used anywhere for `handleResponses`
    * and before `injectRequestMiddleware` is called
    */
   predefinedSpec = aPredefinedSpec;
 
-  injectResponseMiddleware(aApp, { pathToOutputFile: aPath, writeIntervalMs: aWriteInterval });
+  handleResponses(aApp, { pathToOutputFile: aPath, writeIntervalMs: aWriteInterval });
 
   /**
    * make sure we list routes after they are configured
@@ -384,7 +384,7 @@ const setPackageInfoPath = pkgInfoPath => {
 };
 
 module.exports = {
-  injectResponseMiddleware,
+  handleResponses,
   injectRequestMiddleware,
   init,
   getSpec,

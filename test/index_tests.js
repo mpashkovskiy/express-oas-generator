@@ -308,7 +308,7 @@ it('WHEN middleware order is correct THEN no errors should be thrown', done => {
 
   expect(() => {
     try {
-      generator.injectResponseMiddleware(app, {});
+      generator.handleResponses(app, {});
       generator.injectRequestMiddleware(app);
     } catch (err) {
       /**

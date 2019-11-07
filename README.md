@@ -76,7 +76,7 @@ Instead of using a single `init` handler, we'll use 2 separate ones - one for **
 let app = express();
 
 -expressOasGenerator.init(app, {});
-+expressOasGenerator.injectResponseMiddleware(app, {});
++expressOasGenerator.handleResponses(app, {});
 
 /** do other stuff with `app` */
 
