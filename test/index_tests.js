@@ -289,15 +289,13 @@ it('WHEN no custom path for docs set THEN the default path should be provided', 
 });
 
 it('WHEN **request** middleware is injected before **response** middleware THEN an error should be thrown', done => {
-  const app = express();
-
   /**
    * @note make sure that the global variables are reset
    * after every test
    */
 
   expect(() => {
-    generator.handleRequests(app);
+    generator.handleRequests();
   }).toThrowError();
 
   done();
@@ -309,7 +307,7 @@ it('WHEN middleware order is correct THEN no errors should be thrown', done => {
   expect(() => {
     try {
       generator.handleResponses(app, {});
-      generator.handleRequests(app);
+      generator.handleRequests();
     } catch (err) {
       /**
 	   * this shoud NOT happen, but if it does - log the error & let it bubble
