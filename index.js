@@ -122,7 +122,7 @@ function serveApiDocs(options = { path: 'api-docs', predefinedSpec: {} }) {
 
 function patchSpec(predefinedSpec) {
   return !predefinedSpec
-    ? {}
+    ? spec
     : typeof predefinedSpec === 'object'
       ? utils.sortObject(_.merge(spec, predefinedSpec || {}))
       : predefinedSpec(spec);
