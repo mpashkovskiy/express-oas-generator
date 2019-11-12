@@ -13,7 +13,7 @@
     "cve-check": "npm audit --audit-level high",
     "test": "npm run lint -- --fix && npm run cve-check && npm run jasmine",
     "send-coverage": "nyc report --reporter=text-lcov | ./node_modules/coveralls/bin/coveralls.js",
-    "pp": "npm version patch && npm publish && git push && git push --tag",
+    "pp": "npm version patch && npm run docs:api && npm publish && git push --follow-tag",
     "docs:api": "jsdoc -c jsdoc.json"
   },
   "repository": {
