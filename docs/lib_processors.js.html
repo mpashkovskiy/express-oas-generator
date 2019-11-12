@@ -27,7 +27,7 @@
 
 <nav >
     
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-index.html">index</a><ul class='methods'><li data-type='method' style='display: none;'><a href="module-index.html#~handleRequests">handleRequests</a></li><li data-type='method' style='display: none;'><a href="module-index.html#~handleResponses">handleResponses</a></li><li data-type='method' style='display: none;'><a href="module-index.html#~init">init</a></li><li data-type='method' style='display: none;'><a href="module-index.html#~serveApiDocs">serveApiDocs</a></li></ul></li><li><a href="module-lib_processors.html">lib/processors</a></li><li><a href="module-lib_utils.html">lib/utils</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-index.html">index</a><ul class='methods'><li data-type='method' style='display: none;'><a href="module-index.html#~getMethod">getMethod</a></li><li data-type='method' style='display: none;'><a href="module-index.html#~getPathKey">getPathKey</a></li><li data-type='method' style='display: none;'><a href="module-index.html#~getSpec">getSpec</a></li><li data-type='method' style='display: none;'><a href="module-index.html#~handleRequests">handleRequests</a></li><li data-type='method' style='display: none;'><a href="module-index.html#~handleResponses">handleResponses</a></li><li data-type='method' style='display: none;'><a href="module-index.html#~init">init</a></li><li data-type='method' style='display: none;'><a href="module-index.html#~patchSpec">patchSpec</a></li><li data-type='method' style='display: none;'><a href="module-index.html#~serveApiDocs">serveApiDocs</a></li><li data-type='method' style='display: none;'><a href="module-index.html#~setPackageInfoPath">setPackageInfoPath</a></li><li data-type='method' style='display: none;'><a href="module-index.html#~updateSchemesAndHost">updateSchemesAndHost</a></li><li data-type='method' style='display: none;'><a href="module-index.html#~updateSpecFromPackage">updateSpecFromPackage</a></li></ul></li><li><a href="module-lib_processors.html">lib/processors</a><ul class='methods'><li data-type='method' style='display: none;'><a href="module-lib_processors.html#.processBody">processBody</a></li><li data-type='method' style='display: none;'><a href="module-lib_processors.html#.processHeaders">processHeaders</a></li><li data-type='method' style='display: none;'><a href="module-lib_processors.html#.processPath">processPath</a></li><li data-type='method' style='display: none;'><a href="module-lib_processors.html#.processQuery">processQuery</a></li><li data-type='method' style='display: none;'><a href="module-lib_processors.html#.processResponse">processResponse</a></li><li data-type='method' style='display: none;'><a href="module-lib_processors.html#~appendChunkIfNeeded">appendChunkIfNeeded</a></li><li data-type='method' style='display: none;'><a href="module-lib_processors.html#~isCompressed">isCompressed</a></li><li data-type='method' style='display: none;'><a href="module-lib_processors.html#~updateProduces">updateProduces</a></li><li data-type='method' style='display: none;'><a href="module-lib_processors.html#~updateResponses">updateResponses</a></li><li data-type='method' style='display: none;'><a href="module-lib_processors.html#~updateSecurity">updateSecurity</a></li><li data-type='method' style='display: none;'><a href="module-lib_processors.html#~updateSecurityDefinitions">updateSecurityDefinitions</a></li></ul></li><li><a href="module-lib_utils.html">lib/utils</a><ul class='methods'><li data-type='method' style='display: none;'><a href="module-lib_utils.html#.getSchema">getSchema</a></li><li data-type='method' style='display: none;'><a href="module-lib_utils.html#.getType">getType</a></li><li data-type='method' style='display: none;'><a href="module-lib_utils.html#.sortObject">sortObject</a></li><li data-type='method' style='display: none;'><a href="module-lib_utils.html#~fillExamples">fillExamples</a></li></ul></li></ul>
 </nav>
 
 <div id="main">
@@ -50,6 +50,12 @@
 const generateSchema = require('generate-schema');
 const utils = require('./utils');
 
+/**
+ *
+ * @param req
+ * @param method
+ * @param pathKey
+ */
 module.exports.processPath = (req, method, pathKey) => {
   if (pathKey.indexOf('{') === -1) {
     return;
@@ -72,6 +78,11 @@ module.exports.processPath = (req, method, pathKey) => {
   });
 };
 
+/**
+ *
+ * @param method
+ * @param headerName
+ */
 function updateSecurity(method, headerName) {
   method.security = method.security || [];
   if (method.security.map(s => Object.keys(s)[0]).indexOf(headerName) === -1) {
@@ -81,6 +92,11 @@ function updateSecurity(method, headerName) {
   }
 }
 
+/**
+ *
+ * @param spec
+ * @param headerName
+ */
 function updateSecurityDefinitions(spec, headerName) {
   spec.securityDefinitions = spec.securityDefinitions || {};
   spec.securityDefinitions[headerName] = {
@@ -90,6 +106,12 @@ function updateSecurityDefinitions(spec, headerName) {
   };
 }
 
+/**
+ *
+ * @param req
+ * @param method
+ * @param spec
+ */
 module.exports.processHeaders = (req, method, spec) => {
   Object
     .keys(req.headers)
@@ -104,6 +126,11 @@ module.exports.processHeaders = (req, method, spec) => {
     });
 };
 
+/**
+ *
+ * @param req
+ * @param method
+ */
 module.exports.processBody = (req, method) => {
   if (!req.body || Object.keys(req.body).length === 0) {
     return;
@@ -122,6 +149,11 @@ module.exports.processBody = (req, method) => {
   });
 };
 
+/**
+ *
+ * @param req
+ * @param method
+ */
 module.exports.processQuery = (req, method) => {
   const params = req.query;
   if (!params || Object.keys(params).length === 0) {
@@ -147,6 +179,11 @@ module.exports.processQuery = (req, method) => {
   }
 };
 
+/**
+ *
+ * @param res
+ * @param method
+ */
 function updateProduces(res, method) {
   let contentType = res.get('content-type');
   if (!contentType) {
@@ -160,6 +197,12 @@ function updateProduces(res, method) {
   }
 }
 
+/**
+ *
+ * @param res
+ * @param method
+ * @param chunks
+ */
 function updateResponses(res, method, chunks) {
   method.responses = method.responses || {};
   method.responses[res.statusCode] = {};
@@ -184,6 +227,13 @@ function updateResponses(res, method, chunks) {
   method.responses[res.statusCode].schema = schema;
 }
 
+/**
+ *
+ * @param res
+ * @param method
+ * @param chunks
+ * @param chunk
+ */
 function appendChunkIfNeeded(res, method, chunks, chunk) {
   if (method.responses &amp;&amp; method.responses[res.statusCode]) {
     return;
@@ -196,11 +246,21 @@ function appendChunkIfNeeded(res, method, chunks, chunk) {
   chunks.push(new Buffer(chunk));
 }
 
+/**
+ *
+ * @param res
+ * @returns {boolean}
+ */
 function isCompressed(res) {
   const headers = res.getHeaders ? res.getHeaders() : res.headers();
   return ['gzip', 'compress', 'deflate'].indexOf(headers['content-encoding']) !== -1;
 }
 
+/**
+ *
+ * @param res
+ * @param method
+ */
 module.exports.processResponse = (res, method) => {
   const oldWrite = res.write;
   const oldEnd = res.end;
@@ -244,7 +304,7 @@ module.exports.processResponse = (res, method) => {
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a> on Tue Nov 12 2019 09:57:26 GMT+0200 (Eastern European Standard Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a> on Tue Nov 12 2019 14:08:28 GMT+0200 (Eastern European Standard Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
 <script>prettyPrint();</script>

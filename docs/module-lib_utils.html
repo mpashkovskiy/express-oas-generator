@@ -27,7 +27,7 @@
 
 <nav >
     
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-index.html">index</a><ul class='methods'><li data-type='method' style='display: none;'><a href="module-index.html#~handleRequests">handleRequests</a></li><li data-type='method' style='display: none;'><a href="module-index.html#~handleResponses">handleResponses</a></li><li data-type='method' style='display: none;'><a href="module-index.html#~init">init</a></li><li data-type='method' style='display: none;'><a href="module-index.html#~serveApiDocs">serveApiDocs</a></li></ul></li><li><a href="module-lib_processors.html">lib/processors</a></li><li><a href="module-lib_utils.html">lib/utils</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-index.html">index</a><ul class='methods'><li data-type='method' style='display: none;'><a href="module-index.html#~getMethod">getMethod</a></li><li data-type='method' style='display: none;'><a href="module-index.html#~getPathKey">getPathKey</a></li><li data-type='method' style='display: none;'><a href="module-index.html#~getSpec">getSpec</a></li><li data-type='method' style='display: none;'><a href="module-index.html#~handleRequests">handleRequests</a></li><li data-type='method' style='display: none;'><a href="module-index.html#~handleResponses">handleResponses</a></li><li data-type='method' style='display: none;'><a href="module-index.html#~init">init</a></li><li data-type='method' style='display: none;'><a href="module-index.html#~patchSpec">patchSpec</a></li><li data-type='method' style='display: none;'><a href="module-index.html#~serveApiDocs">serveApiDocs</a></li><li data-type='method' style='display: none;'><a href="module-index.html#~setPackageInfoPath">setPackageInfoPath</a></li><li data-type='method' style='display: none;'><a href="module-index.html#~updateSchemesAndHost">updateSchemesAndHost</a></li><li data-type='method' style='display: none;'><a href="module-index.html#~updateSpecFromPackage">updateSpecFromPackage</a></li></ul></li><li><a href="module-lib_processors.html">lib/processors</a><ul class='methods'><li data-type='method' style='display: none;'><a href="module-lib_processors.html#.processBody">processBody</a></li><li data-type='method' style='display: none;'><a href="module-lib_processors.html#.processHeaders">processHeaders</a></li><li data-type='method' style='display: none;'><a href="module-lib_processors.html#.processPath">processPath</a></li><li data-type='method' style='display: none;'><a href="module-lib_processors.html#.processQuery">processQuery</a></li><li data-type='method' style='display: none;'><a href="module-lib_processors.html#.processResponse">processResponse</a></li><li data-type='method' style='display: none;'><a href="module-lib_processors.html#~appendChunkIfNeeded">appendChunkIfNeeded</a></li><li data-type='method' style='display: none;'><a href="module-lib_processors.html#~isCompressed">isCompressed</a></li><li data-type='method' style='display: none;'><a href="module-lib_processors.html#~updateProduces">updateProduces</a></li><li data-type='method' style='display: none;'><a href="module-lib_processors.html#~updateResponses">updateResponses</a></li><li data-type='method' style='display: none;'><a href="module-lib_processors.html#~updateSecurity">updateSecurity</a></li><li data-type='method' style='display: none;'><a href="module-lib_processors.html#~updateSecurityDefinitions">updateSecurityDefinitions</a></li></ul></li><li><a href="module-lib_utils.html">lib/utils</a><ul class='methods'><li data-type='method' style='display: none;'><a href="module-lib_utils.html#.getSchema">getSchema</a></li><li data-type='method' style='display: none;'><a href="module-lib_utils.html#.getType">getType</a></li><li data-type='method' style='display: none;'><a href="module-lib_utils.html#.sortObject">sortObject</a></li><li data-type='method' style='display: none;'><a href="module-lib_utils.html#~fillExamples">fillExamples</a></li></ul></li></ul>
 </nav>
 
 <div id="main">
@@ -155,6 +155,572 @@
     
 
     
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    <h4 class="name" id=".getSchema"><span class="type-signature">(static) </span>getSchema<span class="signature">(json)</span><span class="type-signature"> &rarr; {Object}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="lib_utils.js.html">lib/utils.js</a>, <a href="lib_utils.js.html#line69">line 69</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>json</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Object</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id=".getType"><span class="type-signature">(static) </span>getType<span class="signature">(obj)</span><span class="type-signature"> &rarr; {string}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="lib_utils.js.html">lib/utils.js</a>, <a href="lib_utils.js.html#line33">line 33</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>obj</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">string</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id=".sortObject"><span class="type-signature">(static) </span>sortObject<span class="signature">(o)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="lib_utils.js.html">lib/utils.js</a>, <a href="lib_utils.js.html#line12">line 12</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>o</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="~fillExamples"><span class="type-signature">(inner) </span>fillExamples<span class="signature">(schema, vals)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="lib_utils.js.html">lib/utils.js</a>, <a href="lib_utils.js.html#line54">line 54</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>schema</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>vals</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+    
 
     
 
@@ -173,7 +739,7 @@
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a> on Tue Nov 12 2019 09:57:26 GMT+0200 (Eastern European Standard Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a> on Tue Nov 12 2019 14:08:28 GMT+0200 (Eastern European Standard Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
 <script>prettyPrint();</script>

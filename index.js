@@ -55,6 +55,9 @@ let firstResponseProcessing = true;
  */
 let responseMiddlewareHasBeenApplied = false;
 
+/**
+ *
+ */
 function updateSpecFromPackage() {
 
   /* eslint global-require : off */
@@ -142,6 +145,11 @@ function serveApiDocs(options = { path: 'api-docs', predefinedSpec: {} }) {
   });
 }
 
+/**
+ *
+ * @param predefinedSpec
+ * @returns {{}}
+ */
 function patchSpec(predefinedSpec) {
   return !predefinedSpec
     ? spec
@@ -150,6 +158,11 @@ function patchSpec(predefinedSpec) {
       : predefinedSpec(spec);
 }
 
+/**
+ *
+ * @param req
+ * @returns {string|undefined|*}
+ */
 function getPathKey(req) {
   if (!req.url) {
     return undefined;
@@ -170,6 +183,11 @@ function getPathKey(req) {
   return undefined;
 }
 
+/**
+ *
+ * @param req
+ * @returns {{method: *, pathKey: *}|undefined}
+ */
 function getMethod(req) {
   if (req.url.startsWith('/api-')) {
     return undefined;
@@ -188,6 +206,10 @@ function getMethod(req) {
   return { method: spec.paths[pathKey][m], pathKey };
 }
 
+/**
+ *
+ * @param req
+ */
 function updateSchemesAndHost(req) {
   spec.schemes = spec.schemes || [];
   if (spec.schemes.indexOf(req.protocol) === -1) {
@@ -376,10 +398,18 @@ function init(aApp, aPredefinedSpec = {}, aPath = undefined, aWriteInterval = 10
   }, 1000);
 }
 
+/**
+ *
+ * @returns {{}}
+ */
 const getSpec = () => {
   return patchSpec(predefinedSpec);
 };
 
+/**
+ *
+ * @param pkgInfoPath
+ */
 const setPackageInfoPath = pkgInfoPath => {
   packageJsonPath = `${process.cwd()}/${pkgInfoPath}/package.json`;
 };
