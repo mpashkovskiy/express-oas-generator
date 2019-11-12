@@ -9,9 +9,29 @@ const listEndpoints = require('express-list-endpoints');
 let packageJsonPath = `${process.cwd()}/package.json`;
 let packageInfo;
 let app;
+
+/**
+ * @param {function|object} predefinedSpec either the Swagger specification
+ * or a function with one argument producing it.
+ */
 let predefinedSpec;
 let spec = {};
 let lastRecordTime = new Date().getTime();
+
+/**
+ * @param {boolean} [responseMiddlewareHasBeenApplied=false]
+ *
+ * @note make sure to reset this variable once you've done your checks.
+ *
+ * @description used make sure the *order* of which the middlewares are applied is correct
+ *
+ * The `response` middleware MUST be applied FIRST,
+ * before the `request` middleware is applied.
+ *
+ * We'll use this to make sure the order is correct.
+ * If not - we'll throw an informative error.
+ */
+let responseMiddlewareHasBeenApplied = false;
 
 function updateSpecFromPackage() {
 
@@ -43,7 +63,19 @@ function updateSpecFromPackage() {
 
 }
 
-function init(aApiDocsPath) {
+/**
+ * @description serve the openAPI docs with swagger at a specified path / url
+ *
+ * @param {object} options
+ * @param {string} [options.path=api-docs] where to serve the openAPI docs. Defaults to `api-docs`
+ * @param {*} [options.predefinedSpec={}]
+ *
+ * @returns void
+ */
+function serveApiDocs(options = { path: 'api-docs', predefinedSpec: {} }) {
+  const { path, predefinedSpec } = options;
+
+  const aApiDocsPath = path;
   spec = { swagger: '2.0', paths: {} };
 
   const endpoints = listEndpoints(app);
@@ -89,9 +121,11 @@ function init(aApiDocsPath) {
 }
 
 function patchSpec(predefinedSpec) {
-  return typeof predefinedSpec === 'object'
-    ? utils.sortObject(_.merge(spec, predefinedSpec || {}))
-    : predefinedSpec(spec);
+  return !predefinedSpec
+    ? spec
+    : typeof predefinedSpec === 'object'
+      ? utils.sortObject(_.merge(spec, predefinedSpec || {}))
+      : predefinedSpec(spec);
 }
 
 function getPathKey(req) {
@@ -142,59 +176,217 @@ function updateSchemesAndHost(req) {
   }
 }
 
-module.exports.init = (aApp, aPredefinedSpec, aPath, aWriteInterval, aApiDocsPath = 'api-docs') => {
-  app = aApp;
-  predefinedSpec = aPredefinedSpec;
-  const writeInterval = aWriteInterval || 10 * 1000;
+/** TODO - type defs for Express don't work (I tried @external) */
+/**
+ * Apply this **first**!
+ *
+ * (straight after creating the express app (as the very first middleware))
+ *
+ * @description apply the `response` middleware.
+ *
+ * @param {Express} expressApp - the express app
+ *
+ * @param {Object} [options] optional configuration options
+ * @param {string|undefined} [options.pathToOutputFile=undefined] where to write the openAPI specification to.
+ * Specify this to create the openAPI specification file.
+ * @param {number} [options.writeIntervalMs=10000] how often to write the openAPI specification to file
+ *
+ * @returns void
+ */
+function handleResponses(expressApp, options = { pathToOutputFile: undefined, writeIntervalMs: 1000 * 10 }) {
+  responseMiddlewareHasBeenApplied = true;
 
-  // middleware to handle responses
+  /**
+   * save the `expressApp` to our local `app` variable.
+   * Used here, but not in `handleRequests`,
+   * because this comes before it.
+   */
+  app = expressApp;
+
+  const { pathToOutputFile, writeIntervalMs } = options;
+
+  /** middleware to handle RESPONSES */
+  // eslint-disable-next-line complexity
   app.use((req, res, next) => {
     try {
       const methodAndPathKey = getMethod(req);
+
       if (methodAndPathKey && methodAndPathKey.method) {
         processors.processResponse(res, methodAndPathKey.method);
       }
-      let firstTime = true;
+
+      let firstTime = true; /** run instantly the first time. TODO do not set set `lastRecordTime` at the start until we run */
       const ts = new Date().getTime();
-      if (firstTime || aPath && ts - lastRecordTime > writeInterval) {
+
+      if (firstTime || pathToOutputFile && ts - lastRecordTime > writeIntervalMs) {
         firstTime = false;
         lastRecordTime = ts;
-        fs.writeFile(aPath, JSON.stringify(spec, null, 2), 'utf8', err => {
-          const fullPath = path.resolve(aPath);
+
+        fs.writeFile(pathToOutputFile, JSON.stringify(spec, null, 2), 'utf8', err => {
+          const fullPath = path.resolve(pathToOutputFile);
+
           if (err) {
+            /**
+			 * TODO - this is broken - the error will be caught and ignored in the catch below.
+			 * See https://github.com/mpashkovskiy/express-oas-generator/pull/39#discussion_r340026645
+			 */
             throw new Error(`Cannot store the specification into ${fullPath} because of ${err.message}`);
           }
         });
       }
-    } catch (e) {}
-    next();
+    } catch (e) {
+      /** TODO - shouldn't we do something here? */
+    } finally {
+      /** always call the next middleware */
+      next();
+    }
+  });
+}
+
+/** TODO - type defs for Express don't work (I tried @external) */
+/**
+ * Apply this **last**!
+ *
+ * (as the very last middleware of your express app)
+ *
+ * @description apply the `request` middleware
+ * Applies to the `app` you provided in `handleResponses`
+ *
+ * Also, since this is the last function you'll need to invoke,
+ * it also initializes the specification and serves the api documentation.
+ * The options are for these tasks.
+ *
+ * @param {object} options
+ * @param {string} [options.path=api-docs] where to serve the openAPI docs. Defaults to `api-docs`
+ * @param {*} [options.predefinedSpec={}]
+ *
+ *
+ * @returns void
+ */
+function handleRequests(options = { path: 'api-docs', predefinedSpec: {} }) {
+  /** make sure the middleware placement order (by the user) is correct */
+  if (responseMiddlewareHasBeenApplied !== true) {
+    const wrongMiddlewareOrderError = `
+Express oas generator:
+
+you miss-placed the **response** and **request** middlewares!
+
+Please, make sure to:
+
+1. place the RESPONSE middleware FIRST,
+right after initializing the express app,
+
+2. and place the REQUEST middleware LAST,
+inside the app.listen callback
+
+For more information, see https://github.com/mpashkovskiy/express-oas-generator#Advanced-usage-recommended
+	`;
+
+    throw new Error(wrongMiddlewareOrderError);
+  }
+
+  /** everything was applied correctly; reset the global variable. */
+  responseMiddlewareHasBeenApplied = false;
+
+  /** middleware to handle REQUESTS */
+  // eslint-disable-next-line complexity
+  app.use((req, res, next) => {
+    try {
+      const methodAndPathKey = getMethod(req);
+      if (methodAndPathKey && methodAndPathKey.method && methodAndPathKey.pathKey) {
+        const method = methodAndPathKey.method;
+        updateSchemesAndHost(req);
+        processors.processPath(req, method, methodAndPathKey.pathKey);
+        processors.processHeaders(req, method, spec);
+        processors.processBody(req, method);
+        processors.processQuery(req, method);
+      }
+    } catch (e) {
+      /** TODO - shouldn't we do something here? */
+    } finally {
+      next();
+    }
   });
 
-  // make sure we list routes after they are configured
-  setTimeout(() => {
-    // middleware to handle requests
-    app.use((req, res, next) => {
-      try {
-        const methodAndPathKey = getMethod(req);
-        if (methodAndPathKey && methodAndPathKey.method && methodAndPathKey.pathKey) {
-          const method = methodAndPathKey.method;
-          updateSchemesAndHost(req);
-          processors.processPath(req, method, methodAndPathKey.pathKey);
-          processors.processHeaders(req, method, spec);
-          processors.processBody(req, method);
-          processors.processQuery(req, method);
-        }
-      } catch (e) {}
-      next();
-    });
-    init(aApiDocsPath);
-  }, 1000);
-};
+  /** forward options to `serveApiDocs`: */
+  serveApiDocs({path: options.path, predefinedSpec: options.predefinedSpec });
+}
 
-module.exports.getSpec = () => {
+/**
+ * TODO
+ *
+ * 1. Rename the parameter names
+ * (this will require better global variable naming to allow re-assigning properly)
+ *
+ * 2. the `aPath` is ignored only if it's `undefined`,
+ * but if it's set to an empty string `''`, then the tests fail.
+ * I think we should be checking for falsy values, not only `undefined` ones.
+ *
+ * 3. (Breaking) Use object for optional parameters:
+ * https://github.com/mpashkovskiy/express-oas-generator/issues/35
+ *
+ */
+/**
+ * @warn it's preferred that you use `handleResponses`,
+ * `handleRequests` and `serveApiDocs` **individually**
+ * and not directly from this `init` function,
+ * because we need `handleRequests` to be placed as the
+ * very last middleware and we cannot guarantee this here,
+ * since we're only using an arbitrary setTimeout of `1000` ms.
+ *
+ * See
+ * https://github.com/mpashkovskiy/express-oas-generator/pull/32#issuecomment-546807216
+ *
+ * @description initialize the `express-oas-generator`.
+ *
+ * This will apply both `handleResponses` and `handleRequests`
+ * and also will call `serveApiDocs`.
+ *
+ * @param {Express} aApp - the express app
+ * @param {*} [aPredefinedSpec={}]
+ * @param {string|undefined} [aPath=undefined] where to write the openAPI specification to.
+ * Specify this to create the openAPI specification file.
+ * @param {number} [aWriteInterval=10000] how often to write the openAPI specification to file
+ * @param {string} [aApiDocsPath=api-docs] where to serve the openAPI docs. Defaults to `api-docs`
+ */
+function init(aApp, aPredefinedSpec = {}, aPath = undefined, aWriteInterval = 1000 * 10, aApiDocsPath = 'api-docs') {
+  /**
+   * TODO - shouldn't `predefinedSpec` be assigned @ `serveApiDocs`?
+   *
+   * I don't know if the `predefinedSpec` is used anywhere for `handleResponses`
+   * and before `handleRequests` is called
+   */
+  predefinedSpec = aPredefinedSpec;
+
+  handleResponses(aApp, { pathToOutputFile: aPath, writeIntervalMs: aWriteInterval });
+
+  /**
+   * make sure we list routes after they are configured
+   *
+   * TODO - this (setTimeout) is error-prone.
+   * See https://github.com/mpashkovskiy/express-oas-generator/pull/32#issuecomment-546807216
+   *
+   * There could be some heavy-lifting initialization that takes
+   * more than a second and in those cases the requests processing middleware
+   * wouldn't be the last one.
+   */
+  setTimeout(() => {
+    handleRequests({ path: aApiDocsPath, predefinedSpec });
+  }, 1000);
+}
+
+const getSpec = () => {
   return patchSpec(predefinedSpec);
 };
 
-module.exports.setPackageInfoPath = pkgInfoPath => {
+const setPackageInfoPath = pkgInfoPath => {
   packageJsonPath = `${process.cwd()}/${pkgInfoPath}/package.json`;
+};
+
+module.exports = {
+  handleResponses,
+  handleRequests,
+  init,
+  getSpec,
+  setPackageInfoPath
 };

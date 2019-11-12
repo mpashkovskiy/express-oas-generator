@@ -287,3 +287,37 @@ it('WHEN no custom path for docs set THEN the default path should be provided', 
     }, MS_TO_STARTUP);
   });
 });
+
+it('WHEN **request** middleware is injected before **response** middleware THEN an error should be thrown', done => {
+  /**
+   * @note make sure that the global variables are reset
+   * after every test
+   */
+
+  expect(() => {
+    generator.handleRequests();
+  }).toThrowError();
+
+  done();
+});
+
+it('WHEN middleware order is correct THEN no errors should be thrown', done => {
+  const app = express();
+
+  expect(() => {
+    try {
+      generator.handleResponses(app, {});
+      generator.handleRequests();
+    } catch (err) {
+      /**
+	   * this should NOT happen, but if it does - log the error & let it bubble
+	   */
+
+      // eslint-disable-next-line no-console
+      console.error(err);
+      throw err;
+    }
+  }).not.toThrowError();
+
+  done();
+});
