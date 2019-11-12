@@ -13,7 +13,8 @@
     "cve-check": "npm audit --audit-level high",
     "test": "npm run lint -- --fix && npm run cve-check && npm run jasmine",
     "send-coverage": "nyc report --reporter=text-lcov | ./node_modules/coveralls/bin/coveralls.js",
-    "pp": "npm version patch && npm publish && git push && git push --tag"
+    "pp": "npm version patch && npm publish && git push && git push --tag",
+    "docs:api": "jsdoc -c jsdoc.json"
   },
   "repository": {
     "type": "git",
@@ -40,11 +41,13 @@
     "assert": "^1.4.1",
     "body-parser": "^1.18.2",
     "coveralls": "^3.0.0",
+    "docdash": "^1.1.1",
     "eslint": "^4.13.1",
     "express": "^4.16.2",
     "jasmine": "^2.8.0",
     "jasmine-reporters": "^2.2.1",
     "jasmine-spec-reporter": "^4.2.1",
+    "jsdoc": "^3.6.3",
     "mocha-lcov-reporter": "^1.3.0",
     "nyc": "^14.1.1",
     "request": "^2.88.0",

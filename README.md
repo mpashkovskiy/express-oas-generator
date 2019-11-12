@@ -23,7 +23,6 @@ const expressOasGenerator = require('express-oas-generator');
 ```javascript
 let app = express();
 expressOasGenerator.init(app, {}); // to overwrite generated specification's values use second argument.
-
 ```
 * **Important!** In order to get description of all parameters and JSON payloads you have to start using your REST API or run REST API tests against it so module can analyze requests/responses
 * Assuming you running your app on port 8000
@@ -133,6 +132,7 @@ Here is a sample
   "bin": {
     "cwt-sts-svc": "bin/server"
   }
+}
 ```
 
 ## Rationale

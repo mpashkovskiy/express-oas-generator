@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>Home - Documentation</title>
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <script src="scripts/nav.js" defer></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-index.html">index</a><ul class='methods'><li data-type='method' style='display: none;'><a href="module-index.html#~handleRequests">handleRequests</a></li><li data-type='method' style='display: none;'><a href="module-index.html#~handleResponses">handleResponses</a></li><li data-type='method' style='display: none;'><a href="module-index.html#~init">init</a></li><li data-type='method' style='display: none;'><a href="module-index.html#~serveApiDocs">serveApiDocs</a></li></ul></li><li><a href="module-lib_processors.html">lib/processors</a></li><li><a href="module-lib_utils.html">lib/utils</a></li></ul>
+</nav>
+
+<div id="main">
+    
+
+    
+
+
+
+    
+
+
+    <section class="package">
+        <h3> </h3>		
+    </section>
+
+
+
+
+
+
+
+
+
+    
+
+
+
+    <section class="readme">
+        <article><h1>express-oas-generator</h1>
+<p><a href="https://nodei.co/npm/express-oas-generator/"><img src="https://nodei.co/npm/express-oas-generator.png?downloads=true&amp;downloadRank=true&amp;stars=true" alt="npm package"></a></p>
+<p><a href="https://travis-ci.org/mpashkovskiy/express-oas-generator"><img src="https://travis-ci.org/mpashkovskiy/express-oas-generator.svg?branch=master" alt="Build Status"></a> <a href="https://coveralls.io/github/mpashkovskiy/express-oas-generator"><img src="https://coveralls.io/repos/github/mpashkovskiy/express-oas-generator/badge.svg" alt="Coverage Status"></a> <a href="https://snyk.io/test/github/mpashkovskiy/express-oas-generator?targetFile=package.json"><img src="https://snyk.io/test/github/mpashkovskiy/express-oas-generator/badge.svg?targetFile=package.json" alt="Known Vulnerabilities"></a></p>
+<p>Module to:</p>
+<ul>
+<li>automatically generate OpenAPI (Swagger) specification for existing ExpressJS 4.x REST API applications;</li>
+<li>provide Swagger UI basing on generated specification.</li>
+</ul>
+<h2>How to use</h2>
+<blockquote>
+<p>Note - make sure to also read the <a href="#advanced-usage-recommended">Advanced usage (recommended)</a> section after this!</p>
+</blockquote>
+<ul>
+<li>Install module <code>npm i express-oas-generator --save</code>;</li>
+<li>Import it in a script where you initialize ExpressJS application (see <a href="server.js">server.js</a> for usage example);</li>
+</ul>
+<pre class="prettyprint source lang-javascript"><code>const express = require('express');
+const expressOasGenerator = require('express-oas-generator');
+</code></pre>
+<ul>
+<li>Run initialization of module right after instantiating app;</li>
+</ul>
+<pre class="prettyprint source lang-javascript"><code>let app = express();
+expressOasGenerator.init(app, {}); // to overwrite generated specification's values use second argument.
+</code></pre>
+<ul>
+<li><strong>Important!</strong> In order to get description of all parameters and JSON payloads you have to start using your REST API or run REST API tests against it so module can analyze requests/responses</li>
+<li>Assuming you running your app on port 8000
+<ul>
+<li>open <a href="http://localhost:8000/api-docs">http://localhost:8000/api-docs</a> to see Swagger UI for your REST API</li>
+<li>specification file is available  <a href="http://localhost:8000/api-spec">http://localhost:8000/api-spec</a> - link is prepended to description field</li>
+</ul>
+</li>
+</ul>
+<p>Second argument of <code>expressOasGenerator.init(app, {})</code> could be either an object or a function. In case of the object generated spec will be merged with the object. In case of function it will be used to apply changes for generated spec. Example of function usage:</p>
+<pre class="prettyprint source lang-javascript"><code>generator.init(app, function(spec) {
+    _.set(spec, 'info.title', 'New Title');
+    _.set(spec, 'paths[\'/path\'].get.parameters[0].example', 2);
+    return spec;
+});
+
+</code></pre>
+<p>To write specification into a file use third and forth (optional) arguments:</p>
+<pre class="prettyprint source lang-javascript"><code>expressOasGenerator.init(
+  app,
+  function(spec) { return spec; },
+  'path/to/a/file/filename.json',
+  60 * 1000
+)
+</code></pre>
+<p>where:</p>
+<ul>
+<li>'path/to/a/file/filename.json' - path to a file and file name</li>
+<li>60 * 1000 - write interval in milliseconds (optional parameter, by default interval is equal to 10 seconds)</li>
+</ul>
+<p>To change the Swagger UI path for your REST API use fifth (optional) argument:</p>
+<pre class="prettyprint source lang-javascript"><code>expressOasGenerator.init(
+  app,
+  function(spec) { return spec; },
+  'path/to/a/file/filename.json',
+  60 * 1000,
+  'custom-docs-path'
+)
+</code></pre>
+<p>where:</p>
+<ul>
+<li>'path/to/a/file/filename.json' - path to a file and file name</li>
+<li>60 * 1000 - write interval in milliseconds (optional parameter, by default interval is equal to 10 seconds)</li>
+<li>'custom-docs-path' - Swagger UI path for your REST API (default: api-docs)</li>
+</ul>
+<h2>Advanced usage (recommended)</h2>
+<p>Instead of using a single <code>init</code> handler, we'll use 2 separate ones - one for <strong>responses</strong>, and one for <strong>requests</strong>.</p>
+<pre class="prettyprint source lang-javascript"><code>let app = express();
+/** place handleResponses as the very first middleware */
+expressOasGenerator.handleResponses(app, {});
+
+/** initialize your `app` and routes */
+
+/** place handleRequests as the very last middleware */
+expressOasGenerator.handleRequests(app);
+app.listen(PORT);
+</code></pre>
+<p>mind the order of the middleware handlers - first we apply the one for <strong>responses</strong>, then we apply the one for <strong>requests</strong>,
+which might seem counter-intuitive since requests come before responses, but this is how we need to do it because:</p>
+<ul>
+<li>to intercept responses <code>response.write()/end()</code> methods should be wrapped before any route or middleware call it</li>
+<li>to intercept requests in right format they have to be read after parsing middlewares like <code>body-parser</code></li>
+</ul>
+<p>Don't worry - we'll throw a loud error if you messed this up so that you can correct yourself quickly! 💥</p>
+<h3>Why do we need to do this?</h3>
+<p>In order to generate documentation, we need to analyze both <strong>responses</strong> and <strong>requests</strong>.</p>
+<p>The tricky thing is - one handler must be placed as the very first middleware of the express app,
+and the other must be the very last. It is needed to intercept all the data (headers and payload) coming in and out out the app.</p>
+<p>In the <code>expressOasGenerator.init()</code> method, we assume that you place it straight after initializing the express app.
+Inside we place response intercept middleware and then we call <code>setTimeout</code> with <code>1000</code> miliseconds to make sure we place our request intercept middleware as the very last one.</p>
+<p>The basic approach is error-prone because:</p>
+<ul>
+<li>if you have heavy initialization logic it can take longer than a second, then the request handler will be placed, and it would not be the last middleware of the app.</li>
+<li>if you want to start using the API as soon as possible requests would not be handled until the <code>1000</code> milisecond <code>setTimeout</code> passes and applies the request middleware.</li>
+</ul>
+<p>This could occur, for example, if you start your express server and then run the API tests immidiately - that wouldn't work.
+You'd have to start your server and then make your tests wait a second before the request middleware is applied.</p>
+<h2>(Optional) Additions to your package.json</h2>
+<p>If your service is running not at the root of the server add full base path URL to package.json</p>
+<pre class="prettyprint source lang-json"><code>{
+  &quot;baseUrlPath&quot; : &quot;/tokens&quot;
+}
+</code></pre>
+<p>Here is a sample</p>
+<pre class="prettyprint source lang-json"><code>{
+  &quot;name&quot;: &quot;cwt-sts-svc&quot;,
+  &quot;version&quot;: &quot;1.1.48&quot;,
+  &quot;description&quot;: &quot;JWT generation service&quot;,
+  &quot;keywords&quot;: [],
+  &quot;author&quot;: &quot;&quot;,
+  &quot;main&quot;: &quot;lib&quot;,
+  &quot;baseUrlPath&quot; : &quot;/tokens&quot;,
+  &quot;bin&quot;: {
+    &quot;cwt-sts-svc&quot;: &quot;bin/server&quot;
+  }
+}
+</code></pre>
+<h2>Rationale</h2>
+<p>Goal of the module is to provide developers with Swagger UI in development environments. Module process every request and response therefore it may slow down your app - is not supposed to be used in production environment.</p>
+<p>Assuming you have ExpressJS REST API application and you</p>
+<ul>
+<li>don't want to write documentation manually;</li>
+<li>but want to use Swagger ecosystem:
+<ul>
+<li>keep REST API endpoint documented;</li>
+<li>provide others with Swagger UI to your REST API;</li>
+<li>generate client libraries for it with Swagger code generator.</li>
+</ul>
+</li>
+</ul>
+<h2>How does it work</h2>
+<ol>
+<li>During initialization module iterates through all routes and methods and initializes OpenAPI (Swagger) specification.</li>
+<li>After an application start module analyze every request/response and fills specification with schemes and examples.</li>
+<li>Module replace values of password fields with <code>******</code></li>
+</ol>
+<h2>Limitations</h2>
+<ol>
+<li>All headers with prefix <code>X-</code> treated as a apiKey type headers;</li>
+<li>Module doesn't recognize enumerations in JSON objects;</li>
+</ol></article>
+    </section>
+
+
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a> on Tue Nov 12 2019 09:57:26 GMT+0200 (Eastern European Standard Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+
+<script src="scripts/collapse.js" defer></script>
+
+
+</body>
+</html>
