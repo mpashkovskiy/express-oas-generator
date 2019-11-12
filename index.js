@@ -6,6 +6,22 @@ const utils = require('./lib/utils');
 const processors = require('./lib/processors');
 const listEndpoints = require('express-list-endpoints');
 
+const WRONG_MIDDLEWARE_ORDER_ERROR = `
+Express oas generator:
+
+you miss-placed the **response** and **request** middlewares!
+
+Please, make sure to:
+
+1. place the RESPONSE middleware FIRST,
+right after initializing the express app,
+
+2. and place the REQUEST middleware LAST,
+inside the app.listen callback
+
+For more information, see https://github.com/mpashkovskiy/express-oas-generator#Advanced-usage-recommended
+`;
+
 let packageJsonPath = `${process.cwd()}/package.json`;
 let packageInfo;
 let app;
@@ -17,6 +33,7 @@ let app;
 let predefinedSpec;
 let spec = {};
 let lastRecordTime = new Date().getTime();
+let firstResponseProcessing = true;
 
 /**
  * @param {boolean} [responseMiddlewareHasBeenApplied=false]
@@ -206,20 +223,16 @@ function handleResponses(expressApp, options = { pathToOutputFile: undefined, wr
   const { pathToOutputFile, writeIntervalMs } = options;
 
   /** middleware to handle RESPONSES */
-  // eslint-disable-next-line complexity
   app.use((req, res, next) => {
     try {
       const methodAndPathKey = getMethod(req);
-
       if (methodAndPathKey && methodAndPathKey.method) {
         processors.processResponse(res, methodAndPathKey.method);
       }
 
-      let firstTime = true; /** run instantly the first time. TODO do not set set `lastRecordTime` at the start until we run */
       const ts = new Date().getTime();
-
-      if (firstTime || pathToOutputFile && ts - lastRecordTime > writeIntervalMs) {
-        firstTime = false;
+      if (firstResponseProcessing || pathToOutputFile && ts - lastRecordTime > writeIntervalMs) {
+        firstResponseProcessing = false;
         lastRecordTime = ts;
 
         fs.writeFile(pathToOutputFile, JSON.stringify(spec, null, 2), 'utf8', err => {
@@ -266,30 +279,13 @@ function handleResponses(expressApp, options = { pathToOutputFile: undefined, wr
 function handleRequests(options = { path: 'api-docs', predefinedSpec: {} }) {
   /** make sure the middleware placement order (by the user) is correct */
   if (responseMiddlewareHasBeenApplied !== true) {
-    const wrongMiddlewareOrderError = `
-Express oas generator:
-
-you miss-placed the **response** and **request** middlewares!
-
-Please, make sure to:
-
-1. place the RESPONSE middleware FIRST,
-right after initializing the express app,
-
-2. and place the REQUEST middleware LAST,
-inside the app.listen callback
-
-For more information, see https://github.com/mpashkovskiy/express-oas-generator#Advanced-usage-recommended
-	`;
-
-    throw new Error(wrongMiddlewareOrderError);
+    throw new Error(WRONG_MIDDLEWARE_ORDER_ERROR);
   }
 
   /** everything was applied correctly; reset the global variable. */
   responseMiddlewareHasBeenApplied = false;
 
   /** middleware to handle REQUESTS */
-  // eslint-disable-next-line complexity
   app.use((req, res, next) => {
     try {
       const methodAndPathKey = getMethod(req);

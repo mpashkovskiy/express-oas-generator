@@ -72,22 +72,23 @@ where:
 
 Instead of using a single `init` handler, we'll use 2 separate ones - one for **responses**, and one for **requests**.
 
-```diff
+```javascript
 let app = express();
+/** place handleResponses as the very first middleware */
+expressOasGenerator.handleResponses(app, {});
 
--expressOasGenerator.init(app, {});
-+expressOasGenerator.handleResponses(app, {});
+/** initialize your `app` and routes */
 
-/** do other stuff with `app` */
-
-/** place this as the last middleware */
-+expressOasGenerator.handleRequests(app);
-
+/** place handleRequests as the very last middleware */
+expressOasGenerator.handleRequests(app);
 app.listen(PORT);
 ```
 
 mind the order of the middleware handlers - first we apply the one for **responses**, then we apply the one for **requests**,
-which might seem counter-intuitive since requests come before responses, but this is how we need to do it.
+which might seem counter-intuitive since requests come before responses, but this is how we need to do it because:
+
+* to intercept responses `response.write()/end()` methods should be wrapped before any route or middleware call it
+* to intercept requests in right format they have to be read after parsing middlewares like `body-parser`
 
 Don't worry - we'll throw a loud error if you messed this up so that you can correct yourself quickly! 💥
 
@@ -96,23 +97,18 @@ Don't worry - we'll throw a loud error if you messed this up so that you can cor
 In order to generate documentation, we need to analyze both **responses** and **requests**.
 
 The tricky thing is - one handler must be placed as the very first middleware of the express app,
-and the other must be the very last.
+and the other must be the very last. It is needed to intercept all the data (headers and payload) coming in and out out the app.
 
-In the `expressOasGenerator.init()` method, we assume you that place it straight after initializing the express app.
-We create a `setTimeout` of `1000` miliseconds, and then we place the other handler,
-to make sure it's the last middleware.
+In the `expressOasGenerator.init()` method, we assume that you place it straight after initializing the express app.
+Inside we place response intercept middleware and then we call `setTimeout` with `1000` miliseconds to make sure we place our request intercept middleware as the very last one.
 
-The basic approach is error-prone
+The basic approach is error-prone because:
 
-* if you have heavy initialization logic
+* if you have heavy initialization logic it can take longer than a second, then the request handler will be placed, and it would not be the last middleware of the app.
+* if you want to start using the API as soon as possible requests would not be handled until the `1000` milisecond `setTimeout` passes and applies the request middleware.
 
-if it takes longer than a second, then the request handler will be placed, and it would not be the last middleware of the app.
-
-* if you want to start using the API as soon as possible
-
-in this case, requests would not be handled until the `1000` milisecond `setTimeout` passes and applies the request middleware.
-
-This could occur, for example, if you start your express server and then run the API tests immidiately - that wouldn't work. You'd have to start your server and then make your tests wait a second before the request middleware is applied.
+This could occur, for example, if you start your express server and then run the API tests immidiately - that wouldn't work.
+You'd have to start your server and then make your tests wait a second before the request middleware is applied.
 
 ## (Optional) Additions to your package.json
 

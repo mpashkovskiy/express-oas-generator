@@ -39,4 +39,6 @@ router.route('/gzip')
       });
 app.use(router);
 app.set('port', 8080);
-app.listen(app.get('port'));
+app.listen(app.get('port'), function () {
+  console.log('Server started. Open http://localhost:8080/api-docs/');
+});
