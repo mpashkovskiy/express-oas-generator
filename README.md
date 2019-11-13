@@ -8,6 +8,9 @@ Module to:
 * automatically generate OpenAPI (Swagger) specification for existing ExpressJS 4.x REST API applications;
 * provide Swagger UI basing on generated specification.
 
+#### WARNINING!
+Again: goal of the module is to provide baseline specification which should be reviewed and modified before exposing to REST API clients.
+Module should be used in test environment only because it can disclose sensitive information if it is running in production. See [How does it work?](#how-does-it-work) and [comment about usage](https://github.com/mpashkovskiy/express-oas-generator/issues/36#issuecomment-553040533) for more info.
 
 ## How to use
 
@@ -146,7 +149,7 @@ Assuming you have ExpressJS REST API application and you
   * provide others with Swagger UI to your REST API;
   * generate client libraries for it with Swagger code generator.
 
-## How does it work
+## How does it work?
 
 1. During initialization module iterates through all routes and methods and initializes OpenAPI (Swagger) specification.
 2. After an application start module analyze every request/response and fills specification with schemes and examples.
