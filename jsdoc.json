@@ -27,6 +27,18 @@
     "search": false,
     "collapse": true,
     "typedefs": true,
-    "removeQuotes": "none"
+    "removeQuotes": "none",
+    "menu": {
+      "Source code": {
+        "href": "https://github.com/mpashkovskiy/express-oas-generator",
+        "target": "_blank",
+        "class": "menu-item"
+      },
+      "Issues": {
+        "href": "https://github.com/mpashkovskiy/express-oas-generator/issues",
+        "target": "_blank",
+        "class": "menu-item"
+      }
+    }
   }
 }
