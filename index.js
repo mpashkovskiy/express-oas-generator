@@ -98,9 +98,7 @@ function updateSpecFromPackage() {
  * @returns void
  */
 function serveApiDocs(options = { path: 'api-docs', predefinedSpec: {} }) {
-  const { path, predefinedSpec } = options;
-
-  const aApiDocsPath = path;
+  predefinedSpec = options.predefinedSpec;
   spec = { swagger: '2.0', paths: {} };
 
   const endpoints = listEndpoints(app);
@@ -140,7 +138,7 @@ function serveApiDocs(options = { path: 'api-docs', predefinedSpec: {} }) {
     res.send(JSON.stringify(patchSpec(predefinedSpec), null, 2));
     next();
   });
-  app.use(packageInfo.baseUrlPath + '/' + aApiDocsPath, swaggerUi.serve, (req, res) => {
+  app.use(packageInfo.baseUrlPath + '/' + options.path, swaggerUi.serve, (req, res) => {
     swaggerUi.setup(patchSpec(predefinedSpec))(req, res);
   });
 }
@@ -373,28 +371,9 @@ function handleRequests(options = { path: 'api-docs', predefinedSpec: {} }) {
  * @param {string} [aApiDocsPath=api-docs] where to serve the openAPI docs. Defaults to `api-docs`
  */
 function init(aApp, aPredefinedSpec = {}, aPath = undefined, aWriteInterval = 1000 * 10, aApiDocsPath = 'api-docs') {
-  /**
-   * TODO - shouldn't `predefinedSpec` be assigned @ `serveApiDocs`?
-   *
-   * I don't know if the `predefinedSpec` is used anywhere for `handleResponses`
-   * and before `handleRequests` is called
-   */
-  predefinedSpec = aPredefinedSpec;
-
   handleResponses(aApp, { pathToOutputFile: aPath, writeIntervalMs: aWriteInterval });
-
-  /**
-   * make sure we list routes after they are configured
-   *
-   * TODO - this (setTimeout) is error-prone.
-   * See https://github.com/mpashkovskiy/express-oas-generator/pull/32#issuecomment-546807216
-   *
-   * There could be some heavy-lifting initialization that takes
-   * more than a second and in those cases the requests processing middleware
-   * wouldn't be the last one.
-   */
   setTimeout(() => {
-    handleRequests({ path: aApiDocsPath, predefinedSpec });
+    handleRequests({ path: aApiDocsPath, predefinedSpec: aPredefinedSpec });
   }, 1000);
 }
 

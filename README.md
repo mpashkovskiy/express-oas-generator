@@ -17,7 +17,7 @@ Module should be used in test environment only because it can disclose sensitive
 > Note - make sure to also read the [Advanced usage (recommended)](#advanced-usage-recommended) section after this!
 
 * Install module `npm i express-oas-generator --save`;
-* Import it in a script where you initialize ExpressJS application (see [server.js](server.js) for usage example);
+* Import it in a script where you initialize ExpressJS application (see [server.js](server_basic.js) for usage example);
 ```javascript
 const express = require('express');
 const expressOasGenerator = require('express-oas-generator');
@@ -82,7 +82,7 @@ expressOasGenerator.handleResponses(app, {});
 /** initialize your `app` and routes */
 
 /** place handleRequests as the very last middleware */
-expressOasGenerator.handleRequests(app);
+expressOasGenerator.handleRequests();
 app.listen(PORT);
 ```
 
@@ -93,6 +93,8 @@ which might seem counter-intuitive since requests come before responses, but thi
 * to intercept requests in right format they have to be read after parsing middlewares like `body-parser`
 
 Don't worry - we'll throw a loud error if you messed this up so that you can correct yourself quickly! 💥
+
+See [server_advanced.js](server_advanced.js) for usage example.
 
 ### Why do we need to do this?
 
