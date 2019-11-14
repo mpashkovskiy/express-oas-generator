@@ -7,7 +7,13 @@ const _ = require('lodash');
 const zlib = require('zlib');
 
 const app = express();
-generator.handleResponses(app, {});
+generator.handleResponses(app, {
+  predefinedSpec: function(spec) {
+    _.set(spec, 'paths["/foo/{name}"].get.parameters[0].description', 'description of a parameter');
+    return spec;
+  },
+  specOutputPath: './test_spec.json',
+});
 
 app.use(bodyParser.json({}));
 let router = express.Router();

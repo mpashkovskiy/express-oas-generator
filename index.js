@@ -35,6 +35,7 @@ let app;
  * @param {function|object} predefinedSpec either the Swagger specification
  * or a function with one argument producing it.
  */
+let swaggerUiServePath;
 let predefinedSpec;
 let spec = {};
 let lastRecordTime = new Date().getTime();
@@ -91,14 +92,9 @@ function updateSpecFromPackage() {
 /**
  * @description serve the openAPI docs with swagger at a specified path / url
  *
- * @param {object} options
- * @param {string} [options.path=api-docs] where to serve the openAPI docs. Defaults to `api-docs`
- * @param {*} [options.predefinedSpec={}]
- *
  * @returns void
  */
-function serveApiDocs(options = { path: 'api-docs', predefinedSpec: {} }) {
-  predefinedSpec = options.predefinedSpec;
+function serveApiDocs() {
   spec = { swagger: '2.0', paths: {} };
 
   const endpoints = listEndpoints(app);
@@ -138,7 +134,7 @@ function serveApiDocs(options = { path: 'api-docs', predefinedSpec: {} }) {
     res.send(JSON.stringify(patchSpec(predefinedSpec), null, 2));
     next();
   });
-  app.use(packageInfo.baseUrlPath + '/' + options.path, swaggerUi.serve, (req, res) => {
+  app.use(packageInfo.baseUrlPath + '/' + swaggerUiServePath, swaggerUi.serve, (req, res) => {
     swaggerUi.setup(patchSpec(predefinedSpec))(req, res);
   });
 }
@@ -229,13 +225,13 @@ function updateSchemesAndHost(req) {
  * @param {Express} expressApp - the express app
  *
  * @param {Object} [options] optional configuration options
- * @param {string|undefined} [options.pathToOutputFile=undefined] where to write the openAPI specification to.
+ * @param {string|undefined} [options.specOutputPath=undefined] where to write the openAPI specification to.
  * Specify this to create the openAPI specification file.
  * @param {number} [options.writeIntervalMs=10000] how often to write the openAPI specification to file
  *
  * @returns void
  */
-function handleResponses(expressApp, options = { pathToOutputFile: undefined, writeIntervalMs: 1000 * 10 }) {
+function handleResponses(expressApp, options = { swaggerUiServePath: 'api-docs', specOutputPath: undefined, predefinedSpec: {}, writeIntervalMs: 1000 * 10 }) {
   responseMiddlewareHasBeenApplied = true;
 
   /**
@@ -244,8 +240,9 @@ function handleResponses(expressApp, options = { pathToOutputFile: undefined, wr
    * because this comes before it.
    */
   app = expressApp;
-
-  const { pathToOutputFile, writeIntervalMs } = options;
+  swaggerUiServePath = options.swaggerUiServePath || 'api-docs';
+  predefinedSpec = options.predefinedSpec || {};
+  const { specOutputPath, writeIntervalMs } = options;
 
   /** middleware to handle RESPONSES */
   app.use((req, res, next) => {
@@ -256,12 +253,12 @@ function handleResponses(expressApp, options = { pathToOutputFile: undefined, wr
       }
 
       const ts = new Date().getTime();
-      if (firstResponseProcessing || pathToOutputFile && ts - lastRecordTime > writeIntervalMs) {
+      if (firstResponseProcessing || specOutputPath && ts - lastRecordTime > writeIntervalMs) {
         firstResponseProcessing = false;
         lastRecordTime = ts;
 
-        fs.writeFile(pathToOutputFile, JSON.stringify(spec, null, 2), 'utf8', err => {
-          const fullPath = path.resolve(pathToOutputFile);
+        fs.writeFile(specOutputPath, JSON.stringify(spec, null, 2), 'utf8', err => {
+          const fullPath = path.resolve(specOutputPath);
 
           if (err) {
             /**
@@ -294,14 +291,9 @@ function handleResponses(expressApp, options = { pathToOutputFile: undefined, wr
  * it also initializes the specification and serves the api documentation.
  * The options are for these tasks.
  *
- * @param {object} options
- * @param {string} [options.path=api-docs] where to serve the openAPI docs. Defaults to `api-docs`
- * @param {*} [options.predefinedSpec={}]
- *
- *
  * @returns void
  */
-function handleRequests(options = { path: 'api-docs', predefinedSpec: {} }) {
+function handleRequests() {
   /** make sure the middleware placement order (by the user) is correct */
   if (responseMiddlewareHasBeenApplied !== true) {
     throw new Error(WRONG_MIDDLEWARE_ORDER_ERROR);
@@ -330,7 +322,7 @@ function handleRequests(options = { path: 'api-docs', predefinedSpec: {} }) {
   });
 
   /** forward options to `serveApiDocs`: */
-  serveApiDocs({path: options.path, predefinedSpec: options.predefinedSpec });
+  serveApiDocs();
 }
 
 /**
@@ -365,15 +357,20 @@ function handleRequests(options = { path: 'api-docs', predefinedSpec: {} }) {
  *
  * @param {Express} aApp - the express app
  * @param {*} [aPredefinedSpec={}]
- * @param {string|undefined} [aPath=undefined] where to write the openAPI specification to.
+ * @param {string|undefined} [aSpecOutputPath=undefined] where to write the openAPI specification to.
  * Specify this to create the openAPI specification file.
  * @param {number} [aWriteInterval=10000] how often to write the openAPI specification to file
- * @param {string} [aApiDocsPath=api-docs] where to serve the openAPI docs. Defaults to `api-docs`
+ * @param {string} [aSwaggerUiServePath=api-docs] where to serve the openAPI docs. Defaults to `api-docs`
  */
-function init(aApp, aPredefinedSpec = {}, aPath = undefined, aWriteInterval = 1000 * 10, aApiDocsPath = 'api-docs') {
-  handleResponses(aApp, { pathToOutputFile: aPath, writeIntervalMs: aWriteInterval });
+function init(aApp, aPredefinedSpec = {}, aSpecOutputPath = undefined, aWriteInterval = 1000 * 10, aSwaggerUiServePath = 'api-docs') {
+  handleResponses(aApp, {
+    swaggerUiServePath: aSwaggerUiServePath,
+    specOutputPath: aSpecOutputPath,
+    predefinedSpec: aPredefinedSpec,
+    writeIntervalMs: aWriteInterval,
+  });
   setTimeout(() => {
-    handleRequests({ path: aApiDocsPath, predefinedSpec: aPredefinedSpec });
+    handleRequests();
   }, 1000);
 }
 
@@ -387,7 +384,7 @@ const getSpec = () => {
 
 /**
  *
- * @param pkgInfoPath
+ * @param pkgInfoPath - path to package.json
  */
 const setPackageInfoPath = pkgInfoPath => {
   packageJsonPath = `${process.cwd()}/${pkgInfoPath}/package.json`;

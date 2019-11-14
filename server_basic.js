@@ -7,7 +7,7 @@ const _ = require('lodash');
 const zlib = require('zlib');
 
 const app = express();
-generator.init(app, function (spec) {
+generator.init(app, function(spec) {
   _.set(spec, 'paths["/foo/{name}"].get.parameters[0].description', 'description of a parameter');
   return spec;
 }, './test_spec.json');
