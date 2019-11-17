@@ -217,12 +217,6 @@ function updateSchemesAndHost(req) {
 }
 
 /**
- * Apply this **first**!
- *
- * (straight after creating the express app (as the very first middleware))
- *
- * @description apply the `response` middleware.
- *
  * @type { typeof import('./index').handleResponses }
 */
 function handleResponses(expressApp, options = { swaggerUiServePath: 'api-docs', specOutputPath: undefined, predefinedSpec: {}, writeIntervalMs: 1000 * 10 }) {
@@ -273,17 +267,6 @@ function handleResponses(expressApp, options = { swaggerUiServePath: 'api-docs',
 }
 
 /**
- * Apply this **last**!
- *
- * (as the very last middleware of your express app)
- *
- * @description apply the `request` middleware
- * Applies to the `app` you provided in `handleResponses`
- *
- * Also, since this is the last function you'll need to invoke,
- * it also initializes the specification and serves the api documentation.
- * The options are for these tasks.
- *
  * @type { typeof import('./index').handleRequests }
  */
 function handleRequests() {
@@ -333,21 +316,6 @@ function handleRequests() {
  *
  */
 /**
- * @warn it's preferred that you use `handleResponses`,
- * `handleRequests` and `serveApiDocs` **individually**
- * and not directly from this `init` function,
- * because we need `handleRequests` to be placed as the
- * very last middleware and we cannot guarantee this here,
- * since we're only using an arbitrary setTimeout of `1000` ms.
- *
- * See
- * https://github.com/mpashkovskiy/express-oas-generator/pull/32#issuecomment-546807216
- *
- * @description initialize the `express-oas-generator`.
- *
- * This will apply both `handleResponses` and `handleRequests`
- * and also will call `serveApiDocs`.
- *
  * @type { typeof import('./index').init }
  */
 function init(aApp, aPredefinedSpec = {}, aSpecOutputPath = undefined, aWriteInterval = 1000 * 10, aSwaggerUiServePath = 'api-docs') {
