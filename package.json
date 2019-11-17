@@ -3,6 +3,7 @@
   "version": "1.0.17",
   "description": "Module to automatically generate OpenAPI (Swagger) specification for existing ExpressJS 4.x REST API applications",
   "main": "index.js",
+  "typings": "./index.d.ts",
   "directories": {
     "test": "test",
     "lib": "lib"
