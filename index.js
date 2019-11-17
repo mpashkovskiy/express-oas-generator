@@ -3,6 +3,8 @@
  * @module index
  */
 
+require('./index');
+
 const _ = require('lodash');
 const fs = require('fs');
 const path = require('path');
@@ -214,7 +216,6 @@ function updateSchemesAndHost(req) {
   }
 }
 
-/** TODO - type defs for Express don't work (I tried @external) */
 /**
  * Apply this **first**!
  *
@@ -222,15 +223,8 @@ function updateSchemesAndHost(req) {
  *
  * @description apply the `response` middleware.
  *
- * @param {Express} expressApp - the express app
- *
- * @param {Object} [options] optional configuration options
- * @param {string|undefined} [options.specOutputPath=undefined] where to write the openAPI specification to.
- * Specify this to create the openAPI specification file.
- * @param {number} [options.writeIntervalMs=10000] how often to write the openAPI specification to file
- *
- * @returns void
- */
+ * @type { typeof import('./index').handleResponses }
+*/
 function handleResponses(expressApp, options = { swaggerUiServePath: 'api-docs', specOutputPath: undefined, predefinedSpec: {}, writeIntervalMs: 1000 * 10 }) {
   responseMiddlewareHasBeenApplied = true;
 
@@ -278,7 +272,6 @@ function handleResponses(expressApp, options = { swaggerUiServePath: 'api-docs',
   });
 }
 
-/** TODO - type defs for Express don't work (I tried @external) */
 /**
  * Apply this **last**!
  *
@@ -291,7 +284,7 @@ function handleResponses(expressApp, options = { swaggerUiServePath: 'api-docs',
  * it also initializes the specification and serves the api documentation.
  * The options are for these tasks.
  *
- * @returns void
+ * @type { typeof import('./index').handleRequests }
  */
 function handleRequests() {
   /** make sure the middleware placement order (by the user) is correct */
@@ -355,12 +348,7 @@ function handleRequests() {
  * This will apply both `handleResponses` and `handleRequests`
  * and also will call `serveApiDocs`.
  *
- * @param {Express} aApp - the express app
- * @param {*} [aPredefinedSpec={}]
- * @param {string|undefined} [aSpecOutputPath=undefined] where to write the openAPI specification to.
- * Specify this to create the openAPI specification file.
- * @param {number} [aWriteInterval=10000] how often to write the openAPI specification to file
- * @param {string} [aSwaggerUiServePath=api-docs] where to serve the openAPI docs. Defaults to `api-docs`
+ * @type { typeof import('./index').init }
  */
 function init(aApp, aPredefinedSpec = {}, aSpecOutputPath = undefined, aWriteInterval = 1000 * 10, aSwaggerUiServePath = 'api-docs') {
   handleResponses(aApp, {
@@ -375,16 +363,16 @@ function init(aApp, aPredefinedSpec = {}, aSpecOutputPath = undefined, aWriteInt
 }
 
 /**
- *
- * @returns {{}}
+ * @type { typeof import('./index').getSpec }
  */
 const getSpec = () => {
   return patchSpec(predefinedSpec);
 };
 
 /**
+ * @type { typeof import('./index').setPackageInfoPath }
  *
- * @param pkgInfoPath - path to package.json
+ * @param pkgInfoPath  path to package.json
  */
 const setPackageInfoPath = pkgInfoPath => {
   packageJsonPath = `${process.cwd()}/${pkgInfoPath}/package.json`;
