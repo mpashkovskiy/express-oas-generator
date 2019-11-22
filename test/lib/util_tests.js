@@ -31,7 +31,8 @@ describe('utils.js', () => {
       inner0: {
         inner1: {
           password: '122'
-        }
+        },
+        a: [1, 2]
       }
     };
     const schema = utils.getSchema(obj);
@@ -40,6 +41,7 @@ describe('utils.js', () => {
     expect(schema.properties.b.type).toBe('string');
     expect(schema.properties.password.example).toBe('******');
     expect(schema.properties.inner0.properties.inner1.properties.password.example).toBe('******');
+    expect(schema.properties.inner0.properties.a.example).toEqual([1]);
   });
 
 });
