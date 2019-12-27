@@ -1,5 +1,5 @@
 'use strict';
-const _ = require('lodash');
+
 const processors = require('../../lib/processors.js');
 
 describe('processors.js', () => {
@@ -45,7 +45,7 @@ describe('processors.js', () => {
     let method = {};
     processors.processHeaders(req, method, spec);
     expect(method.security.map(s => Object.keys(s)[0])).toEqual(headers);
-    expect(_.values(spec.securityDefinitions)).toEqual(headers.map(h => ({
+    expect(Object.values(spec.securityDefinitions)).toEqual(headers.map(h => ({
       name: h,
       in: 'header',
       type: 'apiKey'

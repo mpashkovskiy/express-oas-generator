@@ -34,7 +34,7 @@
   "dependencies": {
     "express-list-endpoints": "^3.0.1",
     "generate-schema": "^2.6.0",
-    "lodash": "^4.17.12",
+    "lodash.merge": "^4.6.2",
     "swagger-ui-express": "^3.0.8"
   },
   "devDependencies": {
