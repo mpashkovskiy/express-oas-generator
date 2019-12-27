@@ -3,6 +3,7 @@
   "version": "1.0.22",
   "description": "Module to automatically generate OpenAPI (Swagger) specification for existing ExpressJS 4.x REST API applications",
   "main": "index.js",
+  "typings": "./index.d.ts",
   "directories": {
     "test": "test",
     "lib": "lib"
@@ -32,10 +33,13 @@
   },
   "homepage": "https://github.com/mpashkovskiy/express-oas-generator#readme",
   "dependencies": {
+    "@types/express": "^4.17.2",
     "express-list-endpoints": "^3.0.1",
     "generate-schema": "^2.6.0",
-    "lodash.merge": "^4.6.2",
-    "swagger-ui-express": "^3.0.8"
+    "openapi-types": "^1.3.5",
+    "swagger-ui-express": "^3.0.8",
+    "typescript": "^3.7.2",
+    "lodash.merge": "^4.6.2"
   },
   "devDependencies": {
     "assert": "^1.4.1",

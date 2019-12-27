@@ -3,6 +3,8 @@
  * @module index
  */
 
+require('./index');
+
 const _merge = require('lodash.merge');
 const fs = require('fs');
 const path = require('path');
@@ -214,23 +216,9 @@ function updateSchemesAndHost(req) {
   }
 }
 
-/** TODO - type defs for Express don't work (I tried @external) */
 /**
- * Apply this **first**!
- *
- * (straight after creating the express app (as the very first middleware))
- *
- * @description apply the `response` middleware.
- *
- * @param {Express} expressApp - the express app
- *
- * @param {Object} [options] optional configuration options
- * @param {string|undefined} [options.specOutputPath=undefined] where to write the openAPI specification to.
- * Specify this to create the openAPI specification file.
- * @param {number} [options.writeIntervalMs=10000] how often to write the openAPI specification to file
- *
- * @returns void
- */
+ * @type { typeof import('./index').handleResponses }
+*/
 function handleResponses(expressApp, options = { swaggerUiServePath: 'api-docs', specOutputPath: undefined, predefinedSpec: {}, writeIntervalMs: 1000 * 10 }) {
   responseMiddlewareHasBeenApplied = true;
 
@@ -278,20 +266,8 @@ function handleResponses(expressApp, options = { swaggerUiServePath: 'api-docs',
   });
 }
 
-/** TODO - type defs for Express don't work (I tried @external) */
 /**
- * Apply this **last**!
- *
- * (as the very last middleware of your express app)
- *
- * @description apply the `request` middleware
- * Applies to the `app` you provided in `handleResponses`
- *
- * Also, since this is the last function you'll need to invoke,
- * it also initializes the specification and serves the api documentation.
- * The options are for these tasks.
- *
- * @returns void
+ * @type { typeof import('./index').handleRequests }
  */
 function handleRequests() {
   /** make sure the middleware placement order (by the user) is correct */
@@ -340,27 +316,7 @@ function handleRequests() {
  *
  */
 /**
- * @warn it's preferred that you use `handleResponses`,
- * `handleRequests` and `serveApiDocs` **individually**
- * and not directly from this `init` function,
- * because we need `handleRequests` to be placed as the
- * very last middleware and we cannot guarantee this here,
- * since we're only using an arbitrary setTimeout of `1000` ms.
- *
- * See
- * https://github.com/mpashkovskiy/express-oas-generator/pull/32#issuecomment-546807216
- *
- * @description initialize the `express-oas-generator`.
- *
- * This will apply both `handleResponses` and `handleRequests`
- * and also will call `serveApiDocs`.
- *
- * @param {Express} aApp - the express app
- * @param {*} [aPredefinedSpec={}]
- * @param {string|undefined} [aSpecOutputPath=undefined] where to write the openAPI specification to.
- * Specify this to create the openAPI specification file.
- * @param {number} [aWriteInterval=10000] how often to write the openAPI specification to file
- * @param {string} [aSwaggerUiServePath=api-docs] where to serve the openAPI docs. Defaults to `api-docs`
+ * @type { typeof import('./index').init }
  */
 function init(aApp, aPredefinedSpec = {}, aSpecOutputPath = undefined, aWriteInterval = 1000 * 10, aSwaggerUiServePath = 'api-docs') {
   handleResponses(aApp, {
@@ -375,16 +331,16 @@ function init(aApp, aPredefinedSpec = {}, aSpecOutputPath = undefined, aWriteInt
 }
 
 /**
- *
- * @returns {{}}
+ * @type { typeof import('./index').getSpec }
  */
 const getSpec = () => {
   return patchSpec(predefinedSpec);
 };
 
 /**
+ * @type { typeof import('./index').setPackageInfoPath }
  *
- * @param pkgInfoPath - path to package.json
+ * @param pkgInfoPath  path to package.json
  */
 const setPackageInfoPath = pkgInfoPath => {
   packageJsonPath = `${process.cwd()}/${pkgInfoPath}/package.json`;

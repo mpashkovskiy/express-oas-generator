@@ -1,0 +1,43 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": true,
+    "noEmit": true,
+    "strict": true,
+    "target": "es6",
+    "module": "commonjs",
+    "lib": [
+      "dom", //
+      "es6",
+      "es2017",
+      "esnext.asynciterable"
+    ],
+    "sourceMap": true,
+    // "outDir": "./dist", /** disabled since we don't emit js */
+    "moduleResolution": "node",
+    "removeComments": false,
+    "noImplicitAny": false /** TODO - true (will require quite some fixing; it's worth it) */,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "noImplicitThis": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "resolveJsonModule": true,
+    "baseUrl": "."
+  },
+  "exclude": [
+    "node_modules", //
+    "build",
+    "docs"
+  ],
+  "include": [
+    "./index.js", //
+    "./lib/**/*.js"
+  ]
+}
