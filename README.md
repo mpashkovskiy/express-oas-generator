@@ -17,7 +17,7 @@ Module should be used in test environment only because it can disclose sensitive
 > Note - make sure to also read the [Advanced usage (recommended)](#advanced-usage-recommended) section after this!
 
 * Install module `npm i express-oas-generator --save`;
-* Import it in a script where you initialize ExpressJS application (see [server.js](server_basic.js) for usage example);
+* Import it in a script where you initialize ExpressJS application (see [server_basic.js](server_basic.js) for usage example);
 ```javascript
 const express = require('express');
 const expressOasGenerator = require('express-oas-generator');

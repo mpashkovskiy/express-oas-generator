@@ -15,16 +15,21 @@ generator.init(app, function(spec) {
 app.use(bodyParser.json({}));
 let router = express.Router();
 router.route('/foo/stranger')
-      .get(function(req, res, next) {
+      .post(function(req, res, next) {
         //code here
         console.log('calling /foo/stranger');
-        res.json({message: 'hello stranger'});
+        res.json(req.body);
         return next();
       });
 router.route('/foo/:name')
       .get(function(req, res, next) {
         console.log('calling /foo/:name');
-        res.json({message: 'hello ' + req.params.name});
+        var a = Math.random();
+        if (a > 0.5) {
+          res.json({message: 'hello ' + req.params.name});
+        } else {
+          res.json({message: 'hello ' + req.params.name, a: [{b: 1}, {b: 2, c: 'asd'}]});
+        }
         return next();
       });
 router.route('/gzip')

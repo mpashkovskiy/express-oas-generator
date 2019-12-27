@@ -5,7 +5,7 @@
 
 require('./index');
 
-const _ = require('lodash');
+const _merge = require('lodash.merge');
 const fs = require('fs');
 const path = require('path');
 const swaggerUi = require('swagger-ui-express');
@@ -150,7 +150,7 @@ function patchSpec(predefinedSpec) {
   return !predefinedSpec
     ? spec
     : typeof predefinedSpec === 'object'
-      ? utils.sortObject(_.merge(spec, predefinedSpec || {}))
+      ? utils.sortObject(_merge(spec, predefinedSpec || {}))
       : predefinedSpec(spec);
 }
 
