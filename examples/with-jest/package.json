@@ -1,0 +1,21 @@
+{
+	"name": "with-jest",
+	"version": "1.0.0",
+	"main": "start-server.js",
+	"scripts": {
+		"start": "cross-env PORT=5000 NODE_ENV='development' node ./start-server.js",
+		"test": " cross-env PORT=5069 NODE_ENV='development' jest --config ./test/jest.config.js"
+	},
+	"dependencies": {
+		"cross-env": "^7.0.2",
+		"express": "^4.17.1",
+		"express-oas-generator": "^1.0.23",
+		"jest": "^26.0.1",
+		"mkdirp": "^1.0.4",
+		"supertest": "^4.0.2"
+	},
+	"author": "Kipras Melnikovas (https://kipras.org) <kipras@kipras.org>",
+	"license": "MIT",
+	"description": "",
+	"keywords": []
+}
