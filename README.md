@@ -12,6 +12,12 @@ Module to:
 Again: goal of the module is to provide baseline specification which should be reviewed and modified before exposing to REST API clients.
 Module should be used in test environment only because it can disclose sensitive information if it is running in production. See [How does it work?](#how-does-it-work) and [comment about usage](https://github.com/mpashkovskiy/express-oas-generator/issues/36#issuecomment-553040533) for more info.
 
+## Examples
+
+See [./examples](./examples):
+
+* [./examples/with-jest](./examples/with-jest)
+
 ## How to use
 
 > Note - make sure to also read the [Advanced usage (recommended)](#advanced-usage-recommended) section after this!
