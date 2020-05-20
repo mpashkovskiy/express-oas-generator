@@ -14,9 +14,10 @@ Module should be used in test environment only because it can disclose sensitive
 
 ## Examples
 
-See [./examples](./examples):
-
-* [./examples/with-jest](./examples/with-jest)
+* [server_basic.js](server_basic.js)
+* [server_advanced.js](server_advanced.js)
+* [./examples](./examples):
+    * [./examples/with-jest](./examples/with-jest)
 
 ## How to use
 
