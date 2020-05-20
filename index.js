@@ -137,6 +137,7 @@ function serveApiDocs() {
     next();
   });
   app.use(packageInfo.baseUrlPath + '/' + swaggerUiServePath, swaggerUi.serve, (req, res) => {
+    res.setHeader('Content-Type', 'text/html');
     swaggerUi.setup(patchSpec(predefinedSpec))(req, res);
   });
 }
