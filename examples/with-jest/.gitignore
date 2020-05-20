@@ -1,0 +1,7 @@
+
+node_modules
+
+# the path to the generated openAPI spec.
+# you do not need to track it with your source control, since it's generated.
+path/to/
+path/to/file.json
