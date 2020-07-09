@@ -2,7 +2,6 @@
 
 const express = require('express');
 const request = require('request');
-const assert = require('assert');
 const bodyParser = require('body-parser');
 const generator = require('../index.js');
 
@@ -214,9 +213,10 @@ it('WHEN package json includes baseUrlPath THEN spec description is updated', do
 
   setTimeout(() => {
     const spec = generator.getSpec();
-    assert.equal(spec.info.description.indexOf(', base url :') > 0, true);
+    expect(spec.basePath !== undefined).toBeTruthy();
+    expect(spec.info.description.indexOf(spec.basePath) > 0).toBeTruthy();
     done();
-  }, 1001);
+  }, MS_TO_STARTUP);
 });
 
 
@@ -226,9 +226,10 @@ it('WHEN package json does not include baseUrlPath THEN spec description is not 
 
   setTimeout(() => {
     const spec = generator.getSpec();
-    assert.equal(spec.info.description.indexOf(', base url :') > 0, false);
+    expect(spec.basePath === undefined).toBeTruthy();
+    expect(spec.info.description.indexOf('base url') === -1).toBeTruthy();
     done();
-  }, 1001);
+  }, MS_TO_STARTUP);
 });
 
 it('WHEN custom path for docs set THEN the the path should provide it', done => {
@@ -236,9 +237,7 @@ it('WHEN custom path for docs set THEN the the path should provide it', done => 
   const path = '/';
   generator.init(
     app,
-    function(spec) {
-      return spec;
-    },
+    spec => spec,
     'api-spec.json',
     1000,
     'custom-docs'
@@ -249,7 +248,7 @@ it('WHEN custom path for docs set THEN the the path should provide it', done => 
     return next();
   });
   app.set('port', port);
-  const server = app.listen(app.get('port'), function() {
+  const server = app.listen(app.get('port'), () => {
     setTimeout(() => {
       request.get(`http://localhost:${port}/custom-docs`, (error, response) => {
         expect(error).toBeNull();
@@ -264,19 +263,14 @@ it('WHEN custom path for docs set THEN the the path should provide it', done => 
 it('WHEN no custom path for docs set THEN the default path should be provided', done => {
   const app = express();
   const path = '/';
-  generator.init(
-    app,
-    function(spec) {
-      return spec;
-    }
-  );
+  generator.init(app);
   app.get(path, (req, res, next) => {
     res.setHeader('Content-Type', 'text/plain');
     res.send(PLAIN_TEXT_RESPONSE);
     return next();
   });
   app.set('port', port);
-  const server = app.listen(app.get('port'), function() {
+  const server = app.listen(app.get('port'), () => {
     setTimeout(() => {
       request.get(`http://localhost:${port}/api-docs`, (error, response) => {
         expect(error).toBeNull();
@@ -294,10 +288,7 @@ it('WHEN **request** middleware is injected before **response** middleware THEN 
    * after every test
    */
 
-  expect(() => {
-    generator.handleRequests();
-  }).toThrowError();
-
+  expect(() => generator.handleRequests()).toThrowError();
   done();
 });
 

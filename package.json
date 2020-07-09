@@ -42,7 +42,6 @@
     "lodash.merge": "^4.6.2"
   },
   "devDependencies": {
-    "assert": "^1.4.1",
     "body-parser": "^1.18.2",
     "coveralls": "^3.0.0",
     "docdash": "^1.1.1",
