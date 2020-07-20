@@ -169,6 +169,17 @@ Assuming you have ExpressJS REST API application and you
 1. All headers with prefix `X-` treated as a apiKey type headers;
 2. Module doesn't recognize enumerations in JSON objects;
 
+## Troubleshooting
+
+* Parameters and response body not documented!
+  
+  Express-oas-generator (EOG) adds parameters handler as a very last middleware. If any middleware or path in router breaks the chain and doesn't pass execution to next middleware/router then very last EOG middleware won't be called. So call next() or next(err) as the very last line in your handler.
+  Some docs:
+  * calling next() https://expressjs.com/en/guide/writing-middleware.html
+  * handling errors with next() https://expressjs.com/en/guide/error-handling.html
+  
+  For more info please read the entire [issue report](https://github.com/mpashkovskiy/express-oas-generator/issues/24)
+
 ## Contributors
 
 [![](https://sourcerer.io/fame/mpashkovskiy/mpashkovskiy/express-oas-generator/images/0)](https://sourcerer.io/fame/mpashkovskiy/mpashkovskiy/express-oas-generator/links/0)[![](https://sourcerer.io/fame/mpashkovskiy/mpashkovskiy/express-oas-generator/images/1)](https://sourcerer.io/fame/mpashkovskiy/mpashkovskiy/express-oas-generator/links/1)[![](https://sourcerer.io/fame/mpashkovskiy/mpashkovskiy/express-oas-generator/images/2)](https://sourcerer.io/fame/mpashkovskiy/mpashkovskiy/express-oas-generator/links/2)[![](https://sourcerer.io/fame/mpashkovskiy/mpashkovskiy/express-oas-generator/images/3)](https://sourcerer.io/fame/mpashkovskiy/mpashkovskiy/express-oas-generator/links/3)[![](https://sourcerer.io/fame/mpashkovskiy/mpashkovskiy/express-oas-generator/images/4)](https://sourcerer.io/fame/mpashkovskiy/mpashkovskiy/express-oas-generator/links/4)[![](https://sourcerer.io/fame/mpashkovskiy/mpashkovskiy/express-oas-generator/images/5)](https://sourcerer.io/fame/mpashkovskiy/mpashkovskiy/express-oas-generator/links/5)[![](https://sourcerer.io/fame/mpashkovskiy/mpashkovskiy/express-oas-generator/images/6)](https://sourcerer.io/fame/mpashkovskiy/mpashkovskiy/express-oas-generator/links/6)[![](https://sourcerer.io/fame/mpashkovskiy/mpashkovskiy/express-oas-generator/images/7)](https://sourcerer.io/fame/mpashkovskiy/mpashkovskiy/express-oas-generator/links/7)

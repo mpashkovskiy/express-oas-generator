@@ -127,6 +127,7 @@ describe('processors.js', () => {
       expect(method.produces).toEqual([appJson]);
       expect(Object.keys(method.responses)).toEqual(['200']);
       expect(method.responses['200'].schema).not.toBe(undefined);
+      expect(method.responses['200'].description).toBe('OK');
     });
 
   });
