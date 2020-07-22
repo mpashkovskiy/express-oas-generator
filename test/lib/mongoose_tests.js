@@ -17,7 +17,7 @@ describe('mongoose.js', () => {
       }
     });
 
-    it('WHEN supplied mongoose model does not exist THEN should throw exception', () => {
+    it('WHEN mongoose model exists THEN it should generate the model spec', () => {
       const mongooseModels = ['Student'];
     
       const mongooseModelSpecs = generateMongooseModelsSpec(mongooseModels);
