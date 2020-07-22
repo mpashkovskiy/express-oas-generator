@@ -56,5 +56,8 @@
     "nyc": "^14.1.1",
     "request": "^2.88.0",
     "zlib": "^1.0.5"
+  },
+  "peerDependencies": {
+    "mongoose": "^5.9.25"
   }
 }
