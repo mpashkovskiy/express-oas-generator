@@ -32,6 +32,9 @@ export interface HandleResponsesOptions {
 
 	/** how often to write the openAPI specification to file */
 	writeIntervalMs?: number;
+
+	/** Mongoose model names */
+	mongooseModels?: Array<string>;
 }
 
 /**
@@ -78,7 +81,8 @@ export function init(
 	predefinedSpec?: HandleResponsesOptions['predefinedSpec'],
 	specOutputPath?: HandleResponsesOptions['specOutputPath'],
 	writeIntervalMs?: HandleResponsesOptions['writeIntervalMs'],
-	swaggerUiServePath?: HandleResponsesOptions['swaggerUiServePath']
+	swaggerUiServePath?: HandleResponsesOptions['swaggerUiServePath'],
+	mongooseModels?: HandleResponsesOptions['mongooseModels']
 ): void;
 
 export const getSpec: () => object | OpenAPIV2.Document;

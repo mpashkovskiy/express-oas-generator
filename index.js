@@ -10,6 +10,7 @@ const fs = require('fs');
 const path = require('path');
 const swaggerUi = require('swagger-ui-express');
 const utils = require('./lib/utils');
+const { generateMongooseModelsSpec } = require('./lib/mongoose');
 const processors = require('./lib/processors');
 const listEndpoints = require('express-list-endpoints');
 
@@ -42,6 +43,7 @@ let predefinedSpec;
 let spec = {};
 let lastRecordTime = new Date().getTime();
 let firstResponseProcessing = true;
+let mongooseModelsSpecs;
 
 /**
  * @param {boolean} [responseMiddlewareHasBeenApplied=false]
@@ -130,6 +132,10 @@ function serveApiDocs() {
     });
   });
 
+  if (mongooseModelsSpecs) {
+    spec.definitions = mongooseModelsSpecs;
+  }
+
   updateSpecFromPackage();
   spec = patchSpec(predefinedSpec);
   app.use(packageInfo.baseUrlPath + '/api-spec', (req, res, next) => {
@@ -217,7 +223,6 @@ function updateSchemesAndHost(req) {
     spec.host = req.get('host');
   }
 }
-
 /**
  * @type { typeof import('./index').handleResponses }
 */
@@ -320,7 +325,7 @@ function handleRequests() {
 /**
  * @type { typeof import('./index').init }
  */
-function init(aApp, aPredefinedSpec = {}, aSpecOutputPath = undefined, aWriteInterval = 1000 * 10, aSwaggerUiServePath = 'api-docs') {
+function init(aApp, aPredefinedSpec = {}, aSpecOutputPath = undefined, aWriteInterval = 1000 * 10, aSwaggerUiServePath = 'api-docs', mongooseModels = []) {
   handleResponses(aApp, {
     swaggerUiServePath: aSwaggerUiServePath,
     specOutputPath: aSpecOutputPath,
@@ -330,6 +335,10 @@ function init(aApp, aPredefinedSpec = {}, aSpecOutputPath = undefined, aWriteInt
   setTimeout(() => {
     handleRequests();
   }, 1000);
+  
+  if (mongooseModels && Array.isArray(mongooseModels) && mongooseModels.length > 0) {
+    mongooseModelsSpecs = generateMongooseModelsSpec(mongooseModels);
+  }
 }
 
 /**

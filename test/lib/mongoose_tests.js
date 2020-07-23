@@ -1,8 +1,9 @@
 'use strict';
 
 const mongoose = require('mongoose');
-const {generateMongooseModelsSpec} = require('../../lib/mongoose.js');
 require('./mongoose_models/student');
+
+const {generateMongooseModelsSpec} = require('../../lib/mongoose.js');
 
 describe('mongoose.js', () => {
 
