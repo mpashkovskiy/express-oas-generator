@@ -1,5 +1,6 @@
 'use strict';
 
+const mongoose = require('mongoose');
 const {generateMongooseModelsSpec} = require('../../lib/mongoose.js');
 require('./mongoose_models/student');
 
@@ -18,12 +19,14 @@ describe('mongoose.js', () => {
     });
 
     it('WHEN mongoose model exists THEN it should generate the model spec', () => {
-      const mongooseModels = ['Student'];
-    
+      const mongooseModels = mongoose.modelNames();
       const mongooseModelSpecs = generateMongooseModelsSpec(mongooseModels);
-      const studentModelSpec = mongooseModelSpecs[mongooseModels.shift()];
-      /* Not asserting the spec itself, trusting mongoose-to-swagger :) */
-      expect(studentModelSpec).toBeDefined();
+      return mongooseModels.map(model => {
+        const modelSpec = mongooseModelSpecs[model];
+        /* Not asserting the spec itself, trusting mongoose-to-swagger :) */
+        return expect(modelSpec).toBeDefined();
+      });
+      
     });
   });
 });
