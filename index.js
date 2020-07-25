@@ -223,10 +223,25 @@ function updateSchemesAndHost(req) {
     spec.host = req.get('host');
   }
 }
+
+/**
+ * @description Generates definitions spec from mongoose models
+ *
+ * @returns string
+ */
+function updateDefinitionsSpec(mongooseModels) {
+  const validMongooseModels = Array.isArray(mongooseModels) && mongooseModels.length > 0;
+  
+  if (validMongooseModels && !mongooseModelsSpecs) {
+    mongooseModelsSpecs = generateMongooseModelsSpec(mongooseModels);
+  }
+  return mongooseModelsSpecs;
+}
+
 /**
  * @type { typeof import('./index').handleResponses }
 */
-function handleResponses(expressApp, options = { swaggerUiServePath: 'api-docs', specOutputPath: undefined, predefinedSpec: {}, writeIntervalMs: 1000 * 10 }) {
+function handleResponses(expressApp, options = { swaggerUiServePath: 'api-docs', specOutputPath: undefined, predefinedSpec: {}, writeIntervalMs: 1000 * 10, mongooseModels: []}) {
   responseMiddlewareHasBeenApplied = true;
 
   /**
@@ -238,6 +253,8 @@ function handleResponses(expressApp, options = { swaggerUiServePath: 'api-docs',
   swaggerUiServePath = options.swaggerUiServePath || 'api-docs';
   predefinedSpec = options.predefinedSpec || {};
   const { specOutputPath, writeIntervalMs } = options;
+
+  updateDefinitionsSpec(options.mongooseModels);
 
   /** middleware to handle RESPONSES */
   app.use((req, res, next) => {
@@ -336,9 +353,7 @@ function init(aApp, aPredefinedSpec = {}, aSpecOutputPath = undefined, aWriteInt
     handleRequests();
   }, 1000);
   
-  if (mongooseModels && Array.isArray(mongooseModels) && mongooseModels.length > 0) {
-    mongooseModelsSpecs = generateMongooseModelsSpec(mongooseModels);
-  }
+  updateDefinitionsSpec(mongooseModels);
 }
 
 /**
