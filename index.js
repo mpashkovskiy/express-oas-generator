@@ -227,7 +227,7 @@ function updateSchemesAndHost(req) {
 /**
  * @description Generates definitions spec from mongoose models
  *
- * @returns string
+ * @returns Definitions spec
  */
 function updateDefinitionsSpec(mongooseModels) {
   const validMongooseModels = Array.isArray(mongooseModels) && mongooseModels.length > 0;
