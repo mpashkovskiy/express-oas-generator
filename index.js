@@ -132,10 +132,7 @@ function serveApiDocs() {
     });
   });
 
-  if (mongooseModelsSpecs) {
-    spec.definitions = mongooseModelsSpecs;
-  }
-
+  spec.definitions = mongooseModelsSpecs || {};
   updateSpecFromPackage();
   spec = patchSpec(predefinedSpec);
   app.use(packageInfo.baseUrlPath + '/api-spec', (req, res, next) => {
