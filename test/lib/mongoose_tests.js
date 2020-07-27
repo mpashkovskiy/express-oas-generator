@@ -10,13 +10,11 @@ describe('mongoose.js', () => {
   describe('generateMongooseModelsSpec()', () => {
     it('WHEN supplied mongoose model does not exist THEN should throw exception', () => {
       const mongooseModels = ['User', 'Student'];
-    
-      try {
-        generateMongooseModelsSpec(mongooseModels);
-        throw new Error();
-      } catch (err) {
-        expect(err.message).toContain(`Schema hasn't been registered for model "${mongooseModels.shift()}"`);
-      }
+      
+      return expect(() => {
+        generateMongooseModelsSpec(mongooseModels); 
+      })
+        .toThrowError(new RegExp(`Schema hasn't been registered for model "${mongooseModels[0]}"`));
     });
 
     it('WHEN mongoose model exists THEN it should generate the model spec', () => {
