@@ -232,7 +232,6 @@ function updateDefinitionsSpec(mongooseModels) {
   if (validMongooseModels && !mongooseModelsSpecs) {
     mongooseModelsSpecs = generateMongooseModelsSpec(mongooseModels);
   }
-  return mongooseModelsSpecs;
 }
 
 /**
