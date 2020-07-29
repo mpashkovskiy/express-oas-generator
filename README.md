@@ -55,12 +55,15 @@ expressOasGenerator.init(
   app,
   function(spec) { return spec; },
   'path/to/a/file/filename.json',
-  60 * 1000
+  60 * 1000,
+  ['User','Student']
 )
 ```
 where:
 * 'path/to/a/file/filename.json' - path to a file and file name
 * 60 * 1000 - write interval in milliseconds (optional parameter, by default interval is equal to 10 seconds)
+* ['User','Student'] - Mongoose models to be included as definitions. To get all just do mongoose.modelNames().
+The following peer dependencies are required to use this last argument: mongoose, mongoose-to-swagger, bson.
 
 To change the Swagger UI path for your REST API use fifth (optional) argument:
 ```javascript
@@ -69,13 +72,16 @@ expressOasGenerator.init(
   function(spec) { return spec; },
   'path/to/a/file/filename.json',
   60 * 1000,
-  'custom-docs-path'
+  'custom-docs-path',
+  ['User','Student']
 )
 ```
 where:
 * 'path/to/a/file/filename.json' - path to a file and file name
 * 60 * 1000 - write interval in milliseconds (optional parameter, by default interval is equal to 10 seconds)
 * 'custom-docs-path' - Swagger UI path for your REST API (default: api-docs)
+* ['User','Student'] - Mongoose models to be included as definitions. To get all just do mongoose.modelNames().
+The following peer dependencies are required to this last argument: mongoose, mongoose-to-swagger, bson.
 
 ## Advanced usage (recommended)
 

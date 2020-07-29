@@ -4,7 +4,8 @@ const express = require('express');
 const request = require('request');
 const bodyParser = require('body-parser');
 const generator = require('../index.js');
-
+const mongoose = require('mongoose');
+require('./lib/mongoose_models/student');
 
 const MS_TO_STARTUP = 2000;
 const port = 8888;
@@ -242,6 +243,7 @@ it('WHEN custom path for docs set THEN the the path should provide it', done => 
     1000,
     'custom-docs'
   );
+  
   app.get(path, (req, res, next) => {
     res.setHeader('Content-Type', 'text/plain');
     res.send(PLAIN_TEXT_RESPONSE);
@@ -275,6 +277,39 @@ it('WHEN no custom path for docs set THEN the default path should be provided', 
       request.get(`http://localhost:${port}/api-docs`, (error, response) => {
         expect(error).toBeNull();
         expect(response.statusCode).toBe(200);
+        server.close();
+        done();
+      });
+    }, MS_TO_STARTUP);
+  });
+});
+
+it('WHEN mongoose models are supplied THEN the definitions should be included', done => {
+  const app = express();
+  const path = '/';
+  
+  generator.init(
+    app,
+    spec => spec,
+    'api-spec.json',
+    1000,
+    'custom-docs',
+    mongoose.modelNames()
+  );
+  app.get(path, (req, res, next) => {
+    res.setHeader('Content-Type', 'text/plain');
+    res.send(PLAIN_TEXT_RESPONSE);
+    return next();
+  });
+  app.set('port', port);
+  const server = app.listen(app.get('port'), () => {
+    setTimeout(() => {
+      request.get(`http://localhost:${port}/api-spec`, (error, response) => {
+        const spec = JSON.parse(response.body); 
+        mongoose.modelNames().map(model => {
+          return expect(spec.definitions[model]).toBeDefined(); 
+        });
+
         server.close();
         done();
       });
