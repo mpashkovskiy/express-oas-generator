@@ -44,9 +44,4 @@ describe('utils.js', () => {
     expect(schema.properties.inner0.properties.a.example).toEqual([1]);
   });
 
-  it('WHEN getResponseDescription method called THEN it returns corresponding description of the response code', () => {
-    const responseDescription = utils.getResponseDescription(100);
-    expect(responseDescription).toBe('Continue');
-  });
-
 });
