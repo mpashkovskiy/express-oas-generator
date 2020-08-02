@@ -64,7 +64,7 @@ describe('index.js', () => {
     const app = express();
 
     //Default args supplied to init. Only tag is modified
-    generator.init(app, {}, undefined, 1000*10, 'api-docs', [], ['hello']);
+    generator.init(app, {});
 
     app.use(bodyParser.json({}));
     app.get('/hello', (req, res) => {
@@ -110,19 +110,6 @@ describe('index.js', () => {
       expect(method.summary).toEqual(path);
       expect(method.responses[200].schema.type).toEqual('string');
       expect(method.responses[200].schema.example).toEqual(PLAIN_TEXT_RESPONSE);
-      done();
-    });
-  });
-
-  it('WHEN tags are supplied THEN path should contain the matching ones', done => {
-    const tag = 'hello';
-    const path = `/${tag}`;
-    request.get(`http://localhost:${port}${path}`, () => {
-      const spec = generator.getSpec();
-      expect(spec.tags.find(t => t.name === tag)).toBeDefined();
-
-      const method = spec.paths[path].get;
-      expect(method.tags).toEqual([tag]);
       done();
     });
   });
@@ -325,6 +312,42 @@ it('WHEN mongoose models are supplied THEN the definitions should be included', 
           return expect(spec.definitions[model]).toBeDefined(); 
         });
 
+        server.close();
+        done();
+      });
+    }, MS_TO_STARTUP);
+  });
+});
+
+it('WHEN tags are supplied THEN the paths should be contain the matching ones', done => {
+  const app = express();
+  const tag = 'students';
+  const path = `/${tag}`;
+  
+  generator.init(
+    app,
+    spec => spec,
+    'api-spec.json',
+    1000,
+    'api-spec',
+    [],
+    ['students']
+  );
+  app.get(path, (req, res, next) => {
+    res.setHeader('Content-Type', 'text/plain');
+    res.send(PLAIN_TEXT_RESPONSE);
+    return next();
+  });
+  app.set('port', port);
+  const server = app.listen(app.get('port'), () => {
+    setTimeout(() => {
+      request.get(`http://localhost:${port}/api-spec`, (error, response) => {
+        const spec = JSON.parse(response.body); 
+        
+        expect(spec.tags.find(t => t.name === tag)).toBeDefined();
+
+        const method = spec.paths[path].get;
+        expect(method.tags).toEqual([tag]);
         server.close();
         done();
       });
