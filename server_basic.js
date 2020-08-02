@@ -13,7 +13,7 @@ const app = express();
 generator.init(app, function(spec) {
   _.set(spec, 'paths["/foo/{name}"].get.parameters[0].description', 'description of a parameter');
   return spec;
-}, './test_spec.json', 1000, 'api-docs', mongoose.modelNames());
+}, './test_spec.json', 1000, 'api-docs', mongoose.modelNames(), ['foo']);
 
 app.use(bodyParser.json({}));
 let router = express.Router();
