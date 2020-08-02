@@ -12,27 +12,27 @@ const mongoose = require('mongoose');
 const app = express();
 generator.handleResponses(app, {
   predefinedSpec: function(spec) {
-    _.set(spec, 'paths["/foo/{name}"].get.parameters[0].description', 'description of a parameter');
+    _.set(spec, 'paths["/students/{id}"].get.parameters[0].description', 'description of a parameter');
     return spec;
   },
   specOutputPath: './test_spec.json',
   mongooseModels: mongoose.modelNames(),
-  tags: ['foo']
+  tags: ['Students']
 });
 
 app.use(bodyParser.json({}));
 let router = express.Router();
-router.route('/foo/stranger')
+router.route('/students')
   .get(function(req, res, next) {
     //code here
-    console.log('calling /foo/stranger');
-    res.json({message: 'hello stranger'});
+    console.log('calling /students');
+    res.json({message: 'hello students'});
     return next();
   });
-router.route('/foo/:name')
+router.route('/students/:id')
   .get(function(req, res, next) {
-    console.log('calling /foo/:name');
-    res.json({message: 'hello ' + req.params.name});
+    console.log('calling /students/:id');
+    res.json({message: 'hello ' + req.params.id});
     return next();
   });
 router.route('/gzip')

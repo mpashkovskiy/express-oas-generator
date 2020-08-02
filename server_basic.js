@@ -11,27 +11,27 @@ const mongoose = require('mongoose');
 
 const app = express();
 generator.init(app, function(spec) {
-  _.set(spec, 'paths["/foo/{name}"].get.parameters[0].description', 'description of a parameter');
+  _.set(spec, 'paths["/students/{id}"].get.parameters[0].description', 'description of a parameter');
   return spec;
-}, './test_spec.json', 1000, 'api-docs', mongoose.modelNames(), ['foo']);
+}, './test_spec.json', 1000, 'api-docs', mongoose.modelNames(), ['Students']);
 
 app.use(bodyParser.json({}));
 let router = express.Router();
-router.route('/foo/stranger')
+router.route('/students')
   .post(function(req, res, next) {
     //code here
-    console.log('calling /foo/stranger');
+    console.log('calling /students');
     res.json(req.body);
     return next();
   });
-router.route('/foo/:name')
+router.route('/students/:id')
   .get(function(req, res, next) {
-    console.log('calling /foo/:name');
+    console.log('calling /students/:id');
     let a = Math.random();
     if (a > 0.5) {
-      res.json({message: 'hello ' + req.params.name});
+      res.json({message: 'hello ' + req.params.id});
     } else {
-      res.json({message: 'hello ' + req.params.name, a: [{b: 1}, {b: 2, c: 'asd'}]});
+      res.json({message: 'hello ' + req.params.id, a: [{b: 1}, {b: 2, c: 'asd'}]});
     }
     return next();
   });
