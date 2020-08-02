@@ -62,7 +62,9 @@ describe('index.js', () => {
 
   beforeAll(done => {
     const app = express();
-    generator.init(app, {});
+
+    //Default args supplied to init. Only tag is modified
+    generator.init(app, {}, undefined, 1000*10, 'api-docs', [], ['hello']);
 
     app.use(bodyParser.json({}));
     app.get('/hello', (req, res) => {
@@ -108,6 +110,19 @@ describe('index.js', () => {
       expect(method.summary).toEqual(path);
       expect(method.responses[200].schema.type).toEqual('string');
       expect(method.responses[200].schema.example).toEqual(PLAIN_TEXT_RESPONSE);
+      done();
+    });
+  });
+
+  it('WHEN tags are supplied THEN path should contain the matching ones', done => {
+    const tag = 'hello';
+    const path = `/${tag}`;
+    request.get(`http://localhost:${port}${path}`, () => {
+      const spec = generator.getSpec();
+      expect(spec.tags.find(t => t.name === tag)).toBeDefined();
+
+      const method = spec.paths[path].get;
+      expect(method.tags).toEqual([tag]);
       done();
     });
   });
