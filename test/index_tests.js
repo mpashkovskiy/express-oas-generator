@@ -329,7 +329,7 @@ it('WHEN tags are supplied THEN the paths should be contain the matching ones', 
     spec => spec,
     'api-spec.json',
     1000,
-    'api-spec',
+    'custom-docs',
     [],
     [tag]
   );
