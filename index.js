@@ -229,8 +229,6 @@ function updateSchemesAndHost(req) {
 
 /**
  * @description Generates definitions spec from mongoose models
- *
- * @returns Definitions spec
  */
 function updateDefinitionsSpec(mongooseModels) {
   const validMongooseModels = Array.isArray(mongooseModels) && mongooseModels.length > 0;
@@ -242,8 +240,6 @@ function updateDefinitionsSpec(mongooseModels) {
 
 /**
  * @description Generates tags spec
- *
- * @returns Tags spec
  */
 function updateTagsSpec(tags) {
   const validTags = Array.isArray(tags) && tags.length > 0;
