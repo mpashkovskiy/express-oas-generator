@@ -11,6 +11,7 @@ const path = require('path');
 const swaggerUi = require('swagger-ui-express');
 const utils = require('./lib/utils');
 const { generateMongooseModelsSpec } = require('./lib/mongoose');
+const { generateTagsSpec, matchingTags } = require('./lib/tags');
 const processors = require('./lib/processors');
 const listEndpoints = require('express-list-endpoints');
 
@@ -44,6 +45,7 @@ let spec = {};
 let lastRecordTime = new Date().getTime();
 let firstResponseProcessing = true;
 let mongooseModelsSpecs;
+let tagsSpecs;
 
 /**
  * @param {boolean} [responseMiddlewareHasBeenApplied=false]
@@ -118,6 +120,9 @@ function serveApiDocs() {
     if (!spec.paths[path]) {
       spec.paths[path] = {};
     }
+
+    spec.tags = tagsSpecs || [];
+
     endpoint.methods.forEach(m => {
       spec.paths[path][m.toLowerCase()] = {
         summary: path,
@@ -127,7 +132,8 @@ function serveApiDocs() {
           in: 'path',
           required: true,
         })) || [],
-        responses: {}
+        responses: {},
+        tags: matchingTags(tagsSpecs || [], path)
       };
     });
   });
@@ -235,9 +241,30 @@ function updateDefinitionsSpec(mongooseModels) {
 }
 
 /**
+ * @description Generates tags spec
+ *
+ * @returns Tags spec
+ */
+function updateTagsSpec(tags) {
+  const validTags = Array.isArray(tags) && tags.length > 0;
+
+  if (validTags && !tagsSpecs) {
+    tagsSpecs = generateTagsSpec(tags);
+  }
+}
+
+/**
  * @type { typeof import('./index').handleResponses }
 */
-function handleResponses(expressApp, options = { swaggerUiServePath: 'api-docs', specOutputPath: undefined, predefinedSpec: {}, writeIntervalMs: 1000 * 10, mongooseModels: []}) {
+function handleResponses(expressApp, 
+  options = { 
+    swaggerUiServePath: 'api-docs', 
+    specOutputPath: undefined, 
+    predefinedSpec: {}, 
+    writeIntervalMs: 1000 * 10, 
+    mongooseModels: [], 
+    tags: []
+  }) {
   responseMiddlewareHasBeenApplied = true;
 
   /**
@@ -251,6 +278,7 @@ function handleResponses(expressApp, options = { swaggerUiServePath: 'api-docs',
   const { specOutputPath, writeIntervalMs } = options;
 
   updateDefinitionsSpec(options.mongooseModels);
+  updateTagsSpec(options.tags);
 
   /** middleware to handle RESPONSES */
   app.use((req, res, next) => {
@@ -338,18 +366,21 @@ function handleRequests() {
 /**
  * @type { typeof import('./index').init }
  */
-function init(aApp, aPredefinedSpec = {}, aSpecOutputPath = undefined, aWriteInterval = 1000 * 10, aSwaggerUiServePath = 'api-docs', mongooseModels = []) {
+function init(aApp, aPredefinedSpec = {}, aSpecOutputPath = undefined, aWriteInterval = 1000 * 10, aSwaggerUiServePath = 'api-docs', aMongooseModels = [], aTags = []) {
   handleResponses(aApp, {
     swaggerUiServePath: aSwaggerUiServePath,
     specOutputPath: aSpecOutputPath,
     predefinedSpec: aPredefinedSpec,
     writeIntervalMs: aWriteInterval,
+    mongooseModels: aMongooseModels,
+    tags: aTags
   });
   setTimeout(() => {
     handleRequests();
   }, 1000);
   
-  updateDefinitionsSpec(mongooseModels);
+  updateDefinitionsSpec(aMongooseModels);
+  updateTagsSpec(aTags);
 }
 
 /**
