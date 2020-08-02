@@ -35,6 +35,9 @@ export interface HandleResponsesOptions {
 
 	/** Mongoose model names */
 	mongooseModels?: Array<string>;
+
+	/** Tags to be used */
+	tags?: Array<string>;
 }
 
 /**
@@ -82,7 +85,8 @@ export function init(
 	specOutputPath?: HandleResponsesOptions['specOutputPath'],
 	writeIntervalMs?: HandleResponsesOptions['writeIntervalMs'],
 	swaggerUiServePath?: HandleResponsesOptions['swaggerUiServePath'],
-	mongooseModels?: HandleResponsesOptions['mongooseModels']
+	mongooseModels?: HandleResponsesOptions['mongooseModels'],
+	tags?: HandleResponsesOptions['tags']
 ): void;
 
 export const getSpec: () => object | OpenAPIV2.Document;
