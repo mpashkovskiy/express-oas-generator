@@ -331,7 +331,7 @@ it('WHEN tags are supplied THEN the paths should be contain the matching ones', 
     1000,
     'api-spec',
     [],
-    ['students']
+    [tag]
   );
   app.get(path, (req, res, next) => {
     res.setHeader('Content-Type', 'text/plain');
