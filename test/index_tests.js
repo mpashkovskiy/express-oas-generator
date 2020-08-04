@@ -62,8 +62,7 @@ describe('index.js', () => {
 
   beforeAll(done => {
     const app = express();
-
-    //Default args supplied to init. Only tag is modified
+    
     generator.init(app, {});
 
     app.use(bodyParser.json({}));
