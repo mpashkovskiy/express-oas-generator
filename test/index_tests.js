@@ -285,9 +285,9 @@ it('WHEN no custom path for docs set THEN the default path should be provided', 
   });
 });
 
-it('WHEN mongoose models are supplied THEN the definitions should be included', done => {
+it('WHEN mongoose models are supplied THEN the definitions and tags should be included', done => {
   const app = express();
-  const path = '/';
+  const mongooseModels = mongoose.modelNames();
   
   generator.init(
     app,
@@ -295,8 +295,12 @@ it('WHEN mongoose models are supplied THEN the definitions should be included', 
     'api-spec.json',
     1000,
     'custom-docs',
-    mongoose.modelNames()
+    mongooseModels
   );
+
+  const tag = mongooseModels.shift();
+  const path = `/${tag}`;
+  
   app.get(path, (req, res, next) => {
     res.setHeader('Content-Type', 'text/plain');
     res.send(PLAIN_TEXT_RESPONSE);
@@ -311,42 +315,12 @@ it('WHEN mongoose models are supplied THEN the definitions should be included', 
           return expect(spec.definitions[model]).toBeDefined(); 
         });
 
-        server.close();
-        done();
-      });
-    }, MS_TO_STARTUP);
-  });
-});
-
-it('WHEN tags are supplied THEN the paths should be contain the matching ones', done => {
-  const app = express();
-  const tag = 'students';
-  const path = `/${tag}`;
-  
-  generator.init(
-    app,
-    spec => spec,
-    'api-spec.json',
-    1000,
-    'custom-docs',
-    [],
-    [tag]
-  );
-  app.get(path, (req, res, next) => {
-    res.setHeader('Content-Type', 'text/plain');
-    res.send(PLAIN_TEXT_RESPONSE);
-    return next();
-  });
-  app.set('port', port);
-  const server = app.listen(app.get('port'), () => {
-    setTimeout(() => {
-      request.get(`http://localhost:${port}/api-spec`, (error, response) => {
-        const spec = JSON.parse(response.body); 
-        
         expect(spec.tags.find(t => t.name === tag)).toBeDefined();
 
         const method = spec.paths[path].get;
         expect(method.tags).toEqual([tag]);
+        server.close();
+
         server.close();
         done();
       });
