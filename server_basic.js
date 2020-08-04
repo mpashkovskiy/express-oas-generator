@@ -8,30 +8,31 @@ const _ = require('lodash');
 const zlib = require('zlib');
 require('./test/lib/mongoose_models/student');
 const mongoose = require('mongoose');
+const modelNames = mongoose.modelNames();
 
 const app = express();
 generator.init(app, function(spec) {
-  _.set(spec, 'paths["/students/{id}"].get.parameters[0].description', 'description of a parameter');
+  _.set(spec, 'paths["/students/{name}"].get.parameters[0].description', 'description of a parameter');
   return spec;
-}, './test_spec.json', 1000, 'api-docs', mongoose.modelNames(), ['Students']);
+}, './test_spec.json', 1000, 'api-docs', modelNames, modelNames);
 
 app.use(bodyParser.json({}));
 let router = express.Router();
-router.route('/students')
+router.route('/students/stranger')
   .post(function(req, res, next) {
     //code here
-    console.log('calling /students');
+    console.log('calling /students/stranger');
     res.json(req.body);
     return next();
   });
-router.route('/students/:id')
+router.route('/students/:name')
   .get(function(req, res, next) {
-    console.log('calling /students/:id');
+    console.log('calling /students/:name');
     let a = Math.random();
     if (a > 0.5) {
-      res.json({message: 'hello ' + req.params.id});
+      res.json({message: 'hello ' + req.params.name});
     } else {
-      res.json({message: 'hello ' + req.params.id, a: [{b: 1}, {b: 2, c: 'asd'}]});
+      res.json({message: 'hello ' + req.params.name, a: [{b: 1}, {b: 2, c: 'asd'}]});
     }
     return next();
   });
