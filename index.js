@@ -371,12 +371,7 @@ function init(aApp, aPredefinedSpec = {}, aSpecOutputPath = undefined, aWriteInt
     mongooseModels: aMongooseModels,
     tags: aTags
   });
-  setTimeout(() => {
-    handleRequests();
-  }, 1000);
-  
-  updateDefinitionsSpec(aMongooseModels);
-  updateTagsSpec(aTags || aMongooseModels);
+  setTimeout(() => handleRequests(), 1000);
 }
 
 /**
