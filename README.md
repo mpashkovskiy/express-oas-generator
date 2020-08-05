@@ -49,43 +49,26 @@ generator.init(app, function(spec) {
 
 ```
 
-To write specification into a file use third and forth (optional) arguments:
+To write specification into a file use third and forth (optional) arguments. Full signature of `init()` function is following:
 ```javascript
 expressOasGenerator.init(
   app,
   function(spec) { return spec; },
   'path/to/a/file/filename.json',
   60 * 1000,
-  ['User','Student'],
+  'api-docs',
+  ['User', 'Student'],
   ['users', 'students']
 )
 ```
-where:
-* 'path/to/a/file/filename.json' - path to a file and file name
-* 60 * 1000 - write interval in milliseconds (optional parameter, by default interval is equal to 10 seconds)
-* ['User','Student'] - (Optional) Mongoose models to be included as definitions. To get all just do mongoose.modelNames().
+
+where last five parameters are:
+* 'path/to/a/file/filename.json' - (Optional) path to a file and file name, if missing module won't write spec to the disc
+* 60 * 1000 - (Optional) write interval in milliseconds (default: 10 seconds)
+* 'api-docs' - (Optional) Swagger UI path for your REST API (default: api-docs)
+* ['User', 'Student'] - (Optional) Mongoose models to be included as definitions. To get all just do mongoose.modelNames().
 The following peer dependencies are required to use this last argument: mongoose, mongoose-to-swagger, bson.
 * ['users', 'students'] - (Optional) Tags: Really useful to group operations (commonly by resources). All the matching paths containing the supplied tags will be grouped. If not supplied, defaults to mongoose models. See [example](https://swagger.io/docs/specification/2-0/grouping-operations-with-tags/).
-
-To change the Swagger UI path for your REST API use fifth (optional) argument:
-```javascript
-expressOasGenerator.init(
-  app,
-  function(spec) { return spec; },
-  'path/to/a/file/filename.json',
-  60 * 1000,
-  'custom-docs-path',
-  ['User','Student'],
-  ['users', 'students']
-)
-```
-where:
-* 'path/to/a/file/filename.json' - path to a file and file name
-* 60 * 1000 - write interval in milliseconds (optional parameter, by default interval is equal to 10 seconds)
-* 'custom-docs-path' - Swagger UI path for your REST API (default: api-docs)
-* ['User','Student'] - (Optional) Mongoose models to be included as definitions. To get all just do mongoose.modelNames().
-The following peer dependencies are required to this last argument: mongoose, mongoose-to-swagger, bson.
-* ['users', 'students'] - (Optional) Tags: Really useful to group operations (commonly by resources). All the matching paths containing the supplied tags will be grouped. If not supplied, defaults to mongoose models. See [example](https://swagger.io/docs/specification/2-0/grouping-operations-with-tags/). 
 
 ## Advanced usage (recommended)
 
