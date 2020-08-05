@@ -8,29 +8,30 @@ const _ = require('lodash');
 const zlib = require('zlib');
 require('./test/lib/mongoose_models/student');
 const mongoose = require('mongoose');
+const modelNames = mongoose.modelNames();
 
 const app = express();
 generator.handleResponses(app, {
   predefinedSpec: function(spec) {
-    _.set(spec, 'paths["/foo/{name}"].get.parameters[0].description', 'description of a parameter');
+    _.set(spec, 'paths["/students/{name}"].get.parameters[0].description', 'description of a parameter');
     return spec;
   },
   specOutputPath: './test_spec.json',
-  mongooseModels: mongoose.modelNames()
+  mongooseModels: modelNames
 });
 
 app.use(bodyParser.json({}));
 let router = express.Router();
-router.route('/foo/stranger')
+router.route('/students/stranger')
   .get(function(req, res, next) {
     //code here
-    console.log('calling /foo/stranger');
+    console.log('calling /students/stranger');
     res.json({message: 'hello stranger'});
     return next();
   });
-router.route('/foo/:name')
+router.route('/students/:name')
   .get(function(req, res, next) {
-    console.log('calling /foo/:name');
+    console.log('calling /students/:name');
     res.json({message: 'hello ' + req.params.name});
     return next();
   });

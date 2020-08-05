@@ -8,25 +8,26 @@ const _ = require('lodash');
 const zlib = require('zlib');
 require('./test/lib/mongoose_models/student');
 const mongoose = require('mongoose');
+const modelNames = mongoose.modelNames();
 
 const app = express();
 generator.init(app, function(spec) {
-  _.set(spec, 'paths["/foo/{name}"].get.parameters[0].description', 'description of a parameter');
+  _.set(spec, 'paths["/students/{name}"].get.parameters[0].description', 'description of a parameter');
   return spec;
-}, './test_spec.json', 1000, 'api-docs', mongoose.modelNames());
+}, './test_spec.json', 1000, 'api-docs', modelNames, ['students']);
 
 app.use(bodyParser.json({}));
 let router = express.Router();
-router.route('/foo/stranger')
+router.route('/students/stranger')
   .post(function(req, res, next) {
     //code here
-    console.log('calling /foo/stranger');
+    console.log('calling /students/stranger');
     res.json(req.body);
     return next();
   });
-router.route('/foo/:name')
+router.route('/students/:name')
   .get(function(req, res, next) {
-    console.log('calling /foo/:name');
+    console.log('calling /students/:name');
     let a = Math.random();
     if (a > 0.5) {
       res.json({message: 'hello ' + req.params.name});

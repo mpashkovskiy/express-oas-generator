@@ -62,6 +62,7 @@ describe('index.js', () => {
 
   beforeAll(done => {
     const app = express();
+    
     generator.init(app, {});
 
     app.use(bodyParser.json({}));
@@ -284,9 +285,9 @@ it('WHEN no custom path for docs set THEN the default path should be provided', 
   });
 });
 
-it('WHEN mongoose models are supplied THEN the definitions should be included', done => {
+it('WHEN mongoose models are supplied THEN the definitions and tags should be included', done => {
   const app = express();
-  const path = '/';
+  const mongooseModels = mongoose.modelNames();
   
   generator.init(
     app,
@@ -294,8 +295,12 @@ it('WHEN mongoose models are supplied THEN the definitions should be included', 
     'api-spec.json',
     1000,
     'custom-docs',
-    mongoose.modelNames()
+    mongooseModels
   );
+
+  const tag = mongooseModels.shift();
+  const path = `/${tag}`;
+  
   app.get(path, (req, res, next) => {
     res.setHeader('Content-Type', 'text/plain');
     res.send(PLAIN_TEXT_RESPONSE);
@@ -309,6 +314,12 @@ it('WHEN mongoose models are supplied THEN the definitions should be included', 
         mongoose.modelNames().map(model => {
           return expect(spec.definitions[model]).toBeDefined(); 
         });
+
+        expect(spec.tags.find(t => t.name === tag)).toBeDefined();
+
+        const method = spec.paths[path].get;
+        expect(method.tags).toEqual([tag]);
+        server.close();
 
         server.close();
         done();
