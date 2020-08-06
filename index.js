@@ -1,3 +1,5 @@
+// @ts-nocheck
+/* eslint-disable complexity */
 /**
  * @fileOverview main file
  * @module index
@@ -10,10 +12,14 @@ const fs = require('fs');
 const path = require('path');
 const swaggerUi = require('swagger-ui-express');
 const utils = require('./lib/utils');
+
 const { generateMongooseModelsSpec } = require('./lib/mongoose');
 const { generateTagsSpec, matchingTags } = require('./lib/tags');
+const { convertOpenApiVersionToV3 } = require('./lib/openapi');
 const processors = require('./lib/processors');
 const listEndpoints = require('express-list-endpoints');
+
+const OPEN_API_V3_SUFFIX = '_v3';
 
 const WRONG_MIDDLEWARE_ORDER_ERROR = `
 Express oas generator:
@@ -141,14 +147,19 @@ function serveApiDocs() {
   spec.definitions = mongooseModelsSpecs || {};
   updateSpecFromPackage();
   spec = patchSpec(predefinedSpec);
-  app.use(packageInfo.baseUrlPath + '/api-spec', (req, res, next) => {
-    res.setHeader('Content-Type', 'application/json');
-    res.send(JSON.stringify(patchSpec(predefinedSpec), null, 2));
-    next();
-  });
-  app.use(packageInfo.baseUrlPath + '/' + swaggerUiServePath, swaggerUi.serve, (req, res) => {
-    res.setHeader('Content-Type', 'text/html');
-    swaggerUi.setup(patchSpec(predefinedSpec))(req, res);
+
+  convertOpenApiVersionToV3(spec, specV3 => {
+    // Change to corresponding one. Tests are done against spec (v2), but 
+    const specToServe = spec || specV3;
+    app.use(packageInfo.baseUrlPath + '/api-spec', (req, res, next) => {
+      res.setHeader('Content-Type', 'application/json');
+      res.send(JSON.stringify(specToServe, null, 2));
+      next();
+    });
+    app.use(packageInfo.baseUrlPath + '/' + swaggerUiServePath, swaggerUi.serve, (req, res) => {
+      res.setHeader('Content-Type', 'text/html');
+      swaggerUi.setup(specToServe)(req, res);
+    });
   });
 }
 
@@ -289,16 +300,16 @@ function handleResponses(expressApp,
         firstResponseProcessing = false;
         lastRecordTime = ts;
 
-        fs.writeFile(specOutputPath, JSON.stringify(spec, null, 2), 'utf8', err => {
-          const fullPath = path.resolve(specOutputPath);
+        fs.writeFileSync(specOutputPath, JSON.stringify(spec, null, 2), 'utf8');
 
-          if (err) {
-            /**
-			 * TODO - this is broken - the error will be caught and ignored in the catch below.
-			 * See https://github.com/mpashkovskiy/express-oas-generator/pull/39#discussion_r340026645
-			 */
-            throw new Error(`Cannot store the specification into ${fullPath} because of ${err.message}`);
-          }
+        convertOpenApiVersionToV3(spec, specV3 => {
+          const parsedSpecOutputPath = path.parse(specOutputPath);
+          const {name, ext} = parsedSpecOutputPath;
+          parsedSpecOutputPath.base = name.concat(OPEN_API_V3_SUFFIX).concat(ext);
+          
+          const v3Path = path.format(parsedSpecOutputPath);
+          
+          fs.writeFileSync(v3Path, JSON.stringify(specV3), 'utf8');
         });
       }
     } catch (e) {
