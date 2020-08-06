@@ -185,14 +185,12 @@ function serveApiDocs() {
   applySpecMiddlewares(spec, OPEN_API_V2_SUFFIX);
   
   convertOpenApiVersionToV3(spec, (err, specV3) => {
-    if (err) {
-      /** TODO - Log that open api v3 could not be generated. Failing with basic server setup time. */
-      return; 
+    if (!err) {
+      applySpecMiddlewares(specV3, OPEN_API_V3_SUFFIX);
+      // Base path middleware should be applied after specific versions
+      applySpecMiddlewares(spec);  
     }
-    
-    applySpecMiddlewares(specV3, OPEN_API_V3_SUFFIX);
-    // Base path middleware should be applied after specific versions
-    applySpecMiddlewares(spec); 
+    /** TODO - Log that open api v3 could not be generated. Failing with basic server setup time. */
   });
 }
 
@@ -336,17 +334,16 @@ function handleResponses(expressApp,
         fs.writeFileSync(specOutputPath, JSON.stringify(spec, null, 2), 'utf8');
 
         convertOpenApiVersionToV3(spec, (err, specV3) => {
-          if (err) {
-            /** TODO - Log that open api v3 could not be generated. Failing with basic server setup time. */
-            return;
+          if (!err) {
+            const parsedSpecOutputPath = path.parse(specOutputPath);
+            const {name, ext} = parsedSpecOutputPath;
+            parsedSpecOutputPath.base = name.concat('_').concat(OPEN_API_V3_SUFFIX).concat(ext);
+            
+            const v3Path = path.format(parsedSpecOutputPath);
+            
+            fs.writeFileSync(v3Path, JSON.stringify(specV3), 'utf8');
           }
-          const parsedSpecOutputPath = path.parse(specOutputPath);
-          const {name, ext} = parsedSpecOutputPath;
-          parsedSpecOutputPath.base = name.concat('_').concat(OPEN_API_V3_SUFFIX).concat(ext);
-          
-          const v3Path = path.format(parsedSpecOutputPath);
-          
-          fs.writeFileSync(v3Path, JSON.stringify(specV3), 'utf8');
+          /** TODO - Log that open api v3 could not be generated. Failing with basic server setup time. */
         });  
 
       }
