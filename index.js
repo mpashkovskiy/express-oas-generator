@@ -190,7 +190,7 @@ function serveApiDocs() {
       // Base path middleware should be applied after specific versions
       applySpecMiddlewares(spec);  
     }
-    /** TODO - Log that open api v3 could not be generated. Failing with basic server setup time. */
+    /** TODO - Log that open api v3 could not be generated */
   });
 }
 
@@ -343,7 +343,7 @@ function handleResponses(expressApp,
             
             fs.writeFileSync(v3Path, JSON.stringify(specV3), 'utf8');
           }
-          /** TODO - Log that open api v3 could not be generated. Failing with basic server setup time. */
+          /** TODO - Log that open api v3 could not be generated */
         });  
 
       }
