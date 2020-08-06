@@ -5,4 +5,6 @@ build
 .idea
 *.iml
 test_spec.json
+test_spec_v3.json
 api-spec.json
+api-spec_v3.json
