@@ -13,12 +13,9 @@ const utils = require('./lib/utils');
 
 const { generateMongooseModelsSpec } = require('./lib/mongoose');
 const { generateTagsSpec, matchingTags } = require('./lib/tags');
-const { convertOpenApiVersionToV3 } = require('./lib/openapi');
+const { convertOpenApiVersionToV3, getSpecByVersion, versions } = require('./lib/openapi');
 const processors = require('./lib/processors');
 const listEndpoints = require('express-list-endpoints');
-
-const OPEN_API_V2_SUFFIX = 'v2';
-const OPEN_API_V3_SUFFIX = 'v3';
 
 const WRONG_MIDDLEWARE_ORDER_ERROR = `
 Express oas generator:
@@ -106,10 +103,14 @@ function updateSpecFromPackage() {
  *
  * @returns Middleware
  */
-function apiSpecMiddleware(openApiSpec) {
+function apiSpecMiddleware(specV2, version) {
   return (req, res) => {
-    res.setHeader('Content-Type', 'application/json');
-    res.send(JSON.stringify(openApiSpec, null, 2));
+    getSpecByVersion(specV2, version, (err, openApiSpec) => {
+      if (!err) {
+        res.setHeader('Content-Type', 'application/json');
+        res.send(JSON.stringify(openApiSpec, null, 2));
+      }
+    });
   };
 }
 
@@ -118,10 +119,14 @@ function apiSpecMiddleware(openApiSpec) {
  *
  * @returns Middleware
  */
-function swaggerServeMiddleware(openApiSpec) {
+function swaggerServeMiddleware(specV2, version) {
   return (req, res) => {
-    res.setHeader('Content-Type', 'text/html');
-    swaggerUi.setup(openApiSpec)(req, res);
+    getSpecByVersion(specV2, version, (err, openApiSpec) => {
+      if (!err) {
+        res.setHeader('Content-Type', 'text/html');
+        swaggerUi.setup(openApiSpec)(req, res);
+      }
+    });
   };
 }
 
@@ -129,19 +134,20 @@ function swaggerServeMiddleware(openApiSpec) {
  * @description Applies spec middlewares
  */
 function applySpecMiddlewares(spec, version = '') {
+
   const apiSpecBasePath = packageInfo.baseUrlPath.concat('/api-spec');
   const baseSwaggerServePath = packageInfo.baseUrlPath.concat('/' + swaggerUiServePath);
 
-  app.use(apiSpecBasePath.concat('/' + version), apiSpecMiddleware(spec));
-  app.use(baseSwaggerServePath.concat('/' + version), swaggerUi.serve, swaggerServeMiddleware(spec));
+  app.use(apiSpecBasePath.concat('/' + version), apiSpecMiddleware(spec, version));
+  app.use(baseSwaggerServePath.concat('/' + version), swaggerUi.serve, swaggerServeMiddleware(spec, version));
 }
 
 /**
- * @description serve the openAPI docs with swagger at a specified path / url
+ * @description Prepares spec to be served
  *
  * @returns void
  */
-function serveApiDocs() {
+function prepareSpec() {
   spec = { swagger: '2.0', paths: {} };
 
   const endpoints = listEndpoints(app);
@@ -181,17 +187,22 @@ function serveApiDocs() {
   spec.definitions = mongooseModelsSpecs || {};
   updateSpecFromPackage();
   spec = patchSpec(predefinedSpec);
+}
 
-  applySpecMiddlewares(spec, OPEN_API_V2_SUFFIX);
+/**
+ * @description serve the openAPI docs with swagger at a specified path / url
+ *
+ * @returns void
+ */
+function serveApiDocs() {
+  prepareSpec();
+
+  applySpecMiddlewares(spec, versions.OPEN_API_V2);
   
-  convertOpenApiVersionToV3(spec, (err, specV3) => {
-    if (!err) {
-      applySpecMiddlewares(specV3, OPEN_API_V3_SUFFIX);
-      // Base path middleware should be applied after specific versions
-      applySpecMiddlewares(spec);  
-    }
-    /** TODO - Log that open api v3 could not be generated */
-  });
+  applySpecMiddlewares(spec, versions.OPEN_API_V3);
+
+  // Base path middleware should be applied after specific versions
+  applySpecMiddlewares(spec); 
 }
 
 /**
@@ -337,7 +348,7 @@ function handleResponses(expressApp,
           if (!err) {
             const parsedSpecOutputPath = path.parse(specOutputPath);
             const {name, ext} = parsedSpecOutputPath;
-            parsedSpecOutputPath.base = name.concat('_').concat(OPEN_API_V3_SUFFIX).concat(ext);
+            parsedSpecOutputPath.base = name.concat('_').concat(versions.OPEN_API_V3).concat(ext);
             
             const v3Path = path.format(parsedSpecOutputPath);
             
@@ -428,6 +439,13 @@ const getSpec = () => {
 };
 
 /**
+ * @type { typeof import('./index').getSpecV3 }
+ */
+const getSpecV3 = callback => {
+  convertOpenApiVersionToV3(getSpec(), callback);
+};
+
+/**
  * @type { typeof import('./index').setPackageInfoPath }
  *
  * @param pkgInfoPath  path to package.json
@@ -441,5 +459,6 @@ module.exports = {
   handleRequests,
   init,
   getSpec,
+  getSpecV3,
   setPackageInfoPath
 };

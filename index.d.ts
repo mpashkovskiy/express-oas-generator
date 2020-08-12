@@ -94,4 +94,6 @@ export function init(
 
 export const getSpec: () => object | OpenAPIV2.Document;
 
+export const getSpecV3: (callback: (err: object | string, specV3: object | OpenAPIV3.Document) => void) => void
+
 export const setPackageInfoPath: (pkgInfoPath: string) => void;
