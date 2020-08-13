@@ -103,9 +103,9 @@ function updateSpecFromPackage() {
  *
  * @returns Middleware
  */
-function apiSpecMiddleware(specV2, version) {
+function apiSpecMiddleware(version) {
   return (req, res) => {
-    getSpecByVersion(specV2, version, (err, openApiSpec) => {
+    getSpecByVersion(spec, version, (err, openApiSpec) => {
       if (!err) {
         res.setHeader('Content-Type', 'application/json');
         res.send(JSON.stringify(openApiSpec, null, 2));
@@ -119,9 +119,9 @@ function apiSpecMiddleware(specV2, version) {
  *
  * @returns Middleware
  */
-function swaggerServeMiddleware(specV2, version) {
+function swaggerServeMiddleware(version) {
   return (req, res) => {
-    getSpecByVersion(specV2, version, (err, openApiSpec) => {
+    getSpecByVersion(spec, version, (err, openApiSpec) => {
       if (!err) {
         res.setHeader('Content-Type', 'text/html');
         swaggerUi.setup(openApiSpec)(req, res);
@@ -133,13 +133,13 @@ function swaggerServeMiddleware(specV2, version) {
 /**
  * @description Applies spec middlewares
  */
-function applySpecMiddlewares(spec, version = '') {
+function applySpecMiddlewares(version = '') {
 
   const apiSpecBasePath = packageInfo.baseUrlPath.concat('/api-spec');
   const baseSwaggerServePath = packageInfo.baseUrlPath.concat('/' + swaggerUiServePath);
 
-  app.use(apiSpecBasePath.concat('/' + version), apiSpecMiddleware(spec, version));
-  app.use(baseSwaggerServePath.concat('/' + version), swaggerUi.serve, swaggerServeMiddleware(spec, version));
+  app.use(apiSpecBasePath.concat('/' + version), apiSpecMiddleware(version));
+  app.use(baseSwaggerServePath.concat('/' + version), swaggerUi.serve, swaggerServeMiddleware(version));
 }
 
 /**
@@ -197,12 +197,12 @@ function prepareSpec() {
 function serveApiDocs() {
   prepareSpec();
 
-  applySpecMiddlewares(spec, versions.OPEN_API_V2);
+  applySpecMiddlewares(versions.OPEN_API_V2);
   
-  applySpecMiddlewares(spec, versions.OPEN_API_V3);
+  applySpecMiddlewares(versions.OPEN_API_V3);
 
   // Base path middleware should be applied after specific versions
-  applySpecMiddlewares(spec); 
+  applySpecMiddlewares(); 
 }
 
 /**
