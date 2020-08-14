@@ -116,7 +116,7 @@ function apiSpecMiddleware(version) {
 
 /**
  * @description Builds swagger serve middleware
- *
+ * @param version Available open api versions: 'v2' (default if empty) or 'v3'.
  * @returns Middleware
  */
 function swaggerServeMiddleware(version) {
@@ -132,6 +132,7 @@ function swaggerServeMiddleware(version) {
 
 /**
  * @description Applies spec middlewares
+ * @param version Available open api versions: 'v2' (default if empty) or 'v3'.
  */
 function applySpecMiddlewares(version = '') {
 
