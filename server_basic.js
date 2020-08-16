@@ -27,6 +27,9 @@ router.route('/students/stranger')
   });
 router.route('/students/:name')
   .get(function(req, res, next) {
+    if (res.headersSent) {
+      return next();
+    }
     console.log('calling /students/:name');
     let a = Math.random();
     if (a > 0.5) {
