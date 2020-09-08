@@ -85,10 +85,11 @@ function updateSpecFromPackage() {
   }
 
   packageInfo.baseUrlPath = packageInfo.baseUrlPath || '';
-  spec.info.description = '[Specification JSON](' + packageInfo.baseUrlPath + '/api-spec)';
+  const baseSpecPath = packageInfo.baseUrlPath + '/api-spec';
+  spec.info.description = `Specification JSONs: [v2](${baseSpecPath}/v2), [v3](${baseSpecPath}/v3).`;
   if (packageInfo.baseUrlPath !== '') {
     spec.basePath = packageInfo.baseUrlPath;
-    spec.info.description += `, base url: [${packageInfo.baseUrlPath}](${packageInfo.baseUrlPath})`;
+    spec.info.description += ` Base url: [${packageInfo.baseUrlPath}](${packageInfo.baseUrlPath})`;
   }
 
   if (packageInfo.description) {
@@ -134,7 +135,6 @@ function swaggerServeMiddleware(version) {
  * @param version Available open api versions: 'v2' (default if empty) or 'v3'.
  */
 function applySpecMiddlewares(version = '') {
-
   const apiSpecBasePath = packageInfo.baseUrlPath.concat('/api-spec');
   const baseSwaggerServePath = packageInfo.baseUrlPath.concat('/' + swaggerUiServePath);
 
