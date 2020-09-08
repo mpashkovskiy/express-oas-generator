@@ -89,10 +89,16 @@ describe('index.js', () => {
 
   beforeEach(done => {
     let spec = generator.getSpec();
-    expect(Object.keys(spec.paths).length).toBe(5);
-    request.get(`http://localhost:${port}/api-spec`, (error, res) => {
-      expect(JSON.parse(res.body)).toEqual(spec);
-      done();
+    generator.getSpecV3((err, specV3) => {
+      expect(err).toBeNull();
+      expect(Object.keys(spec.paths).length).toBe(5);
+      request.get(`http://localhost:${port}/api-spec`, (error, specV2res) => {
+        expect(JSON.parse(specV2res.body)).toEqual(spec);
+        request.get(`http://localhost:${port}/api-spec/v3`, (error, specV3res) => {
+          expect(JSON.parse(specV3res.body)).toEqual(specV3);
+          done();
+        });
+      });
     });
   });
 

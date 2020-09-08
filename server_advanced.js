@@ -31,6 +31,9 @@ router.route('/students/stranger')
   });
 router.route('/students/:name')
   .get(function(req, res, next) {
+    if (res.headersSent) {
+      return next();
+    }
     console.log('calling /students/:name');
     res.json({message: 'hello ' + req.params.name});
     return next();

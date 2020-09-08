@@ -10,8 +10,10 @@ const fs = require('fs');
 const path = require('path');
 const swaggerUi = require('swagger-ui-express');
 const utils = require('./lib/utils');
+
 const { generateMongooseModelsSpec } = require('./lib/mongoose');
 const { generateTagsSpec, matchingTags } = require('./lib/tags');
+const { convertOpenApiVersionToV3, getSpecByVersion, versions } = require('./lib/openapi');
 const processors = require('./lib/processors');
 const listEndpoints = require('express-list-endpoints');
 
@@ -97,11 +99,56 @@ function updateSpecFromPackage() {
 }
 
 /**
- * @description serve the openAPI docs with swagger at a specified path / url
+ * @description Builds api spec middleware
+ *
+ * @returns Middleware
+ */
+function apiSpecMiddleware(version) {
+  return (req, res) => {
+    getSpecByVersion(spec, version, (err, openApiSpec) => {
+      if (!err) {
+        res.setHeader('Content-Type', 'application/json');
+        res.send(JSON.stringify(openApiSpec, null, 2));
+      }
+    });
+  };
+}
+
+/**
+ * @description Builds swagger serve middleware
+ * @param version Available open api versions: 'v2' (default if empty) or 'v3'.
+ * @returns Middleware
+ */
+function swaggerServeMiddleware(version) {
+  return (req, res) => {
+    getSpecByVersion(spec, version, (err, openApiSpec) => {
+      if (!err) {
+        res.setHeader('Content-Type', 'text/html');
+        swaggerUi.setup(openApiSpec)(req, res);
+      }
+    });
+  };
+}
+
+/**
+ * @description Applies spec middlewares
+ * @param version Available open api versions: 'v2' (default if empty) or 'v3'.
+ */
+function applySpecMiddlewares(version = '') {
+
+  const apiSpecBasePath = packageInfo.baseUrlPath.concat('/api-spec');
+  const baseSwaggerServePath = packageInfo.baseUrlPath.concat('/' + swaggerUiServePath);
+
+  app.use(apiSpecBasePath.concat('/' + version), apiSpecMiddleware(version));
+  app.use(baseSwaggerServePath.concat('/' + version), swaggerUi.serve, swaggerServeMiddleware(version));
+}
+
+/**
+ * @description Prepares spec to be served
  *
  * @returns void
  */
-function serveApiDocs() {
+function prepareSpec() {
   spec = { swagger: '2.0', paths: {} };
 
   const endpoints = listEndpoints(app);
@@ -141,15 +188,22 @@ function serveApiDocs() {
   spec.definitions = mongooseModelsSpecs || {};
   updateSpecFromPackage();
   spec = patchSpec(predefinedSpec);
-  app.use(packageInfo.baseUrlPath + '/api-spec', (req, res, next) => {
-    res.setHeader('Content-Type', 'application/json');
-    res.send(JSON.stringify(patchSpec(predefinedSpec), null, 2));
-    next();
-  });
-  app.use(packageInfo.baseUrlPath + '/' + swaggerUiServePath, swaggerUi.serve, (req, res) => {
-    res.setHeader('Content-Type', 'text/html');
-    swaggerUi.setup(patchSpec(predefinedSpec))(req, res);
-  });
+}
+
+/**
+ * @description serve the openAPI docs with swagger at a specified path / url
+ *
+ * @returns void
+ */
+function serveApiDocs() {
+  prepareSpec();
+
+  applySpecMiddlewares(versions.OPEN_API_V2);
+  
+  applySpecMiddlewares(versions.OPEN_API_V3);
+
+  // Base path middleware should be applied after specific versions
+  applySpecMiddlewares(); 
 }
 
 /**
@@ -275,7 +329,7 @@ function handleResponses(expressApp,
 
   updateDefinitionsSpec(options.mongooseModels);
   updateTagsSpec(options.tags || options.mongooseModels);
-
+  
   /** middleware to handle RESPONSES */
   app.use((req, res, next) => {
     try {
@@ -289,17 +343,21 @@ function handleResponses(expressApp,
         firstResponseProcessing = false;
         lastRecordTime = ts;
 
-        fs.writeFile(specOutputPath, JSON.stringify(spec, null, 2), 'utf8', err => {
-          const fullPath = path.resolve(specOutputPath);
+        fs.writeFileSync(specOutputPath, JSON.stringify(spec, null, 2), 'utf8');
 
-          if (err) {
-            /**
-			 * TODO - this is broken - the error will be caught and ignored in the catch below.
-			 * See https://github.com/mpashkovskiy/express-oas-generator/pull/39#discussion_r340026645
-			 */
-            throw new Error(`Cannot store the specification into ${fullPath} because of ${err.message}`);
+        convertOpenApiVersionToV3(spec, (err, specV3) => {
+          if (!err) {
+            const parsedSpecOutputPath = path.parse(specOutputPath);
+            const {name, ext} = parsedSpecOutputPath;
+            parsedSpecOutputPath.base = name.concat('_').concat(versions.OPEN_API_V3).concat(ext);
+            
+            const v3Path = path.format(parsedSpecOutputPath);
+            
+            fs.writeFileSync(v3Path, JSON.stringify(specV3), 'utf8');
           }
-        });
+          /** TODO - Log that open api v3 could not be generated */
+        });  
+
       }
     } catch (e) {
       /** TODO - shouldn't we do something here? */
@@ -382,6 +440,13 @@ const getSpec = () => {
 };
 
 /**
+ * @type { typeof import('./index').getSpecV3 }
+ */
+const getSpecV3 = callback => {
+  convertOpenApiVersionToV3(getSpec(), callback);
+};
+
+/**
  * @type { typeof import('./index').setPackageInfoPath }
  *
  * @param pkgInfoPath  path to package.json
@@ -395,5 +460,6 @@ module.exports = {
   handleRequests,
   init,
   getSpec,
+  getSpecV3,
   setPackageInfoPath
 };

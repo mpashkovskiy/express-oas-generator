@@ -8,11 +8,12 @@
  */
 
 import { Express } from 'express';
-import { OpenAPIV2 } from 'openapi-types';
+import { OpenAPIV2,OpenAPIV3 } from 'openapi-types';
 
 /** re-export for ease of use for the end user */
 export {
-	OpenAPIV2, //
+	OpenAPIV2,
+	OpenAPIV3
 };
 
 /** Options for `handleResponses` */
@@ -28,7 +29,9 @@ export interface HandleResponsesOptions {
 	specOutputPath?: string;
 
 	/** either the Swagger specification or a function with one argument, which returns the spec */
-	predefinedSpec?: object | OpenAPIV2.Document | ((spec: OpenAPIV2.Document) => OpenAPIV2.Document);
+	predefinedSpec?: object | OpenAPIV2.Document | OpenAPIV3.Document | 
+		((spec: OpenAPIV2.Document) => OpenAPIV2.Document) | 
+		((spec: OpenAPIV3.Document) => OpenAPIV3.Document);
 
 	/** how often to write the openAPI specification to file */
 	writeIntervalMs?: number;
@@ -90,5 +93,7 @@ export function init(
 ): void;
 
 export const getSpec: () => object | OpenAPIV2.Document;
+
+export const getSpecV3: (callback: (err: object | string, specV3: object | OpenAPIV3.Document) => void) => void
 
 export const setPackageInfoPath: (pkgInfoPath: string) => void;
