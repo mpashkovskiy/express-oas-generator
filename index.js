@@ -84,12 +84,11 @@ function updateSpecFromPackage() {
     spec.info.license = { name: packageInfo.license };
   }
 
+  packageInfo.baseUrlPath = packageInfo.baseUrlPath || '';
   spec.info.description = '[Specification JSON](' + packageInfo.baseUrlPath + '/api-spec)';
-  if (packageInfo.baseUrlPath) {
+  if (packageInfo.baseUrlPath !== '') {
     spec.basePath = packageInfo.baseUrlPath;
-    spec.info.description = ', base url: ' + packageInfo.baseUrlPath;
-  } else {
-    packageInfo.baseUrlPath = '';
+    spec.info.description += `, base url: [${packageInfo.baseUrlPath}](${packageInfo.baseUrlPath})`;
   }
 
   if (packageInfo.description) {

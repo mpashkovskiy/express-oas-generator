@@ -37,6 +37,7 @@ it('WHEN patch function is provided THEN it is applied to spec', done => {
       request.get(`http://localhost:${port}${path}?a=1`, () => {
         const spec = generator.getSpec();
         expect(spec.info.title).toBe(newTitle);
+        expect(spec.info.description).toContain('[Specification JSON](/api-spec)');
         expect(spec.paths[path].get.parameters[0].example).toBe(newValue);
         server.close();
         done();
@@ -222,7 +223,10 @@ it('WHEN package json includes baseUrlPath THEN spec description is updated', do
   setTimeout(() => {
     const spec = generator.getSpec();
     expect(spec.basePath !== undefined).toBeTruthy();
-    expect(spec.info.description.indexOf(spec.basePath) > 0).toBeTruthy();
+    expect(spec.info.description).toContain(`(${spec.basePath}/api-spec)`);
+    expect(spec.info.description).toContain(`(${spec.basePath})`);
+    expect(spec.info.description).toContain('base url');
+
     done();
   }, MS_TO_STARTUP);
 });
@@ -235,7 +239,8 @@ it('WHEN package json does not include baseUrlPath THEN spec description is not 
   setTimeout(() => {
     const spec = generator.getSpec();
     expect(spec.basePath === undefined).toBeTruthy();
-    expect(spec.info.description.indexOf('base url') === -1).toBeTruthy();
+    expect(spec.info.description).toContain('(/api-spec)');
+    expect(spec.info.description).not.toContain('base url');
     done();
   }, MS_TO_STARTUP);
 });
