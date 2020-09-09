@@ -85,8 +85,9 @@ function updateSpecFromPackage() {
   }
 
   packageInfo.baseUrlPath = packageInfo.baseUrlPath || '';
-  const baseSpecPath = packageInfo.baseUrlPath + '/api-spec';
-  spec.info.description = `Specification JSONs: [v2](${baseSpecPath}/v2), [v3](${baseSpecPath}/v3).`;
+  const v2link = `[${versions.OPEN_API_V2}](${packageInfo.baseUrlPath}/api-spec/${versions.OPEN_API_V2})`;
+  const v3link = `[${versions.OPEN_API_V3}](${packageInfo.baseUrlPath}/api-spec/${versions.OPEN_API_V3})`;
+  spec.info.description = `Specification JSONs: ${v2link}, ${v3link}.`;
   if (packageInfo.baseUrlPath !== '') {
     spec.basePath = packageInfo.baseUrlPath;
     spec.info.description += ` Base url: [${packageInfo.baseUrlPath}](${packageInfo.baseUrlPath})`;

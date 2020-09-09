@@ -3,9 +3,10 @@
 const express = require('express');
 const request = require('request');
 const bodyParser = require('body-parser');
-const generator = require('../index.js');
 const mongoose = require('mongoose');
 require('./lib/mongoose_models/student');
+const generator = require('../index.js');
+const { versions } = require('../lib/openapi');
 
 const MS_TO_STARTUP = 2000;
 const port = 8888;
@@ -37,8 +38,8 @@ it('WHEN patch function is provided THEN it is applied to spec', done => {
       request.get(`http://localhost:${port}${path}?a=1`, () => {
         const spec = generator.getSpec();
         expect(spec.info.title).toBe(newTitle);
-        expect(spec.info.description).toContain('(/api-spec/v2)');
-        expect(spec.info.description).toContain('(/api-spec/v3)');
+        expect(spec.info.description).toContain(`(/api-spec/${versions.OPEN_API_V2})`);
+        expect(spec.info.description).toContain(`(/api-spec/${versions.OPEN_API_V3})`);
         expect(spec.paths[path].get.parameters[0].example).toBe(newValue);
         server.close();
         done();
@@ -224,8 +225,8 @@ it('WHEN package json includes baseUrlPath THEN spec description is updated', do
   setTimeout(() => {
     const spec = generator.getSpec();
     expect(spec.basePath !== undefined).toBeTruthy();
-    expect(spec.info.description).toContain(`(${spec.basePath}/api-spec/v2)`);
-    expect(spec.info.description).toContain(`(${spec.basePath}/api-spec/v3)`);
+    expect(spec.info.description).toContain(`(${spec.basePath}/api-spec/${versions.OPEN_API_V2})`);
+    expect(spec.info.description).toContain(`(${spec.basePath}/api-spec/${versions.OPEN_API_V3})`);
     expect(spec.info.description).toContain(`(${spec.basePath})`);
     expect(spec.info.description).toContain('Base url');
 
@@ -241,8 +242,8 @@ it('WHEN package json does not include baseUrlPath THEN spec description is not 
   setTimeout(() => {
     const spec = generator.getSpec();
     expect(spec.basePath === undefined).toBeTruthy();
-    expect(spec.info.description).toContain('(/api-spec/v2)');
-    expect(spec.info.description).toContain('(/api-spec/v3)');
+    expect(spec.info.description).toContain(`(/api-spec/${versions.OPEN_API_V2})`);
+    expect(spec.info.description).toContain(`(/api-spec/${versions.OPEN_API_V3})`);
     expect(spec.info.description).not.toContain('base url');
     done();
   }, MS_TO_STARTUP);
