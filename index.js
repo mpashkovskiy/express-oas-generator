@@ -84,12 +84,13 @@ function updateSpecFromPackage() {
     spec.info.license = { name: packageInfo.license };
   }
 
-  spec.info.description = '[Specification JSON](' + packageInfo.baseUrlPath + '/api-spec)';
-  if (packageInfo.baseUrlPath) {
+  packageInfo.baseUrlPath = packageInfo.baseUrlPath || '';
+  const v2link = `[${versions.OPEN_API_V2}](${packageInfo.baseUrlPath}/api-spec/${versions.OPEN_API_V2})`;
+  const v3link = `[${versions.OPEN_API_V3}](${packageInfo.baseUrlPath}/api-spec/${versions.OPEN_API_V3})`;
+  spec.info.description = `Specification JSONs: ${v2link}, ${v3link}.`;
+  if (packageInfo.baseUrlPath !== '') {
     spec.basePath = packageInfo.baseUrlPath;
-    spec.info.description = ', base url: ' + packageInfo.baseUrlPath;
-  } else {
-    packageInfo.baseUrlPath = '';
+    spec.info.description += ` Base url: [${packageInfo.baseUrlPath}](${packageInfo.baseUrlPath})`;
   }
 
   if (packageInfo.description) {
@@ -135,7 +136,6 @@ function swaggerServeMiddleware(version) {
  * @param version Available open api versions: 'v2' (default if empty) or 'v3'.
  */
 function applySpecMiddlewares(version = '') {
-
   const apiSpecBasePath = packageInfo.baseUrlPath.concat('/api-spec');
   const baseSwaggerServePath = packageInfo.baseUrlPath.concat('/' + swaggerUiServePath);
 
