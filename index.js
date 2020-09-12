@@ -17,6 +17,9 @@ const { convertOpenApiVersionToV3, getSpecByVersion, versions } = require('./lib
 const processors = require('./lib/processors');
 const listEndpoints = require('express-list-endpoints');
 
+const DEFAULT_SWAGGER_UI_SERVE_PATH = 'api-docs';
+const DEFAULT_IGNORE_NODE_ENVIRONMENTS = ['production'];
+
 const WRONG_MIDDLEWARE_ORDER_ERROR = `
 Express oas generator:
 
@@ -48,6 +51,7 @@ let lastRecordTime = new Date().getTime();
 let firstResponseProcessing = true;
 let mongooseModelsSpecs;
 let tagsSpecs;
+let ignoredNodeEnvironments;
 
 /**
  * @param {boolean} [responseMiddlewareHasBeenApplied=false]
@@ -308,13 +312,21 @@ function updateTagsSpec(tags) {
 */
 function handleResponses(expressApp, 
   options = { 
-    swaggerUiServePath: 'api-docs', 
+    swaggerUiServePath: DEFAULT_SWAGGER_UI_SERVE_PATH, 
     specOutputPath: undefined, 
     predefinedSpec: {}, 
     writeIntervalMs: 1000 * 10, 
     mongooseModels: [], 
-    tags: undefined
+    tags: undefined,
+    ignoredNodeEnvironments: DEFAULT_IGNORE_NODE_ENVIRONMENTS,
   }) {
+
+  
+  ignoredNodeEnvironments = options.ignoredNodeEnvironments || DEFAULT_IGNORE_NODE_ENVIRONMENTS;
+  if (ignoredNodeEnvironments.includes(process.env.NODE_ENV)) {
+    return;
+  }
+
   responseMiddlewareHasBeenApplied = true;
 
   /**
@@ -323,7 +335,7 @@ function handleResponses(expressApp,
    * because this comes before it.
    */
   app = expressApp;
-  swaggerUiServePath = options.swaggerUiServePath || 'api-docs';
+  swaggerUiServePath = options.swaggerUiServePath || DEFAULT_SWAGGER_UI_SERVE_PATH;
   predefinedSpec = options.predefinedSpec || {};
   const { specOutputPath, writeIntervalMs } = options;
 
@@ -372,6 +384,10 @@ function handleResponses(expressApp,
  * @type { typeof import('./index').handleRequests }
  */
 function handleRequests() {
+  if (ignoredNodeEnvironments.includes(process.env.NODE_ENV)) {
+    return;
+  }
+
   /** make sure the middleware placement order (by the user) is correct */
   if (responseMiddlewareHasBeenApplied !== true) {
     throw new Error(WRONG_MIDDLEWARE_ORDER_ERROR);
@@ -420,14 +436,15 @@ function handleRequests() {
 /**
  * @type { typeof import('./index').init }
  */
-function init(aApp, aPredefinedSpec = {}, aSpecOutputPath = undefined, aWriteInterval = 1000 * 10, aSwaggerUiServePath = 'api-docs', aMongooseModels = [], aTags = undefined) {
+function init(aApp, aPredefinedSpec = {}, aSpecOutputPath = undefined, aWriteInterval = 1000 * 10, aSwaggerUiServePath = DEFAULT_SWAGGER_UI_SERVE_PATH, aMongooseModels = [], aTags = undefined, aIgnoredNodeEnvironments = DEFAULT_IGNORE_NODE_ENVIRONMENTS) {
   handleResponses(aApp, {
     swaggerUiServePath: aSwaggerUiServePath,
     specOutputPath: aSpecOutputPath,
     predefinedSpec: aPredefinedSpec,
     writeIntervalMs: aWriteInterval,
     mongooseModels: aMongooseModels,
-    tags: aTags
+    tags: aTags,
+    ignoredNodeEnvironments: aIgnoredNodeEnvironments
   });
   setTimeout(() => handleRequests(), 1000);
 }
