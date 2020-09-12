@@ -1,3 +1,5 @@
+// @ts-nocheck
+/* eslint-disable complexity */
 /**
  * @fileOverview main file
  * @module index
@@ -321,12 +323,7 @@ function handleResponses(expressApp,
     ignoredNodeEnvironments: DEFAULT_IGNORE_NODE_ENVIRONMENTS,
   }) {
 
-  
   ignoredNodeEnvironments = options.ignoredNodeEnvironments || DEFAULT_IGNORE_NODE_ENVIRONMENTS;
-  if (ignoredNodeEnvironments.includes(process.env.NODE_ENV)) {
-    return;
-  }
-
   responseMiddlewareHasBeenApplied = true;
 
   /**
@@ -342,52 +339,50 @@ function handleResponses(expressApp,
   updateDefinitionsSpec(options.mongooseModels);
   updateTagsSpec(options.tags || options.mongooseModels);
   
-  /** middleware to handle RESPONSES */
-  app.use((req, res, next) => {
-    try {
-      const methodAndPathKey = getMethod(req);
-      if (methodAndPathKey && methodAndPathKey.method) {
-        processors.processResponse(res, methodAndPathKey.method);
+  if (!ignoredNodeEnvironments.includes(process.env.NODE_ENV)) {
+    /** middleware to handle RESPONSES */
+    app.use((req, res, next) => {
+      try {
+        const methodAndPathKey = getMethod(req);
+        if (methodAndPathKey && methodAndPathKey.method) {
+          processors.processResponse(res, methodAndPathKey.method);
+        }
+
+        const ts = new Date().getTime();
+        if (firstResponseProcessing || specOutputPath && ts - lastRecordTime > writeIntervalMs) {
+          firstResponseProcessing = false;
+          lastRecordTime = ts;
+
+          fs.writeFileSync(specOutputPath, JSON.stringify(spec, null, 2), 'utf8');
+
+          convertOpenApiVersionToV3(spec, (err, specV3) => {
+            if (!err) {
+              const parsedSpecOutputPath = path.parse(specOutputPath);
+              const {name, ext} = parsedSpecOutputPath;
+              parsedSpecOutputPath.base = name.concat('_').concat(versions.OPEN_API_V3).concat(ext);
+              
+              const v3Path = path.format(parsedSpecOutputPath);
+              
+              fs.writeFileSync(v3Path, JSON.stringify(specV3), 'utf8');
+            }
+            /** TODO - Log that open api v3 could not be generated */
+          });  
+
+        }
+      } catch (e) {
+        /** TODO - shouldn't we do something here? */
+      } finally {
+        /** always call the next middleware */
+        next();
       }
-
-      const ts = new Date().getTime();
-      if (firstResponseProcessing || specOutputPath && ts - lastRecordTime > writeIntervalMs) {
-        firstResponseProcessing = false;
-        lastRecordTime = ts;
-
-        fs.writeFileSync(specOutputPath, JSON.stringify(spec, null, 2), 'utf8');
-
-        convertOpenApiVersionToV3(spec, (err, specV3) => {
-          if (!err) {
-            const parsedSpecOutputPath = path.parse(specOutputPath);
-            const {name, ext} = parsedSpecOutputPath;
-            parsedSpecOutputPath.base = name.concat('_').concat(versions.OPEN_API_V3).concat(ext);
-            
-            const v3Path = path.format(parsedSpecOutputPath);
-            
-            fs.writeFileSync(v3Path, JSON.stringify(specV3), 'utf8');
-          }
-          /** TODO - Log that open api v3 could not be generated */
-        });  
-
-      }
-    } catch (e) {
-      /** TODO - shouldn't we do something here? */
-    } finally {
-      /** always call the next middleware */
-      next();
-    }
-  });
+    });
+  }
 }
 
 /**
  * @type { typeof import('./index').handleRequests }
  */
 function handleRequests() {
-  if (ignoredNodeEnvironments.includes(process.env.NODE_ENV)) {
-    return;
-  }
-
   /** make sure the middleware placement order (by the user) is correct */
   if (responseMiddlewareHasBeenApplied !== true) {
     throw new Error(WRONG_MIDDLEWARE_ORDER_ERROR);
@@ -396,24 +391,26 @@ function handleRequests() {
   /** everything was applied correctly; reset the global variable. */
   responseMiddlewareHasBeenApplied = false;
 
-  /** middleware to handle REQUESTS */
-  app.use((req, res, next) => {
-    try {
-      const methodAndPathKey = getMethod(req);
-      if (methodAndPathKey && methodAndPathKey.method && methodAndPathKey.pathKey) {
-        const method = methodAndPathKey.method;
-        updateSchemesAndHost(req);
-        processors.processPath(req, method, methodAndPathKey.pathKey);
-        processors.processHeaders(req, method, spec);
-        processors.processBody(req, method);
-        processors.processQuery(req, method);
+  if (!ignoredNodeEnvironments.includes(process.env.NODE_ENV)) {
+    /** middleware to handle REQUESTS */
+    app.use((req, res, next) => {
+      try {
+        const methodAndPathKey = getMethod(req);
+        if (methodAndPathKey && methodAndPathKey.method && methodAndPathKey.pathKey) {
+          const method = methodAndPathKey.method;
+          updateSchemesAndHost(req);
+          processors.processPath(req, method, methodAndPathKey.pathKey);
+          processors.processHeaders(req, method, spec);
+          processors.processBody(req, method);
+          processors.processQuery(req, method);
+        }
+      } catch (e) {
+        /** TODO - shouldn't we do something here? */
+      } finally {
+        next();
       }
-    } catch (e) {
-      /** TODO - shouldn't we do something here? */
-    } finally {
-      next();
-    }
-  });
+    });
+  }
 
   /** forward options to `serveApiDocs`: */
   serveApiDocs();
