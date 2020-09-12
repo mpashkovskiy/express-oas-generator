@@ -62,7 +62,8 @@ expressOasGenerator.init(
   60 * 1000,
   'api-docs',
   ['User', 'Student'],
-  ['users', 'students']
+  ['users', 'students'],
+  ['production']
 )
 ```
 
@@ -73,6 +74,7 @@ where last five parameters are:
 * ['User', 'Student'] - (Optional) Mongoose models to be included as definitions. To get all just do mongoose.modelNames().
 The following peer dependencies are required to use this last argument: mongoose, mongoose-to-swagger, bson.
 * ['users', 'students'] - (Optional) Tags: Really useful to group operations (commonly by resources). All the matching paths containing the supplied tags will be grouped. If not supplied, defaults to mongoose models. See [example](https://swagger.io/docs/specification/2-0/grouping-operations-with-tags/).
+* ['production'] - (Optional) Ignored node environments (does not generate api docs).
 
 ## Advanced usage (recommended)
 
