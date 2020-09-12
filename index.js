@@ -17,6 +17,8 @@ const { convertOpenApiVersionToV3, getSpecByVersion, versions } = require('./lib
 const processors = require('./lib/processors');
 const listEndpoints = require('express-list-endpoints');
 
+const OPTIONS_METHOD = 'options';
+
 const DEFAULT_SWAGGER_UI_SERVE_PATH = 'api-docs';
 const DEFAULT_IGNORE_NODE_ENVIRONMENTS = ['production'];
 
@@ -229,11 +231,7 @@ function patchSpec(predefinedSpec) {
  * @returns {string|undefined|*}
  */
 function getPathKey(req) {
-  if (!req.url) {
-    return undefined;
-  }
-
-  if (spec.paths[req.url]) {
+  if (!req.url || spec.paths[req.url]) {
     return req.url;
   }
 
@@ -259,7 +257,7 @@ function getMethod(req) {
   }
 
   const m = req.method.toLowerCase();
-  if (m === 'options') {
+  if (m === OPTIONS_METHOD) {
     return undefined;
   }
 
