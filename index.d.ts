@@ -41,6 +41,9 @@ export interface HandleResponsesOptions {
 
 	/** Tags to be used */
 	tags?: Array<string>;
+
+	/** Ignored node environments */
+	ignoredNodeEnvironments?: Array<string>
 }
 
 /**
@@ -89,7 +92,8 @@ export function init(
 	writeIntervalMs?: HandleResponsesOptions['writeIntervalMs'],
 	swaggerUiServePath?: HandleResponsesOptions['swaggerUiServePath'],
 	mongooseModels?: HandleResponsesOptions['mongooseModels'],
-	tags?: HandleResponsesOptions['tags']
+	tags?: HandleResponsesOptions['tags'],
+	ignoredNodeEnvironments?: HandleResponsesOptions['ignoredNodeEnvironments']
 ): void;
 
 export const getSpec: () => object | OpenAPIV2.Document;
