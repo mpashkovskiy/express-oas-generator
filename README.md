@@ -39,7 +39,7 @@ expressOasGenerator.init(app, {}); // to overwrite generated specification's val
     * Open [http://localhost:8000/api-docs](http://localhost:8000/api-docs) to see Swagger UI for your REST API. 
         - OpenApi2 (default): [http://localhost:8000/api-docs/v2](http://localhost:8000/api-docs/v2)
         - OpenApi3: [http://localhost:8000/api-docs/v3](http://localhost:8000/api-docs/v3)
-    * specification file is available [http://localhost:8000/api-spec](http://localhost:8000/api-spec). Link is prepended to description field
+    * Specification file is available [http://localhost:8000/api-spec](http://localhost:8000/api-spec). Link is prepended to description field.
         - OpenApi2 (default): [http://localhost:8000/api-spec/v2](http://localhost:8000/api-spec/v2)
         - OpenApi3: [http://localhost:8000/api-spec/v3](http://localhost:8000/api-spec/v3)
     
