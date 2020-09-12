@@ -37,11 +37,11 @@ expressOasGenerator.init(app, {}); // to overwrite generated specification's val
 * **Important!** In order to get description of all parameters and JSON payloads you have to start using your REST API or run REST API tests against it so module can analyze requests/responses
 * Assuming you running your app on port 8000
     * Open [http://localhost:8000/api-docs](http://localhost:8000/api-docs) to see Swagger UI for your REST API. 
-    - OpenApi2 (default): [http://localhost:8000/api-docs/v2](http://localhost:8000/api-docs/v2)
-    - OpenApi3: [http://localhost:8000/api-docs/v3](http://localhost:8000/api-docs/v3)
+        - OpenApi2 (default): [http://localhost:8000/api-docs/v2](http://localhost:8000/api-docs/v2)
+        - OpenApi3: [http://localhost:8000/api-docs/v3](http://localhost:8000/api-docs/v3)
     * specification file is available [http://localhost:8000/api-spec](http://localhost:8000/api-spec). Link is prepended to description field
-    - OpenApi2 (default): [http://localhost:8000/api-spec/v2](http://localhost:8000/api-spec/v2)
-    - OpenApi3: [http://localhost:8000/api-spec/v3](http://localhost:8000/api-spec/v3)
+        - OpenApi2 (default): [http://localhost:8000/api-spec/v2](http://localhost:8000/api-spec/v2)
+        - OpenApi3: [http://localhost:8000/api-spec/v3](http://localhost:8000/api-spec/v3)
     
 Second argument of `expressOasGenerator.init(app, {})` could be either an object or a function. In case of the object generated spec will be merged with the object. In case of function it will be used to apply changes for generated spec. Example of function usage:
 ```javascript
