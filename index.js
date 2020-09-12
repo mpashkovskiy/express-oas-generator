@@ -1,5 +1,3 @@
-// @ts-nocheck
-/* eslint-disable complexity */
 /**
  * @fileOverview main file
  * @module index
