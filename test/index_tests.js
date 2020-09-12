@@ -310,7 +310,9 @@ it('WHEN mongoose models are supplied THEN the definitions and tags should be in
     'api-spec.json',
     1000,
     'custom-docs',
-    mongooseModels
+    mongooseModels,
+    mongooseModels,
+    ['production']
   );
 
   const tag = mongooseModels.shift();
