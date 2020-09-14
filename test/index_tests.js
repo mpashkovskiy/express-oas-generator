@@ -335,11 +335,48 @@ it('WHEN mongoose models are supplied THEN the definitions and tags should be in
         const method = spec.paths[path].get;
         expect(method.tags).toEqual([tag]);
         server.close();
-
-        server.close();
         done();
       });
     }, MS_TO_STARTUP);
+  });
+});
+
+it('WHEN node environment is ignored THEN it should not generate or serve api docs/spec ', done => {
+  const app = express();
+  const PRODUCTION_NODE_ENV = 'production';
+  const ORIGINAL_NODE_ENV = process.env.NODE_ENV;
+  process.env.NODE_ENV = PRODUCTION_NODE_ENV;
+
+  const PATH = '/path';
+
+  generator.handleResponses(app, {
+    ignoredNodeEnvironments: [PRODUCTION_NODE_ENV]
+  });
+
+  app.get(PATH, (req, res, next) => {
+    res.setHeader('Content-Type', 'text/plain');
+    res.send(PLAIN_TEXT_RESPONSE);
+    return next();
+  });
+
+  generator.handleRequests();
+  app.set('port', port);
+  const server = app.listen(app.get('port'), () => {
+    request.get(`http://localhost:${port}/api-spec`, (error, responseApiSpec) => {
+      expect(responseApiSpec.statusCode).toEqual(404);
+      
+      request.get(`http://localhost:${port}/api-docs`, (error, responseApiDocs) => {
+        expect(responseApiDocs.statusCode).toEqual(404);
+        
+        request.get(`http://localhost:${port}${PATH}`, () => {
+          expect(generator.getSpec().paths[PATH]).toBeUndefined();
+          
+          process.env.NODE_ENV = ORIGINAL_NODE_ENV;
+          server.close();
+          done();
+        });
+      });
+    });
   });
 });
 
