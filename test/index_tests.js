@@ -341,6 +341,16 @@ it('WHEN mongoose models are supplied THEN the definitions and tags should be in
   });
 });
 
+it('WHEN node environment is undefined THEN it should log warning ', () => {
+  const app = express();
+  const ORIGINAL_NODE_ENV = process.env.NODE_ENV;
+  delete process.env.NODE_ENV;
+  generator.handleResponses(app);
+  generator.handleRequests();
+  //Is there a way to assert winston warn output?
+  process.env.NODE_ENV = ORIGINAL_NODE_ENV;
+});
+
 it('WHEN node environment is ignored THEN it should not generate or serve api docs/spec ', done => {
   const app = express();
   const PRODUCTION_NODE_ENV = 'production';
@@ -349,17 +359,17 @@ it('WHEN node environment is ignored THEN it should not generate or serve api do
 
   const PATH = '/path';
 
-  generator.handleResponses(app, {
-    ignoredNodeEnvironments: [PRODUCTION_NODE_ENV]
-  });
-
   app.get(PATH, (req, res, next) => {
     res.setHeader('Content-Type', 'text/plain');
     res.send(PLAIN_TEXT_RESPONSE);
     return next();
   });
 
+  generator.handleResponses(app, {
+    ignoredNodeEnvironments: [PRODUCTION_NODE_ENV]
+  });
   generator.handleRequests();
+
   app.set('port', port);
   const server = app.listen(app.get('port'), () => {
     request.get(`http://localhost:${port}/api-spec`, (error, responseApiSpec) => {
