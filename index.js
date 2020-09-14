@@ -1,3 +1,5 @@
+// @ts-nocheck	
+/* eslint-disable complexity */	
 /**
  * @fileOverview main file
  * @module index
@@ -16,9 +18,13 @@ const { generateTagsSpec, matchingTags } = require('./lib/tags');
 const { convertOpenApiVersionToV3, getSpecByVersion, versions } = require('./lib/openapi');
 const processors = require('./lib/processors');
 const listEndpoints = require('express-list-endpoints');
+const { logger } = require('./lib/logger');
 
 const DEFAULT_SWAGGER_UI_SERVE_PATH = 'api-docs';
 const DEFAULT_IGNORE_NODE_ENVIRONMENTS = ['production'];
+
+const UNDEFINED_NODE_ENV_ERROR = ignoredNodeEnvironments => `WARNING!!! process.env.NODE_ENV is not defined. 
+  To disable the module set process.env.NODE_ENV to any of the supplied ignoredNodeEnvironments: ${ignoredNodeEnvironments.join()}`;
 
 const WRONG_MIDDLEWARE_ORDER_ERROR = `
 Express oas generator:
@@ -318,6 +324,11 @@ function handleResponses(expressApp,
   }) {
 
   ignoredNodeEnvironments = options.ignoredNodeEnvironments || DEFAULT_IGNORE_NODE_ENVIRONMENTS;
+  
+  if (!process.env.NODE_ENV) {
+    logger.warn(UNDEFINED_NODE_ENV_ERROR(ignoredNodeEnvironments));
+  }
+  
   if (ignoredNodeEnvironments.includes(process.env.NODE_ENV)) {
     return;
   }
@@ -382,7 +393,7 @@ function handleRequests() {
   if (ignoredNodeEnvironments.includes(process.env.NODE_ENV)) {
     return;
   }
-
+  
   /** make sure the middleware placement order (by the user) is correct */
   if (responseMiddlewareHasBeenApplied !== true) {
     throw new Error(WRONG_MIDDLEWARE_ORDER_ERROR);
