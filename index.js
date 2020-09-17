@@ -1,5 +1,3 @@
-// @ts-nocheck	
-/* eslint-disable complexity */	
 /**
  * @fileOverview main file
  * @module index
@@ -23,8 +21,8 @@ const { logger } = require('./lib/logger');
 const DEFAULT_SWAGGER_UI_SERVE_PATH = 'api-docs';
 const DEFAULT_IGNORE_NODE_ENVIRONMENTS = ['production'];
 
-const UNDEFINED_NODE_ENV_ERROR = ignoredNodeEnvironments => `WARNING!!! process.env.NODE_ENV is not defined. 
-  To disable the module set process.env.NODE_ENV to any of the supplied ignoredNodeEnvironments: ${ignoredNodeEnvironments.join()}`;
+const UNDEFINED_NODE_ENV_ERROR = ignoredNodeEnvironments => `WARNING!!! process.env.NODE_ENV is not defined.\
+To disable the module set process.env.NODE_ENV to any of the supplied ignoredNodeEnvironments: ${ignoredNodeEnvironments.join()}`;
 
 const WRONG_MIDDLEWARE_ORDER_ERROR = `
 Express oas generator:
