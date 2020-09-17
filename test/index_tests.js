@@ -7,6 +7,7 @@ const mongoose = require('mongoose');
 require('./lib/mongoose_models/student');
 const generator = require('../index.js');
 const { versions } = require('../lib/openapi');
+let { logger } = require('../lib/logger');
 
 const MS_TO_STARTUP = 2000;
 const port = 8888;
@@ -343,11 +344,12 @@ it('WHEN mongoose models are supplied THEN the definitions and tags should be in
 
 it('WHEN node environment is undefined THEN it should log warning ', () => {
   const app = express();
+  const loggerSpy = spyOn(logger, 'warn').and.callThrough();
   const ORIGINAL_NODE_ENV = process.env.NODE_ENV;
   delete process.env.NODE_ENV;
   generator.handleResponses(app);
   generator.handleRequests();
-  //Is there a way to assert winston warn output?
+  expect(loggerSpy).toHaveBeenCalled();
   process.env.NODE_ENV = ORIGINAL_NODE_ENV;
 });
 
