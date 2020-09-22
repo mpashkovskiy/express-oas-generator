@@ -12,7 +12,7 @@
     "lint": "eslint --ignore-pattern \"*.json\" lib/** test/** index.js",
     "jasmine": "nyc --reporter cobertura --reporter html --reporter text --report-dir ./build/test-reports/coverage node ./node_modules/jasmine/bin/jasmine.js JASMINE_CONFIG_PATH=test/_jasmine/jasmine.json",
     "cve-check": "npm audit --audit-level high",
-    "test": "npm run lint -- --fix && npm run cve-check && npm run jasmine",
+    "test": "npm run lint -- --fix && npm run cve-check && NODE_ENV=test npm run jasmine",
     "send-coverage": "nyc report --reporter=text-lcov | ./node_modules/coveralls/bin/coveralls.js",
     "pp": "npm version patch && npm publish && git push --follow-tag",
     "generate-docs": "jsdoc -c jsdoc.json"
@@ -40,7 +40,8 @@
     "openapi-types": "^1.3.5",
     "swagger-ui-express": "^3.0.8",
     "swagger2openapi": "^7.0.0",
-    "typescript": "^3.7.2"
+    "typescript": "^3.7.2",
+    "winston": "^3.3.3"
   },
   "devDependencies": {
     "body-parser": "^1.18.2",

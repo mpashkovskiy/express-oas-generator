@@ -8,10 +8,6 @@ Module to:
 * automatically generate OpenAPI (Swagger) specification for existing ExpressJS 4.x REST API applications;
 * provide Swagger UI basing on generated specification.
 
-#### WARNINING!
-Again: goal of the module is to provide baseline specification which should be reviewed and modified before exposing to REST API clients.
-Module should be used in test environment only because it can disclose sensitive information if it is running in production. See [How does it work?](#how-does-it-work) and [comment about usage](https://github.com/mpashkovskiy/express-oas-generator/issues/36#issuecomment-553040533) for more info.
-
 ## Examples
 
 * [server_basic.js](server_basic.js)
@@ -36,8 +32,12 @@ expressOasGenerator.init(app, {}); // to overwrite generated specification's val
 ```
 * **Important!** In order to get description of all parameters and JSON payloads you have to start using your REST API or run REST API tests against it so module can analyze requests/responses
 * Assuming you running your app on port 8000
-    * open [http://localhost:8000/api-docs](http://localhost:8000/api-docs) to see Swagger UI for your REST API
-    * specification file is available  [http://localhost:8000/api-spec](http://localhost:8000/api-spec) - link is prepended to description field
+    * Open [http://localhost:8000/api-docs](http://localhost:8000/api-docs) to see Swagger UI for your REST API. 
+        - OpenApi2 (default): [http://localhost:8000/api-docs/v2](http://localhost:8000/api-docs/v2)
+        - OpenApi3: [http://localhost:8000/api-docs/v3](http://localhost:8000/api-docs/v3)
+    * Specification file is available [http://localhost:8000/api-spec](http://localhost:8000/api-spec). Link is prepended to description field.
+        - OpenApi2 (default): [http://localhost:8000/api-spec/v2](http://localhost:8000/api-spec/v2)
+        - OpenApi3: [http://localhost:8000/api-spec/v3](http://localhost:8000/api-spec/v3)
     
 Second argument of `expressOasGenerator.init(app, {})` could be either an object or a function. In case of the object generated spec will be merged with the object. In case of function it will be used to apply changes for generated spec. Example of function usage:
 ```javascript
@@ -58,7 +58,8 @@ expressOasGenerator.init(
   60 * 1000,
   'api-docs',
   ['User', 'Student'],
-  ['users', 'students']
+  ['users', 'students'],
+  ['production']
 )
 ```
 
@@ -69,6 +70,7 @@ where last five parameters are:
 * ['User', 'Student'] - (Optional) Mongoose models to be included as definitions. To get all just do mongoose.modelNames().
 The following peer dependencies are required to use this last argument: mongoose, mongoose-to-swagger, bson.
 * ['users', 'students'] - (Optional) Tags: Really useful to group operations (commonly by resources). All the matching paths containing the supplied tags will be grouped. If not supplied, defaults to mongoose models. See [example](https://swagger.io/docs/specification/2-0/grouping-operations-with-tags/).
+* ['production'] - (Optional) Ignored node environments. Middlewares are not applied when process.env.NODE_ENV is ignored. Existing api-docs and api-spec are still served.
 
 ## Advanced usage (recommended)
 
