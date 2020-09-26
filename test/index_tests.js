@@ -392,6 +392,41 @@ it('WHEN node environment is ignored THEN it should not generate or serve api do
   });
 });
 
+it('WHEN node environment is ignored but always serve docs is enabled THEN it should not generate but serve api docs/spec ', done => {
+  const app = express();
+  const PRODUCTION_NODE_ENV = 'production';
+  const ORIGINAL_NODE_ENV = process.env.NODE_ENV;
+  process.env.NODE_ENV = PRODUCTION_NODE_ENV;
+
+  const PATH = '/path';
+
+  app.get(PATH, (req, res, next) => {
+    res.setHeader('Content-Type', 'text/plain');
+    res.send(PLAIN_TEXT_RESPONSE);
+    return next();
+  });
+
+  generator.handleResponses(app, {
+    ignoredNodeEnvironments: [PRODUCTION_NODE_ENV],
+    alwaysServeDocs: true
+  });
+  generator.handleRequests();
+
+  app.set('port', port);
+  const server = app.listen(app.get('port'), () => {
+    request.get(`http://localhost:${port}${PATH}`, () => {
+      request.get(`http://localhost:${port}/api-spec`, (error, responseApiSpec) => {    
+        const spec = JSON.parse(responseApiSpec.body);
+        expect(spec.paths[PATH].get.parameters).toEqual([]);
+        expect(spec.paths[PATH].get.responses).toEqual({});
+        process.env.NODE_ENV = ORIGINAL_NODE_ENV;
+        server.close();
+        done();
+      });
+    });
+  });
+});
+
 it('WHEN **request** middleware is injected before **response** middleware THEN an error should be thrown', done => {
   /**
    * @note make sure that the global variables are reset
