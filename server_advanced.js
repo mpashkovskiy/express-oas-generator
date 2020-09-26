@@ -17,7 +17,8 @@ generator.handleResponses(app, {
     return spec;
   },
   specOutputPath: './test_spec.json',
-  mongooseModels: modelNames
+  mongooseModels: modelNames,
+  alwaysServeDocs: true
 });
 
 app.use(bodyParser.json({}));
