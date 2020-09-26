@@ -44,6 +44,9 @@ export interface HandleResponsesOptions {
 
 	/** Ignored node environments */
 	ignoredNodeEnvironments?: Array<string>
+
+	/** Always serve api docs */
+	alwaysServeDocs?: boolean
 }
 
 /**
@@ -93,7 +96,8 @@ export function init(
 	swaggerUiServePath?: HandleResponsesOptions['swaggerUiServePath'],
 	mongooseModels?: HandleResponsesOptions['mongooseModels'],
 	tags?: HandleResponsesOptions['tags'],
-	ignoredNodeEnvironments?: HandleResponsesOptions['ignoredNodeEnvironments']
+	ignoredNodeEnvironments?: HandleResponsesOptions['ignoredNodeEnvironments'],
+	alwaysServeDocs?: HandleResponsesOptions['alwaysServeDocs']
 ): void;
 
 export const getSpec: () => object | OpenAPIV2.Document;
