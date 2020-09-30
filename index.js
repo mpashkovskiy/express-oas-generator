@@ -56,6 +56,7 @@ let firstResponseProcessing = true;
 let mongooseModelsSpecs;
 let tagsSpecs;
 let ignoredNodeEnvironments;
+let serveDocs;
 
 /**
  * @param {boolean} [responseMiddlewareHasBeenApplied=false]
@@ -81,7 +82,7 @@ function updateSpecFromPackage() {
   packageInfo = fs.existsSync(packageJsonPath) ? require(packageJsonPath) : {};
 
   spec.info = spec.info || {};
-
+  
   if (packageInfo.name) {
     spec.info.title = packageInfo.name;
   }
@@ -319,20 +320,21 @@ function handleResponses(expressApp,
     mongooseModels: [], 
     tags: undefined,
     ignoredNodeEnvironments: DEFAULT_IGNORE_NODE_ENVIRONMENTS,
+    alwaysServeDocs: undefined,
   }) {
 
   ignoredNodeEnvironments = options.ignoredNodeEnvironments || DEFAULT_IGNORE_NODE_ENVIRONMENTS;
+  const isEnvironmentIgnored = ignoredNodeEnvironments.includes(process.env.NODE_ENV);
+  serveDocs = options.alwaysServeDocs;
+  
+  if (serveDocs === undefined) {
+    serveDocs = !isEnvironmentIgnored;
+  }
   
   if (!process.env.NODE_ENV) {
     logger.warn(UNDEFINED_NODE_ENV_ERROR(ignoredNodeEnvironments));
   }
   
-  if (ignoredNodeEnvironments.includes(process.env.NODE_ENV)) {
-    return;
-  }
-  
-  responseMiddlewareHasBeenApplied = true;
-
   /**
    * save the `expressApp` to our local `app` variable.
    * Used here, but not in `handleRequests`,
@@ -341,11 +343,17 @@ function handleResponses(expressApp,
   app = expressApp;
   swaggerUiServePath = options.swaggerUiServePath || DEFAULT_SWAGGER_UI_SERVE_PATH;
   predefinedSpec = options.predefinedSpec || {};
-  const { specOutputPath, writeIntervalMs } = options;
-
+  
   updateDefinitionsSpec(options.mongooseModels);
   updateTagsSpec(options.tags || options.mongooseModels);
   
+  if (isEnvironmentIgnored) {
+    return;
+  }
+  
+  responseMiddlewareHasBeenApplied = true;
+  const { specOutputPath, writeIntervalMs } = options;
+
   /** middleware to handle RESPONSES */
   app.use((req, res, next) => {
     try {
@@ -388,7 +396,14 @@ function handleResponses(expressApp,
  * @type { typeof import('./index').handleRequests }
  */
 function handleRequests() {
-  if (ignoredNodeEnvironments.includes(process.env.NODE_ENV)) {
+  
+  const isIgnoredEnvironment = ignoredNodeEnvironments.includes(process.env.NODE_ENV);
+  if (serveDocs || !isIgnoredEnvironment) {      
+    /** forward options to `serveApiDocs`: */
+    serveApiDocs();
+  }
+
+  if (isIgnoredEnvironment) {
     return;
   }
   
@@ -418,9 +433,6 @@ function handleRequests() {
       next();
     }
   });
-  
-  /** forward options to `serveApiDocs`: */
-  serveApiDocs();
 }
 
 /**
@@ -440,7 +452,7 @@ function handleRequests() {
 /**
  * @type { typeof import('./index').init }
  */
-function init(aApp, aPredefinedSpec = {}, aSpecOutputPath = undefined, aWriteInterval = 1000 * 10, aSwaggerUiServePath = DEFAULT_SWAGGER_UI_SERVE_PATH, aMongooseModels = [], aTags = undefined, aIgnoredNodeEnvironments = DEFAULT_IGNORE_NODE_ENVIRONMENTS) {
+function init(aApp, aPredefinedSpec = {}, aSpecOutputPath = undefined, aWriteInterval = 1000 * 10, aSwaggerUiServePath = DEFAULT_SWAGGER_UI_SERVE_PATH, aMongooseModels = [], aTags = undefined, aIgnoredNodeEnvironments = DEFAULT_IGNORE_NODE_ENVIRONMENTS, aAlwaysServeDocs = undefined) {
   handleResponses(aApp, {
     swaggerUiServePath: aSwaggerUiServePath,
     specOutputPath: aSpecOutputPath,
@@ -448,7 +460,8 @@ function init(aApp, aPredefinedSpec = {}, aSpecOutputPath = undefined, aWriteInt
     writeIntervalMs: aWriteInterval,
     mongooseModels: aMongooseModels,
     tags: aTags,
-    ignoredNodeEnvironments: aIgnoredNodeEnvironments
+    ignoredNodeEnvironments: aIgnoredNodeEnvironments,
+    alwaysServeDocs: aAlwaysServeDocs
   });
   setTimeout(() => handleRequests(), 1000);
 }
