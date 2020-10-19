@@ -57,6 +57,8 @@ let mongooseModelsSpecs;
 let tagsSpecs;
 let ignoredNodeEnvironments;
 let serveDocs;
+let specOutputPath;
+let writeIntervalMs;
 
 /**
  * @param {boolean} [responseMiddlewareHasBeenApplied=false]
@@ -309,6 +311,33 @@ function updateTagsSpec(tags) {
 }
 
 /**
+ * @description Persists OpenAPI content to spec output file
+ */
+function writeSpecToOutputFile() {
+  const ts = new Date().getTime();
+  if (firstResponseProcessing || specOutputPath && ts - lastRecordTime > writeIntervalMs) {
+    firstResponseProcessing = false;
+    lastRecordTime = ts;
+
+    fs.writeFileSync(specOutputPath, JSON.stringify(spec, null, 2), 'utf8');
+
+    convertOpenApiVersionToV3(spec, (err, specV3) => {
+      if (!err) {
+        const parsedSpecOutputPath = path.parse(specOutputPath);
+        const {name, ext} = parsedSpecOutputPath;
+        parsedSpecOutputPath.base = name.concat('_').concat(versions.OPEN_API_V3).concat(ext);
+        
+        const v3Path = path.format(parsedSpecOutputPath);
+        
+        fs.writeFileSync(v3Path, JSON.stringify(specV3), 'utf8');
+      }
+      /** TODO - Log that open api v3 could not be generated */
+    });  
+
+  }
+}
+
+/**
  * @type { typeof import('./index').handleResponses }
 */
 function handleResponses(expressApp, 
@@ -343,7 +372,9 @@ function handleResponses(expressApp,
   app = expressApp;
   swaggerUiServePath = options.swaggerUiServePath || DEFAULT_SWAGGER_UI_SERVE_PATH;
   predefinedSpec = options.predefinedSpec || {};
-  
+  specOutputPath = options.specOutputPath;
+  writeIntervalMs = options.writeIntervalMs;
+
   updateDefinitionsSpec(options.mongooseModels);
   updateTagsSpec(options.tags || options.mongooseModels);
   
@@ -352,7 +383,6 @@ function handleResponses(expressApp,
   }
   
   responseMiddlewareHasBeenApplied = true;
-  const { specOutputPath, writeIntervalMs } = options;
 
   /** middleware to handle RESPONSES */
   app.use((req, res, next) => {
@@ -361,28 +391,7 @@ function handleResponses(expressApp,
       if (methodAndPathKey && methodAndPathKey.method) {
         processors.processResponse(res, methodAndPathKey.method);
       }
-
-      const ts = new Date().getTime();
-      if (firstResponseProcessing || specOutputPath && ts - lastRecordTime > writeIntervalMs) {
-        firstResponseProcessing = false;
-        lastRecordTime = ts;
-
-        fs.writeFileSync(specOutputPath, JSON.stringify(spec, null, 2), 'utf8');
-
-        convertOpenApiVersionToV3(spec, (err, specV3) => {
-          if (!err) {
-            const parsedSpecOutputPath = path.parse(specOutputPath);
-            const {name, ext} = parsedSpecOutputPath;
-            parsedSpecOutputPath.base = name.concat('_').concat(versions.OPEN_API_V3).concat(ext);
-            
-            const v3Path = path.format(parsedSpecOutputPath);
-            
-            fs.writeFileSync(v3Path, JSON.stringify(specV3), 'utf8');
-          }
-          /** TODO - Log that open api v3 could not be generated */
-        });  
-
-      }
+      //writeSpecToOutputFile();
     } catch (e) {
       /** TODO - shouldn't we do something here? */
     } finally {
@@ -426,6 +435,7 @@ function handleRequests() {
         processors.processHeaders(req, method, spec);
         processors.processBody(req, method);
         processors.processQuery(req, method);
+        writeSpecToOutputFile();
       }
     } catch (e) {
       /** TODO - shouldn't we do something here? */
