@@ -391,7 +391,7 @@ function handleResponses(expressApp,
       if (methodAndPathKey && methodAndPathKey.method) {
         processors.processResponse(res, methodAndPathKey.method);
       }
-      //writeSpecToOutputFile();
+      writeSpecToOutputFile();
     } catch (e) {
       /** TODO - shouldn't we do something here? */
     } finally {
