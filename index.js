@@ -51,14 +51,11 @@ let app;
 let swaggerUiServePath;
 let predefinedSpec;
 let spec = {};
-let lastRecordTime = new Date().getTime();
-let firstResponseProcessing = true;
 let mongooseModelsSpecs;
 let tagsSpecs;
 let ignoredNodeEnvironments;
 let serveDocs;
 let specOutputPath;
-let writeIntervalMs;
 
 /**
  * @param {boolean} [responseMiddlewareHasBeenApplied=false]
@@ -314,11 +311,7 @@ function updateTagsSpec(tags) {
  * @description Persists OpenAPI content to spec output file
  */
 function writeSpecToOutputFile() {
-  const ts = new Date().getTime();
-  if (firstResponseProcessing || specOutputPath && ts - lastRecordTime > writeIntervalMs) {
-    firstResponseProcessing = false;
-    lastRecordTime = ts;
-
+  if (specOutputPath) {
     fs.writeFileSync(specOutputPath, JSON.stringify(spec, null, 2), 'utf8');
 
     convertOpenApiVersionToV3(spec, (err, specV3) => {
@@ -345,7 +338,7 @@ function handleResponses(expressApp,
     swaggerUiServePath: DEFAULT_SWAGGER_UI_SERVE_PATH, 
     specOutputPath: undefined, 
     predefinedSpec: {}, 
-    writeIntervalMs: 1000 * 10, 
+    writeIntervalMs: 0, 
     mongooseModels: [], 
     tags: undefined,
     ignoredNodeEnvironments: DEFAULT_IGNORE_NODE_ENVIRONMENTS,
@@ -373,8 +366,7 @@ function handleResponses(expressApp,
   swaggerUiServePath = options.swaggerUiServePath || DEFAULT_SWAGGER_UI_SERVE_PATH;
   predefinedSpec = options.predefinedSpec || {};
   specOutputPath = options.specOutputPath;
-  writeIntervalMs = options.writeIntervalMs;
-
+  
   updateDefinitionsSpec(options.mongooseModels);
   updateTagsSpec(options.tags || options.mongooseModels);
   
@@ -462,7 +454,7 @@ function handleRequests() {
 /**
  * @type { typeof import('./index').init }
  */
-function init(aApp, aPredefinedSpec = {}, aSpecOutputPath = undefined, aWriteInterval = 1000 * 10, aSwaggerUiServePath = DEFAULT_SWAGGER_UI_SERVE_PATH, aMongooseModels = [], aTags = undefined, aIgnoredNodeEnvironments = DEFAULT_IGNORE_NODE_ENVIRONMENTS, aAlwaysServeDocs = undefined) {
+function init(aApp, aPredefinedSpec = {}, aSpecOutputPath = undefined, aWriteInterval = 0, aSwaggerUiServePath = DEFAULT_SWAGGER_UI_SERVE_PATH, aMongooseModels = [], aTags = undefined, aIgnoredNodeEnvironments = DEFAULT_IGNORE_NODE_ENVIRONMENTS, aAlwaysServeDocs = undefined) {
   handleResponses(aApp, {
     swaggerUiServePath: aSwaggerUiServePath,
     specOutputPath: aSpecOutputPath,
