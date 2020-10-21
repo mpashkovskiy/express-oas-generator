@@ -119,15 +119,16 @@ describe('processors.js', () => {
       };
       let method = {};
       const json = { a: 1 };
-      processors.processResponse(res, method);
-      res.write(JSON.stringify(json));
-      res.end('');
-      expect(write).toHaveBeenCalled();
-      expect(end).toHaveBeenCalled();
-      expect(method.produces).toEqual([appJson]);
-      expect(Object.keys(method.responses)).toEqual(['200']);
-      expect(method.responses['200'].schema).not.toBe(undefined);
-      expect(method.responses['200'].description).toBe('OK');
+      processors.processResponse(res, method, () => {
+        res.write(JSON.stringify(json));
+        res.end('');
+        expect(write).toHaveBeenCalled();
+        expect(end).toHaveBeenCalled();
+        expect(method.produces).toEqual([appJson]);
+        expect(Object.keys(method.responses)).toEqual(['200']);
+        expect(method.responses['200'].schema).not.toBe(undefined);
+        expect(method.responses['200'].description).toBe('OK');
+      });
     });
 
   });
