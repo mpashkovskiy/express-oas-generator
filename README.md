@@ -178,6 +178,9 @@ Assuming you have ExpressJS REST API application and you
   
   For more info please read the entire [issue report](https://github.com/mpashkovskiy/express-oas-generator/issues/24)
 
-## Contributors
+# Contributing
 
-[![](https://sourcerer.io/fame/mpashkovskiy/mpashkovskiy/express-oas-generator/images/0)](https://sourcerer.io/fame/mpashkovskiy/mpashkovskiy/express-oas-generator/links/0)[![](https://sourcerer.io/fame/mpashkovskiy/mpashkovskiy/express-oas-generator/images/1)](https://sourcerer.io/fame/mpashkovskiy/mpashkovskiy/express-oas-generator/links/1)[![](https://sourcerer.io/fame/mpashkovskiy/mpashkovskiy/express-oas-generator/images/2)](https://sourcerer.io/fame/mpashkovskiy/mpashkovskiy/express-oas-generator/links/2)[![](https://sourcerer.io/fame/mpashkovskiy/mpashkovskiy/express-oas-generator/images/3)](https://sourcerer.io/fame/mpashkovskiy/mpashkovskiy/express-oas-generator/links/3)[![](https://sourcerer.io/fame/mpashkovskiy/mpashkovskiy/express-oas-generator/images/4)](https://sourcerer.io/fame/mpashkovskiy/mpashkovskiy/express-oas-generator/links/4)[![](https://sourcerer.io/fame/mpashkovskiy/mpashkovskiy/express-oas-generator/images/5)](https://sourcerer.io/fame/mpashkovskiy/mpashkovskiy/express-oas-generator/links/5)[![](https://sourcerer.io/fame/mpashkovskiy/mpashkovskiy/express-oas-generator/images/6)](https://sourcerer.io/fame/mpashkovskiy/mpashkovskiy/express-oas-generator/links/6)[![](https://sourcerer.io/fame/mpashkovskiy/mpashkovskiy/express-oas-generator/images/7)](https://sourcerer.io/fame/mpashkovskiy/mpashkovskiy/express-oas-generator/links/7)
+Please read:
+
+* [CONTRIBUTING.md](https://github.com/mpashkovskiy/express-oas-generator/tree/master/CONTRIBUTING.md)
+* [CODE_OF_CONDUCT.md](https://github.com/mpashkovskiy/express-oas-generator/tree/master/CODE_OF_CONDUCT.md)
