@@ -322,7 +322,7 @@ function writeSpecToOutputFile() {
         
         const v3Path = path.format(parsedSpecOutputPath);
         
-        fs.writeFileSync(v3Path, JSON.stringify(specV3), 'utf8');
+        fs.writeFileSync(v3Path, JSON.stringify(specV3, null, 2), 'utf8');
       }
       /** TODO - Log that open api v3 could not be generated */
     });  
