@@ -60,11 +60,12 @@ expressOasGenerator.init(
   ['User', 'Student'],
   ['users', 'students'],
   ['production'],
-  true
+  true,
+  SPEC_OUTPUT_FILE_BEHAVIOR.RECREATE
 )
 ```
 
-where last five parameters are:
+where the last parameters are:
 * 'path/to/a/file/filename.json' - (Optional) path to a file and file name, if missing module won't write spec to the disc
 * 60 * 1000 - (Optional) write interval in milliseconds (default: 10 seconds)
 * 'api-docs' - (Optional) Swagger UI path for your REST API (default: api-docs)
@@ -73,7 +74,7 @@ The following peer dependencies are required to use this last argument: mongoose
 * ['users', 'students'] - (Optional) Tags: Really useful to group operations (commonly by resources). All the matching paths containing the supplied tags will be grouped. If not supplied, defaults to mongoose models. See [example](https://swagger.io/docs/specification/2-0/grouping-operations-with-tags/).
 * ['production'] - (Optional) Ignored node environments. Middlewares are not applied when process.env.NODE_ENV is ignored. Existing api-docs and api-spec are still served.
 * true - (Optional) Always serve docs. In case you don't want to apply middelwares but still serve existing api-docs and api-spec.
-
+* ```SPEC_OUTPUT_FILE_BEHAVIOR.RECREATE``` - (Optional) Enum to indicate if the spec outfile file is recreated or preserved from current content (```SPEC_OUTPUT_FILE_BEHAVIOR.PRESERVE```)
 
 ## Advanced usage (recommended)
 
