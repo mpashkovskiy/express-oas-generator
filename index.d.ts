@@ -53,7 +53,7 @@ export interface HandleResponsesOptions {
 	/** Always serve api docs */
 	alwaysServeDocs?: boolean
 
-	specOutputFileBehavior: SPEC_OUTPUT_FILE_BEHAVIOR
+	specOutputFileBehavior: SPEC_OUTPUT_FILE_BEHAVIOR | string
 }
 
 /**
