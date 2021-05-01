@@ -8,13 +8,18 @@
  */
 
 import { Express } from 'express';
-import { OpenAPIV2,OpenAPIV3 } from 'openapi-types';
+import { OpenAPIV2, OpenAPIV3 } from 'openapi-types';
 
 /** re-export for ease of use for the end user */
 export {
 	OpenAPIV2,
 	OpenAPIV3
 };
+
+export enum SPEC_OUTPUT_FILE_BEHAVIOR {
+	PRESERVE = 'PRESERVE',
+	RECREATE = 'RECREATE'
+}
 
 /** Options for `handleResponses` */
 export interface HandleResponsesOptions {
@@ -29,9 +34,9 @@ export interface HandleResponsesOptions {
 	specOutputPath?: string;
 
 	/** either the Swagger specification or a function with one argument, which returns the spec */
-	predefinedSpec?: object | OpenAPIV2.Document | OpenAPIV3.Document | 
-		((spec: OpenAPIV2.Document) => OpenAPIV2.Document) | 
-		((spec: OpenAPIV3.Document) => OpenAPIV3.Document);
+	predefinedSpec?: object | OpenAPIV2.Document | OpenAPIV3.Document |
+	((spec: OpenAPIV2.Document) => OpenAPIV2.Document) |
+	((spec: OpenAPIV3.Document) => OpenAPIV3.Document);
 
 	/** how often to write the openAPI specification to file */
 	writeIntervalMs?: number;
@@ -47,6 +52,8 @@ export interface HandleResponsesOptions {
 
 	/** Always serve api docs */
 	alwaysServeDocs?: boolean
+
+	specOutputFileBehavior: SPEC_OUTPUT_FILE_BEHAVIOR
 }
 
 /**
