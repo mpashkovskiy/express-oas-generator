@@ -317,12 +317,14 @@ function updateTagsSpec(tags) {
  * Based on SPEC_OUTPUT_FILE_BEHAVIOR.PRESERVE or SPEC_OUTPUT_FILE_BEHAVIOR.RECREATE
  */
 function loadSpecOutputPathContent() {
-  if (specOutputFileBehavior === SPEC_OUTPUT_FILE_BEHAVIOR.PRESERVE) {
-    if (fs.existsSync(specOutputPath)) {
-      const specOutputFileContent = fs.readFileSync(specOutputPath).toString();
-      predefinedSpec = JSON.parse(specOutputFileContent);
-    }
+  if (specOutputFileBehavior !== SPEC_OUTPUT_FILE_BEHAVIOR.PRESERVE) {
+    return;
   }
+  if (!fs.existsSync(specOutputPath)) {
+    return;
+  }
+  const specOutputFileContent = fs.readFileSync(specOutputPath).toString();
+  predefinedSpec = JSON.parse(specOutputFileContent);
 }
 
 /**
@@ -365,7 +367,7 @@ function handleResponses(expressApp,
   }) {
 
   ignoredNodeEnvironments = options.ignoredNodeEnvironments || DEFAULT_IGNORE_NODE_ENVIRONMENTS;
-  const isEnvironmentIgnored = ignoredNodeEnvironments.includes(process.env.NODE_ENV);
+  const isEnvironmentIgnored = ignoredNodeEnvironments.includes(process.env.NODE_ENV || '');
   serveDocs = options.alwaysServeDocs;
   
   if (serveDocs === undefined) {
