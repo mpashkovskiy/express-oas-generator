@@ -9,6 +9,7 @@ const zlib = require('zlib');
 require('./test/lib/mongoose_models/student');
 const mongoose = require('mongoose');
 const modelNames = mongoose.modelNames();
+const { SPEC_OUTPUT_FILE_BEHAVIOR } = generator;
 
 const app = express();
 generator.handleResponses(app, {
@@ -18,7 +19,8 @@ generator.handleResponses(app, {
   },
   specOutputPath: './test_spec.json',
   mongooseModels: modelNames,
-  alwaysServeDocs: true
+  alwaysServeDocs: true,
+  specOutputFileBehavior: SPEC_OUTPUT_FILE_BEHAVIOR.PRESERVE
 });
 
 app.use(bodyParser.json({}));
@@ -50,7 +52,9 @@ router.route('/gzip')
     });
   });
 app.use(router);
+app.disable('etag');
 app.set('port', 8080);
+
 generator.handleRequests();
 app.listen(app.get('port'), function() {
   console.log('Server started. Open http://localhost:8080/api-docs/');

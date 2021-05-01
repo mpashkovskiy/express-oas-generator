@@ -9,12 +9,13 @@ const zlib = require('zlib');
 require('./test/lib/mongoose_models/student');
 const mongoose = require('mongoose');
 const modelNames = mongoose.modelNames();
+const { SPEC_OUTPUT_FILE_BEHAVIOR } = generator;
 
 const app = express();
 generator.init(app, function(spec) {
   _.set(spec, 'paths["/students/{name}"].get.parameters[0].description', 'description of a parameter');
   return spec;
-}, './test_spec.json', 1000, 'api-docs', modelNames, ['students'], ['production']);
+}, './test_spec.json', 1000, 'api-docs', modelNames, ['students'], ['production'], SPEC_OUTPUT_FILE_BEHAVIOR.PRESERVE);
 
 app.use(bodyParser.json({}));
 let router = express.Router();
