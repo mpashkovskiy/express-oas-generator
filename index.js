@@ -18,6 +18,10 @@ const processors = require('./lib/processors');
 const listEndpoints = require('express-list-endpoints');
 const { logger } = require('./lib/logger');
 
+const SPEC_OUTPUT_FILE_BEHAVIOR = {
+  PRESERVE: 'PRESERVE',
+  RECREATE: 'RECREATE'
+};
 const DEFAULT_SWAGGER_UI_SERVE_PATH = 'api-docs';
 const DEFAULT_IGNORE_NODE_ENVIRONMENTS = ['production'];
 
@@ -56,6 +60,7 @@ let tagsSpecs;
 let ignoredNodeEnvironments;
 let serveDocs;
 let specOutputPath;
+let specOutputFileBehavior;
 
 /**
  * @param {boolean} [responseMiddlewareHasBeenApplied=false]
@@ -308,6 +313,19 @@ function updateTagsSpec(tags) {
 }
 
 /**
+ * @description Loads specOutputPath initial content to predefinedSpec.
+ * Based on SPEC_OUTPUT_FILE_BEHAVIOR.PRESERVE or SPEC_OUTPUT_FILE_BEHAVIOR.RECREATE
+ */
+function loadSpecOutputPathContent() {
+  if (specOutputFileBehavior === SPEC_OUTPUT_FILE_BEHAVIOR.PRESERVE) {
+    if (fs.existsSync(specOutputPath)) {
+      const specOutputFileContent = fs.readFileSync(specOutputPath).toString();
+      predefinedSpec = JSON.parse(specOutputFileContent);
+    }
+  }
+}
+
+/**
  * @description Persists OpenAPI content to spec output file
  */
 function writeSpecToOutputFile() {
@@ -343,6 +361,7 @@ function handleResponses(expressApp,
     tags: undefined,
     ignoredNodeEnvironments: DEFAULT_IGNORE_NODE_ENVIRONMENTS,
     alwaysServeDocs: undefined,
+    specOutputFileBehavior: SPEC_OUTPUT_FILE_BEHAVIOR.RECREATE
   }) {
 
   ignoredNodeEnvironments = options.ignoredNodeEnvironments || DEFAULT_IGNORE_NODE_ENVIRONMENTS;
@@ -366,7 +385,9 @@ function handleResponses(expressApp,
   swaggerUiServePath = options.swaggerUiServePath || DEFAULT_SWAGGER_UI_SERVE_PATH;
   predefinedSpec = options.predefinedSpec || {};
   specOutputPath = options.specOutputPath;
+  specOutputFileBehavior = options.specOutputFileBehavior;
   
+  loadSpecOutputPathContent();
   updateDefinitionsSpec(options.mongooseModels);
   updateTagsSpec(options.tags || options.mongooseModels);
   
@@ -456,7 +477,7 @@ function handleRequests() {
 /**
  * @type { typeof import('./index').init }
  */
-function init(aApp, aPredefinedSpec = {}, aSpecOutputPath = undefined, aWriteInterval = 0, aSwaggerUiServePath = DEFAULT_SWAGGER_UI_SERVE_PATH, aMongooseModels = [], aTags = undefined, aIgnoredNodeEnvironments = DEFAULT_IGNORE_NODE_ENVIRONMENTS, aAlwaysServeDocs = undefined) {
+function init(aApp, aPredefinedSpec = {}, aSpecOutputPath = undefined, aWriteInterval = 0, aSwaggerUiServePath = DEFAULT_SWAGGER_UI_SERVE_PATH, aMongooseModels = [], aTags = undefined, aIgnoredNodeEnvironments = DEFAULT_IGNORE_NODE_ENVIRONMENTS, aAlwaysServeDocs = undefined, aSpecOutputFileBehavior = SPEC_OUTPUT_FILE_BEHAVIOR.RECREATE) {
   handleResponses(aApp, {
     swaggerUiServePath: aSwaggerUiServePath,
     specOutputPath: aSpecOutputPath,
@@ -465,7 +486,8 @@ function init(aApp, aPredefinedSpec = {}, aSpecOutputPath = undefined, aWriteInt
     mongooseModels: aMongooseModels,
     tags: aTags,
     ignoredNodeEnvironments: aIgnoredNodeEnvironments,
-    alwaysServeDocs: aAlwaysServeDocs
+    alwaysServeDocs: aAlwaysServeDocs,
+    specOutputFileBehavior: aSpecOutputFileBehavior
   });
   setTimeout(() => handleRequests(), 1000);
 }
@@ -499,5 +521,6 @@ module.exports = {
   init,
   getSpec,
   getSpecV3,
-  setPackageInfoPath
+  setPackageInfoPath,
+  SPEC_OUTPUT_FILE_BEHAVIOR
 };
