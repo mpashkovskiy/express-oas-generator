@@ -4,6 +4,7 @@ const express = require('express');
 const request = require('request');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
+const fs = require('fs');
 require('./lib/mongoose_models/student');
 const generator = require('../index.js');
 const { versions } = require('../lib/openapi');
@@ -425,6 +426,18 @@ it('WHEN node environment is ignored but always serve docs is enabled THEN it sh
       });
     });
   });
+});
+
+it('WHEN specOutputFileBehavior is set to PRESERVE THEN it should load existing spec file', () => {
+  const app = express();
+  const specOutputPath = './test/outputs/test_spec.json';
+  generator.handleResponses(app, {
+    specOutputPath,
+    specOutputFileBehavior: generator.SPEC_OUTPUT_FILE_BEHAVIOR.PRESERVE
+  });
+  generator.handleRequests();
+  const specOutputFileContent = fs.readFileSync(specOutputPath).toString();
+  expect(JSON.parse(specOutputFileContent)).toEqual(generator.getSpec());
 });
 
 it('WHEN **request** middleware is injected before **response** middleware THEN an error should be thrown', done => {
