@@ -1,0 +1,100 @@
+{
+  "swagger": "2.0",
+  "paths": {
+    "/students/stranger": {
+      "get": {
+        "summary": "/students/stranger",
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {},
+        "tags": [
+          "Student"
+        ]
+      }
+    },
+    "/students/{name}": {
+      "get": {
+        "summary": "/students/{name}",
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "description": "description of a parameter",
+            "type": "string",
+            "example": "test"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "hello test"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Student"
+        ],
+        "produces": [
+          "application/json"
+        ]
+      }
+    },
+    "/gzip": {
+      "get": {
+        "summary": "/gzip",
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {},
+        "tags": []
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Student"
+    }
+  ],
+  "definitions": {
+    "Student": {
+      "title": "Student",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "_id": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "info": {
+    "title": "express-oas-generator",
+    "version": "1.0.32",
+    "license": {
+      "name": "ISC"
+    },
+    "description": "Specification JSONs: [v2](/api-spec/v2), [v3](/api-spec/v3).\n\nModule to automatically generate OpenAPI (Swagger) specification for existing ExpressJS 4.x REST API applications"
+  },
+  "schemes": [
+    "http"
+  ],
+  "host": "localhost:8080"
+}

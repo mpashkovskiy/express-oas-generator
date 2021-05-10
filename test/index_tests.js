@@ -430,7 +430,7 @@ it('WHEN node environment is ignored but always serve docs is enabled THEN it sh
 
 it('WHEN specOutputFileBehavior is set to PRESERVE THEN it should load existing spec file', () => {
   const app = express();
-  const specOutputPath = './test/outputs/test_spec.json';
+  const specOutputPath = './test/outputs/example_spec.json';
   generator.handleResponses(app, {
     specOutputPath,
     specOutputFileBehavior: generator.SPEC_OUTPUT_FILE_BEHAVIOR.PRESERVE
