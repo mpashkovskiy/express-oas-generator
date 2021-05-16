@@ -1,5 +1,29 @@
 {
-  "swagger": "2.0",
+  "definitions": {
+    "Student": {
+      "title": "Student",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "_id": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "host": "localhost:8080",
+  "info": {
+    "title": "express-oas-generator",
+    "version": "1.0.32",
+    "license": {
+      "name": "ISC"
+    },
+    "description": "Specification JSONs: [v2](/api-spec/v2), [v3](/api-spec/v3).\n\nModule to automatically generate OpenAPI (Swagger) specification for existing ExpressJS 4.x REST API applications"
+  },
   "paths": {
     "/students/stranger": {
       "get": {
@@ -64,37 +88,13 @@
       }
     }
   },
+  "schemes": [
+    "http"
+  ],
+  "swagger": "2.0",
   "tags": [
     {
       "name": "Student"
     }
-  ],
-  "definitions": {
-    "Student": {
-      "title": "Student",
-      "required": [
-        "name"
-      ],
-      "properties": {
-        "name": {
-          "type": "string"
-        },
-        "_id": {
-          "type": "string"
-        }
-      }
-    }
-  },
-  "info": {
-    "title": "express-oas-generator",
-    "version": "1.0.32",
-    "license": {
-      "name": "ISC"
-    },
-    "description": "Specification JSONs: [v2](/api-spec/v2), [v3](/api-spec/v3).\n\nModule to automatically generate OpenAPI (Swagger) specification for existing ExpressJS 4.x REST API applications"
-  },
-  "schemes": [
-    "http"
-  ],
-  "host": "localhost:8080"
+  ]
 }

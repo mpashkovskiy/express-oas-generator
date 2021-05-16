@@ -4,5 +4,6 @@ node_modules
 build
 .idea
 *.iml
+example_spec*.json
 test_spec*.json
 api-spec*.json
