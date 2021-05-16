@@ -5,6 +5,7 @@ const request = require('request');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const fs = require('fs');
+const path = require('path');
 require('./lib/mongoose_models/student');
 const generator = require('../index.js');
 const { versions } = require('../lib/openapi');
@@ -438,6 +439,18 @@ it('WHEN specOutputFileBehavior is set to PRESERVE THEN it should load existing 
   generator.handleRequests();
   const specOutputFileContent = fs.readFileSync(specOutputPath).toString();
   expect(JSON.parse(specOutputFileContent)).toEqual(generator.getSpec());
+});
+
+it('WHEN specOutputPath directory does not exist THEN it should create it', () => {
+  const app = express();
+  const specOutputPath = './test/generated-outputs/example_spec.json';
+  generator.handleResponses(app, {
+    specOutputPath
+  });
+  generator.handleRequests();
+  const dir = path.dirname(specOutputPath);
+  expect(fs.existsSync(dir)).toBeTruthy();
+  fs.rmdirSync(dir);
 });
 
 it('WHEN **request** middleware is injected before **response** middleware THEN an error should be thrown', done => {
