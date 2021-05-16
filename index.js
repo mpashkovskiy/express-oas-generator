@@ -17,6 +17,7 @@ const { convertOpenApiVersionToV3, getSpecByVersion, versions } = require('./lib
 const processors = require('./lib/processors');
 const listEndpoints = require('express-list-endpoints');
 const { logger } = require('./lib/logger');
+const { ensureDirectoryExistence } = require('./lib/file');
 
 const SPEC_OUTPUT_FILE_BEHAVIOR = {
   PRESERVE: 'PRESERVE',
@@ -327,27 +328,30 @@ function loadSpecOutputPathContent() {
   predefinedSpec = JSON.parse(specOutputFileContent);
 }
 
+
+
 /**
  * @description Persists OpenAPI content to spec output file
  */
 function writeSpecToOutputFile() {
-  if (specOutputPath) {
-    fs.writeFileSync(specOutputPath, JSON.stringify(spec, null, 2), 'utf8');
-
-    convertOpenApiVersionToV3(spec, (err, specV3) => {
-      if (!err) {
-        const parsedSpecOutputPath = path.parse(specOutputPath);
-        const {name, ext} = parsedSpecOutputPath;
-        parsedSpecOutputPath.base = name.concat('_').concat(versions.OPEN_API_V3).concat(ext);
-        
-        const v3Path = path.format(parsedSpecOutputPath);
-        
-        fs.writeFileSync(v3Path, JSON.stringify(specV3, null, 2), 'utf8');
-      }
-      /** TODO - Log that open api v3 could not be generated */
-    });  
-
+  if (!specOutputPath) {
+    return;
   }
+
+  fs.writeFileSync(specOutputPath, JSON.stringify(spec, null, 2), 'utf8');
+
+  convertOpenApiVersionToV3(spec, (err, specV3) => {
+    if (!err) {
+      const parsedSpecOutputPath = path.parse(specOutputPath);
+      const {name, ext} = parsedSpecOutputPath;
+      parsedSpecOutputPath.base = name.concat('_').concat(versions.OPEN_API_V3).concat(ext);
+      
+      const v3Path = path.format(parsedSpecOutputPath);
+      
+      fs.writeFileSync(v3Path, JSON.stringify(specV3, null, 2), 'utf8');
+    }
+    /** TODO - Log that open api v3 could not be generated */
+  });
 }
 
 /**
@@ -441,6 +445,10 @@ function handleRequests() {
   /** everything was applied correctly; reset the global variable. */
   responseMiddlewareHasBeenApplied = false;
 
+  if (specOutputPath) {
+    ensureDirectoryExistence(specOutputPath);
+  }
+  
   /** middleware to handle REQUESTS */
   app.use((req, res, next) => {
     try {
