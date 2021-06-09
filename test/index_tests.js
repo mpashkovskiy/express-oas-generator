@@ -483,3 +483,60 @@ it('WHEN middleware order is correct THEN no errors should be thrown', done => {
 
   done();
 });
+
+it('WHEN swaggerDocumentOptions is set with custom css .handleResponses()', done => {
+  const app = express();
+  const specOutputPath = './test/outputs/example_spec.json';
+
+  generator.handleResponses(app, {
+    specOutputPath,
+    swaggerDocumentOptions: { customCss: '.customCssClass { display: none }' }
+  });
+
+  generator.handleRequests();
+
+  app.set('port', port);
+  const server = app.listen(app.get('port'), () => {
+    setTimeout(() => {
+      request.get(`http://localhost:${port}/api-docs`, (error, response) => {
+        expect(error).toBeNull();
+        expect(response.statusCode).toBe(200);
+        expect(response.body.includes('.customCssClass { display: none }')).toBeTruthy();
+        server.close();
+        done();
+      });
+    }, MS_TO_STARTUP);
+  });
+});
+
+
+it('WHEN swaggerDocumentOptions is set with custom css .init()', done => {
+  const app = express();
+  const mongooseModels = mongoose.modelNames();
+  
+  generator.init(
+    app,
+    spec => spec,
+    'api-spec.json',
+    1000,
+    'api-docs',
+    mongooseModels,
+    null,
+    null,
+    null,
+    { customCss: '.customCssClass { display: none }' }
+  );
+
+  app.set('port', port);
+  const server = app.listen(app.get('port'), () => {
+    setTimeout(() => {
+      request.get(`http://localhost:${port}/api-docs`, (error, response) => {
+        expect(error).toBeNull();
+        expect(response.statusCode).toBe(200);
+        expect(response.body.includes('.customCssClass { display: none }')).toBeTruthy();
+        server.close();
+        done();
+      });
+    }, MS_TO_STARTUP);
+  });
+});

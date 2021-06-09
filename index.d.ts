@@ -54,6 +54,8 @@ export interface HandleResponsesOptions {
 	alwaysServeDocs?: boolean
 
 	specOutputFileBehavior: SPEC_OUTPUT_FILE_BEHAVIOR | string
+
+  swaggerDocumentOptions?: object
 }
 
 /**
@@ -104,7 +106,8 @@ export function init(
 	mongooseModels?: HandleResponsesOptions['mongooseModels'],
 	tags?: HandleResponsesOptions['tags'],
 	ignoredNodeEnvironments?: HandleResponsesOptions['ignoredNodeEnvironments'],
-	alwaysServeDocs?: HandleResponsesOptions['alwaysServeDocs']
+	alwaysServeDocs?: HandleResponsesOptions['alwaysServeDocs'],
+	swaggerDocumentOptions?: HandleResponsesOptions['swaggerDocumentOptions']
 ): void;
 
 export const getSpec: () => object | OpenAPIV2.Document;
