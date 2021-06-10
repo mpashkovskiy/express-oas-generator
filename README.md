@@ -151,10 +151,10 @@ Here is a sample
 This library uses [swagger-ui-express](https://github.com/scottie1984/swagger-ui-express) as dependency , so if you need to edit the swagger's default documentation page style you can set `swaggerDocumentOptions`. This option receives any [custom swagger options](https://github.com/scottie1984/swagger-ui-express#custom-swagger-options) and pass through when swaggerUi are configured.
 
 You can follow these links to see how settings can be edited:
--> [Custom CSS styles](https://github.com/scottie1984/swagger-ui-express#custom-css-styles)
--> [Custom CSS styles from Url](https://github.com/scottie1984/swagger-ui-express#custom-css-styles-from-url)
--> [Custom JS](https://github.com/scottie1984/swagger-ui-express#custom-js)
--> And for all the available options, refer to [Swagger UI Configuration](https://github.com/swagger-api/swagger-ui/blob/master/docs/usage/configuration.md)
+* [Custom CSS styles](https://github.com/scottie1984/swagger-ui-express#custom-css-styles)
+* [Custom CSS styles from Url](https://github.com/scottie1984/swagger-ui-express#custom-css-styles-from-url)
+* [Custom JS](https://github.com/scottie1984/swagger-ui-express#custom-js)
+* And for all the available options, refer to [Swagger UI Configuration](https://github.com/swagger-api/swagger-ui/blob/master/docs/usage/configuration.md)
 
 An basic example is:
 ```
