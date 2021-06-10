@@ -55,7 +55,7 @@ export interface HandleResponsesOptions {
 
 	specOutputFileBehavior: SPEC_OUTPUT_FILE_BEHAVIOR | string
 
-  swaggerDocumentOptions?: object
+  swaggerDocumentOptions: Array<string>
 }
 
 /**
@@ -107,6 +107,7 @@ export function init(
 	tags?: HandleResponsesOptions['tags'],
 	ignoredNodeEnvironments?: HandleResponsesOptions['ignoredNodeEnvironments'],
 	alwaysServeDocs?: HandleResponsesOptions['alwaysServeDocs'],
+	specOutputFileBehavior?: HandleResponsesOptions['specOutputFileBehavior'],
 	swaggerDocumentOptions?: HandleResponsesOptions['swaggerDocumentOptions']
 ): void;
 

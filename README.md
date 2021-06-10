@@ -146,6 +146,25 @@ Here is a sample
 }
 ```
 
+## (Optional) Edit Swagger Document Options
+
+This library uses [swagger-ui-express](https://github.com/scottie1984/swagger-ui-express) as dependency , so if you need to edit the swagger's default documentation page style you can set `swaggerDocumentOptions`. This option receives any [custom swagger options](https://github.com/scottie1984/swagger-ui-express#custom-swagger-options) and pass through when swaggerUi are configured.
+
+You can follow these links to see how settings can be edited:
+-> [Custom CSS styles](https://github.com/scottie1984/swagger-ui-express#custom-css-styles)
+-> [Custom CSS styles from Url](https://github.com/scottie1984/swagger-ui-express#custom-css-styles-from-url)
+-> [Custom JS](https://github.com/scottie1984/swagger-ui-express#custom-js)
+-> And for all the available options, refer to [Swagger UI Configuration](https://github.com/swagger-api/swagger-ui/blob/master/docs/usage/configuration.md)
+
+An basic example is:
+```
+generator.handleResponses(app, {
+    swaggerDocumentOptions: { customCss: '.swagger-ui { background-color: red }' }
+  });
+```
+And that would result in this:
+![image](https://user-images.githubusercontent.com/3339092/121407754-0721ba80-c936-11eb-9aa0-d1bd32152e20.png)
+
 ## Rationale
 
 Goal of the module is to provide developers with Swagger UI in development environments. Module process every request and response therefore it may slow down your app - is not supposed to be used in production environment.

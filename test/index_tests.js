@@ -524,6 +524,7 @@ it('WHEN swaggerDocumentOptions is set with custom css .init()', done => {
     null,
     null,
     null,
+    null,
     { customCss: '.customCssClass { display: none }' }
   );
 
