@@ -9,11 +9,13 @@
 
 import { Express } from 'express';
 import { OpenAPIV2, OpenAPIV3 } from 'openapi-types';
+import { SwaggerUiOptions } from "swagger-ui-express"
 
 /** re-export for ease of use for the end user */
 export {
 	OpenAPIV2,
-	OpenAPIV3
+	OpenAPIV3,
+	SwaggerUiOptions
 };
 
 export enum SPEC_OUTPUT_FILE_BEHAVIOR {
@@ -48,14 +50,14 @@ export interface HandleResponsesOptions {
 	tags?: Array<string>;
 
 	/** Ignored node environments */
-	ignoredNodeEnvironments?: Array<string>
+	ignoredNodeEnvironments?: Array<string>;
 
 	/** Always serve api docs */
-	alwaysServeDocs?: boolean
+	alwaysServeDocs?: boolean;
 
-	specOutputFileBehavior: SPEC_OUTPUT_FILE_BEHAVIOR | string
+	specOutputFileBehavior: SPEC_OUTPUT_FILE_BEHAVIOR | string;
 
-  swaggerDocumentOptions: Array<string>
+  swaggerDocumentOptions: SwaggerUiOptions;
 }
 
 /**

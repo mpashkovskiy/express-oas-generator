@@ -62,6 +62,9 @@ let ignoredNodeEnvironments;
 let serveDocs;
 let specOutputPath;
 let specOutputFileBehavior;
+/**
+ * @type { typeof import('./index').SwaggerUiOptions }
+*/
 let swaggerDocumentOptions;
 
 /**
@@ -369,7 +372,7 @@ function handleResponses(expressApp,
     ignoredNodeEnvironments: DEFAULT_IGNORE_NODE_ENVIRONMENTS,
     alwaysServeDocs: undefined,
     specOutputFileBehavior: SPEC_OUTPUT_FILE_BEHAVIOR.RECREATE,
-    swaggerDocumentOptions: []
+    swaggerDocumentOptions: {}
   }) {
 
   ignoredNodeEnvironments = options.ignoredNodeEnvironments || DEFAULT_IGNORE_NODE_ENVIRONMENTS;
@@ -490,7 +493,7 @@ function handleRequests() {
 /**
  * @type { typeof import('./index').init }
  */
-function init(aApp, aPredefinedSpec = {}, aSpecOutputPath = undefined, aWriteInterval = 0, aSwaggerUiServePath = DEFAULT_SWAGGER_UI_SERVE_PATH, aMongooseModels = [], aTags = undefined, aIgnoredNodeEnvironments = DEFAULT_IGNORE_NODE_ENVIRONMENTS, aAlwaysServeDocs = undefined, aSpecOutputFileBehavior = SPEC_OUTPUT_FILE_BEHAVIOR.RECREATE, aSwaggerDocumentOptions = []) {
+function init(aApp, aPredefinedSpec = {}, aSpecOutputPath = undefined, aWriteInterval = 0, aSwaggerUiServePath = DEFAULT_SWAGGER_UI_SERVE_PATH, aMongooseModels = [], aTags = undefined, aIgnoredNodeEnvironments = DEFAULT_IGNORE_NODE_ENVIRONMENTS, aAlwaysServeDocs = undefined, aSpecOutputFileBehavior = SPEC_OUTPUT_FILE_BEHAVIOR.RECREATE, aSwaggerDocumentOptions = {}) {
   handleResponses(aApp, {
     swaggerUiServePath: aSwaggerUiServePath,
     specOutputPath: aSpecOutputPath,
