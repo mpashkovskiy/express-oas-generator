@@ -1,6 +1,6 @@
 {
   "name": "express-oas-generator",
-  "version": "1.0.39",
+  "version": "1.0.40",
   "description": "Module to automatically generate OpenAPI (Swagger) specification for existing ExpressJS 4.x REST API applications",
   "main": "index.js",
   "typings": "./index.d.ts",
