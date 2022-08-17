@@ -56,7 +56,7 @@
     "jasmine-reporters": "^2.5.0",
     "jasmine-spec-reporter": "^4.2.1",
     "mocha-lcov-reporter": "^1.3.0",
-    "mongoose": "^6.4.4",
+    "mongoose": "^6.4.6",
     "mongoose-to-swagger": "^1.4.0",
     "nyc": "^14.1.1",
     "request": "^2.88.0",
@@ -64,7 +64,7 @@
   },
   "peerDependencies": {
     "bson": "^4.0.4",
-    "mongoose": "^5.9.25",
-    "mongoose-to-swagger": "^1.0.3"
+    "mongoose": "^6.4.6",
+    "mongoose-to-swagger": "^1.4.0"
   }
 }
