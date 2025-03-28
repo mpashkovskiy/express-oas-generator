@@ -184,6 +184,51 @@ describe('index.js', () => {
     });
   });
 
+  it('WHEN making success requests with query params THEN path should be filled with request and response schema', done => {
+    const param = 1;
+    const path = `${BASE_PATH}/success/${param}/router`;
+    request.get(`http://localhost:${port}${path}?some-query-param=123`, () => {
+      const spec = generator.getSpec();
+      expect(spec.host).toEqual(`localhost:${port}`);
+      expect(spec.schemes).toEqual(['http']);
+  
+      const expressPath = path.replace('/' + param, '/{param}');
+      const specPath = spec.paths[expressPath];
+  
+      expect(specPath).toBeDefined();
+      expect(Object.keys(specPath)).toEqual(['get']);
+      expect(specPath.get.parameters.length).toBe(2);
+  
+      const method = specPath.get;
+      ['consumes', 'produces'].forEach(el =>
+        expect(method[el]).toEqual(['application/json'])
+      );
+  
+      const bodyParam = method.parameters[0];
+      expect(bodyParam.name).toBe('param');
+      expect(bodyParam.in).toBe('path');
+      expect(bodyParam.type).toBe('integer');
+      expect(bodyParam.required).toBeTruthy();
+      expect(bodyParam.example).toBe(param);
+  
+      const queryParam = method.parameters[1];
+      expect(queryParam.name).toBe('some-query-param');
+      expect(queryParam.in).toBe('query');
+      expect(queryParam.type).toBe('integer');
+      expect(queryParam.example).toBe('123');
+  
+  
+      const responses = method.responses;
+      expect(Object.keys(responses)).toEqual(['200']);
+      const schema = responses['200'].schema;
+      expect(schema.type).toBe('object');
+      expect(schema.properties.result.type).toBe('string');
+      expect(schema.properties.result.example).toBe('OK');
+  
+      done();
+    });
+  });
+
   it('WHEN getting request with Authorization and X-* headers THEN security parts should be filled', done => {
     const path = `${BASE_PATH}/success-no-param`;
     const options = {
