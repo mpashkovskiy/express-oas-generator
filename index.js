@@ -243,11 +243,12 @@ function patchSpec(predefinedSpec) {
  * @returns {string|undefined|*}
  */
 function getPathKey(req) {
-  if (!req.url || spec.paths[req.url]) {
-    return req.url;
+  const url = req.url ? req.url.split('?')[0] : undefined;
+  
+  if (spec.paths[url]) {
+    return url;
   }
 
-  const url = req.url.split('?')[0];
   const pathKeys = Object.keys(spec.paths);
   for (let i = 0; i < pathKeys.length; i += 1) {
     const pathKey = pathKeys[i];
